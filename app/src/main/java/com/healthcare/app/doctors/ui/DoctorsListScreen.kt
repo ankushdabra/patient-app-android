@@ -12,6 +12,7 @@ import com.healthcare.app.doctors.viewmodel.DoctorsViewModelFactory
 @Composable
 fun DoctorsListScreen(
     tokenManager: TokenManager,
+    onDoctorClick: (String) -> Unit,
     viewModel: DoctorsViewModel = viewModel(
         factory = DoctorsViewModelFactory(tokenManager)
     )
@@ -20,14 +21,16 @@ fun DoctorsListScreen(
 
     DoctorsListScreenContent(
         state = state,
-        onRetry = viewModel::loadDoctors
+        onRetry = viewModel::loadDoctors,
+        onDoctorClick = onDoctorClick
     )
 }
 
 @Composable
 fun DoctorsListScreenContent(
     state: DoctorsUiState,
-    onRetry: () -> Unit
+    onRetry: () -> Unit,
+    onDoctorClick: (String) -> Unit
 ) {
     when (state) {
         DoctorsUiState.Loading -> {
@@ -43,7 +46,8 @@ fun DoctorsListScreenContent(
 
         is DoctorsUiState.Success -> {
             DoctorsList(
-                doctors = state.doctors
+                doctors = state.doctors,
+                onDoctorClick = onDoctorClick
             )
         }
     }

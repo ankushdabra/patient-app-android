@@ -1,4 +1,5 @@
 package com.healthcare.app.doctors.ui
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -28,11 +29,13 @@ import androidx.compose.ui.unit.dp
 import com.healthcare.app.doctors.api.DoctorDto
 
 @Composable
-fun DoctorListItem(doctorDto: DoctorDto) {
+fun DoctorListItem(
+    doctorDto: DoctorDto,
+    modifier: Modifier = Modifier
+) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { },
+        modifier = modifier
+            .fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant

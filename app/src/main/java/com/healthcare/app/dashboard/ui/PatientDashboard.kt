@@ -1,5 +1,6 @@
 package com.healthcare.app.dashboard.ui
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -10,16 +11,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.healthcare.app.appointments.DoctorDetailBookingScreen
 import com.healthcare.app.core.storage.TokenManager
 import com.healthcare.app.doctors.api.DoctorDto
 import com.healthcare.app.doctors.api.DoctorsUiState
 import com.healthcare.app.doctors.ui.DoctorsListScreen
 import com.healthcare.app.doctors.ui.DoctorsListScreenContent
 import com.healthcare.app.navigation.PatientBottomNavItem
+import com.healthcare.app.navigation.Routes
 
 @Composable
 fun PatientDashboard(tokenManager: TokenManager) {
@@ -66,7 +71,23 @@ fun PatientDashboard(tokenManager: TokenManager) {
             modifier = Modifier.padding(padding)
         ) {
             composable(PatientBottomNavItem.Doctors.route) {
-                DoctorsListScreen(tokenManager = tokenManager)
+                DoctorsListScreen(
+                    tokenManager = tokenManager,
+                    onDoctorClick = { doctorId ->
+                        navController.navigate("${Routes.DOCTOR_DETAIL}/$doctorId")
+                    }
+                )
+            }
+            composable(
+                route = "${Routes.DOCTOR_DETAIL}/{doctorId}",
+                arguments = listOf(
+                    navArgument("doctorId") {
+                        type = NavType.StringType
+                    }
+                )
+            ) { backStackEntry ->
+                val doctorId = backStackEntry.arguments?.getString("doctorId")!!
+                DoctorDetailBookingScreen(doctorId = doctorId)
             }
             composable(PatientBottomNavItem.Appointments.route) {
                 //PlaceholderScreen("Appointments")
@@ -114,10 +135,11 @@ fun PatientDashboardPreview() {
                 }
             }
         ) { padding ->
-            androidx.compose.foundation.layout.Box(modifier = Modifier.padding(padding)) {
+            Box(modifier = Modifier.padding(padding)) {
                 DoctorsListScreenContent(
                     state = mockState,
-                    onRetry = { }
+                    onRetry = { },
+                    onDoctorClick = { }
                 )
             }
         }

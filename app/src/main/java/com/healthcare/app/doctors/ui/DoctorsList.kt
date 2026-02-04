@@ -1,5 +1,6 @@
 package com.healthcare.app.doctors.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -11,7 +12,10 @@ import androidx.compose.ui.unit.dp
 import com.healthcare.app.doctors.api.DoctorDto
 
 @Composable
-fun DoctorsList(doctors: List<DoctorDto>) {
+fun DoctorsList(
+    doctors: List<DoctorDto>,
+    onDoctorClick: (String) -> Unit
+) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -23,7 +27,8 @@ fun DoctorsList(doctors: List<DoctorDto>) {
         }
         items(doctors) { doctor ->
             DoctorListItem(
-                doctor
+                doctorDto = doctor,
+                modifier = Modifier.clickable { onDoctorClick(doctor.name) }
             )
         }
     }
