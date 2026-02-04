@@ -8,7 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.healthcare.app.appointments.DoctorDetailBookingScreen
+import com.healthcare.app.appointments.ui.DoctorDetailBookingScreen
 import com.healthcare.app.auth.ui.LoginRoute
 import com.healthcare.app.core.storage.TokenManager
 import com.healthcare.app.dashboard.ui.PatientDashboard

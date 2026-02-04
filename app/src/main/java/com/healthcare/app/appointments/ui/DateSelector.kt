@@ -1,4 +1,4 @@
-package com.healthcare.app.appointments
+package com.healthcare.app.appointments.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

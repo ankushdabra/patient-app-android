@@ -1,6 +1,5 @@
-package com.healthcare.app.appointments
+package com.healthcare.app.appointments.ui
 
-import android.widget.Button
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
