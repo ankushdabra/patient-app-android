@@ -1,4 +1,4 @@
-package com.healthcare.app.auth
+package com.healthcare.app.auth.api
 
 import com.healthcare.app.core.network.NetworkModule
 import com.healthcare.app.core.storage.TokenManager

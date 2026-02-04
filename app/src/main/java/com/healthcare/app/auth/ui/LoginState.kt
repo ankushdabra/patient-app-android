@@ -1,4 +1,4 @@
-package com.healthcare.app.auth
+package com.healthcare.app.auth.ui
 
 sealed class LoginState {
     object Idle : LoginState()

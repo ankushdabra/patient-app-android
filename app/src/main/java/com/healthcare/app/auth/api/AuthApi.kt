@@ -1,4 +1,4 @@
-package com.healthcare.app.auth
+package com.healthcare.app.auth.api
 
 import retrofit2.Response
 import retrofit2.http.Body

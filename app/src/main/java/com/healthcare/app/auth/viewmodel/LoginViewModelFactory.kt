@@ -1,7 +1,8 @@
-package com.healthcare.app.auth
+package com.healthcare.app.auth.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.healthcare.app.auth.api.AuthRepository
 import com.healthcare.app.core.storage.TokenManager
 
 class LoginViewModelFactory(

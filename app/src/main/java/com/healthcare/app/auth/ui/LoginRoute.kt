@@ -1,4 +1,4 @@
-package com.healthcare.app.auth
+package com.healthcare.app.auth.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -6,6 +6,9 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.healthcare.app.auth.viewmodel.LoginViewModel
+import com.healthcare.app.auth.viewmodel.LoginViewModelFactory
+import com.healthcare.app.auth.api.AuthRepository
 import com.healthcare.app.core.storage.TokenManager
 import com.healthcare.app.navigation.Routes
 
