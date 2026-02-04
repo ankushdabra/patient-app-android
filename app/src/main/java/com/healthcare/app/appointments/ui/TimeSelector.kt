@@ -15,16 +15,11 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun TimeSelector(
     selectedTime: String?,
+    times: List<String>,
     onTimeSelected: (String) -> Unit
 ) {
-    val times = listOf("10:00", "10:30", "11:00", "11:30")
-
     Column {
-        Text(
-            text = "Select Time",
-            style = MaterialTheme.typography.titleMedium
-        )
-
+        Text("Select Time", style = MaterialTheme.typography.titleMedium)
         Spacer(Modifier.height(8.dp))
 
         FlowRow(
@@ -41,4 +36,5 @@ fun TimeSelector(
         }
     }
 }
+
 

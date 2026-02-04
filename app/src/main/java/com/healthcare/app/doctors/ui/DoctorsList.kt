@@ -28,7 +28,7 @@ fun DoctorsList(
         items(doctors) { doctor ->
             DoctorListItem(
                 doctorDto = doctor,
-                modifier = Modifier.clickable { onDoctorClick(doctor.name) }
+                modifier = Modifier.clickable { onDoctorClick(doctor.id) }
             )
         }
     }

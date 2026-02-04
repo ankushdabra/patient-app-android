@@ -17,7 +17,8 @@ fun DoctorDetailHeader(
     name: String,
     specialization: String,
     experience: String,
-    fee: String
+    fee: String,
+    rating: Double? = null
 ) {
     Column {
         Text(
@@ -36,7 +37,9 @@ fun DoctorDetailHeader(
         Row(
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text("⭐ 4.8")
+            rating?.let {
+                Text("⭐ $it")
+            }
             Text(experience)
             Text(fee)
         }

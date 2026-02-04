@@ -1,5 +1,7 @@
 package com.healthcare.app.dashboard.ui
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -26,6 +28,7 @@ import com.healthcare.app.doctors.ui.DoctorsListScreenContent
 import com.healthcare.app.navigation.PatientBottomNavItem
 import com.healthcare.app.navigation.Routes
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PatientDashboard(tokenManager: TokenManager) {
     val navController = rememberNavController()
@@ -73,21 +76,24 @@ fun PatientDashboard(tokenManager: TokenManager) {
             composable(PatientBottomNavItem.Doctors.route) {
                 DoctorsListScreen(
                     tokenManager = tokenManager,
-                    onDoctorClick = { doctorId ->
-                        navController.navigate("${Routes.DOCTOR_DETAIL}/$doctorId")
+                    onDoctorClick = { id ->
+                        navController.navigate("${Routes.DOCTOR_DETAIL}/$id")
                     }
                 )
             }
             composable(
-                route = "${Routes.DOCTOR_DETAIL}/{doctorId}",
+                route = "${Routes.DOCTOR_DETAIL}/{id}",
                 arguments = listOf(
-                    navArgument("doctorId") {
+                    navArgument("id") {
                         type = NavType.StringType
                     }
                 )
             ) { backStackEntry ->
-                val doctorId = backStackEntry.arguments?.getString("doctorId")!!
-                DoctorDetailBookingScreen(doctorId = doctorId)
+                val doctorId = backStackEntry.arguments?.getString("id")!!
+                DoctorDetailBookingScreen(
+                    doctorId = doctorId,
+                    tokenManager = tokenManager
+                )
             }
             composable(PatientBottomNavItem.Appointments.route) {
                 //PlaceholderScreen("Appointments")
@@ -110,8 +116,8 @@ fun PatientDashboardPreview() {
         // and bypassing the ViewModel instantiation which triggers OkHttpClient/Retrofit.
         val mockState = DoctorsUiState.Success(
             doctors = listOf(
-                DoctorDto("Dr. John Smith", "Cardiologist", "15 years"),
-                DoctorDto("Dr. Sarah Wilson", "Neurologist", "10 years")
+                DoctorDto("Dr. John Smith", "Cardiologist", "15 years","10"),
+                DoctorDto("Dr. Sarah Wilson", "Neurologist", "10 years", "20")
             )
         )
         

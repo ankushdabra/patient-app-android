@@ -16,10 +16,9 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun DateSelector(
     selectedDate: String?,
+    dates: List<String>,
     onDateSelected: (String) -> Unit
 ) {
-    val dates = listOf("Mon 12", "Tue 13", "Wed 14")
-
     Column {
         Text(
             text = "Select Date",
@@ -45,4 +44,3 @@ fun DateSelector(
         }
     }
 }
-

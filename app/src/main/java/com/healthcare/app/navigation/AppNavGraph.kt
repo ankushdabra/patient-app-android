@@ -41,28 +41,29 @@ fun AppNavGraph(
         composable(Routes.DOCTORS) {
             DoctorsListScreen(
                 tokenManager = tokenManager,
-                onDoctorClick = { doctorId ->
+                onDoctorClick = { id ->
                     navController.navigate(
-                        "${Routes.DOCTOR_DETAIL}/$doctorId"
+                        "${Routes.DOCTOR_DETAIL}/$id"
                     )
                 }
             )
         }
 
         composable(
-            route = "${Routes.DOCTOR_DETAIL}/{doctorId}",
+            route = "${Routes.DOCTOR_DETAIL}/{id}",
             arguments = listOf(
-                navArgument("doctorId") {
+                navArgument("id") {
                     type = NavType.StringType
                 }
             )
         ) { backStackEntry ->
 
             val doctorId =
-                backStackEntry.arguments?.getString("doctorId")!!
+                backStackEntry.arguments?.getString("id")!!
 
             DoctorDetailBookingScreen(
-                doctorId = doctorId
+                doctorId = doctorId,
+                tokenManager = tokenManager
             )
         }
     }
