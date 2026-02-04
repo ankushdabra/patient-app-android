@@ -1,13 +1,13 @@
-package com.healthcare.app.dashboard.ui
+package com.healthcare.app.doctors.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.healthcare.app.core.storage.TokenManager
-import com.healthcare.app.dashboard.api.DoctorsUiState
-import com.healthcare.app.dashboard.viewmodel.DoctorsViewModel
-import com.healthcare.app.dashboard.viewmodel.DoctorsViewModelFactory
+import com.healthcare.app.doctors.api.DoctorsUiState
+import com.healthcare.app.doctors.viewmodel.DoctorsViewModel
+import com.healthcare.app.doctors.viewmodel.DoctorsViewModelFactory
 
 @Composable
 fun DoctorsListScreen(

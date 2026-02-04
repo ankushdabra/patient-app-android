@@ -15,8 +15,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.healthcare.app.core.storage.TokenManager
-import com.healthcare.app.dashboard.api.DoctorDto
-import com.healthcare.app.dashboard.api.DoctorsUiState
+import com.healthcare.app.doctors.api.DoctorDto
+import com.healthcare.app.doctors.api.DoctorsUiState
+import com.healthcare.app.doctors.ui.DoctorsListScreen
+import com.healthcare.app.doctors.ui.DoctorsListScreenContent
 import com.healthcare.app.navigation.PatientBottomNavItem
 
 @Composable

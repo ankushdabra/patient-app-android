@@ -1,9 +1,9 @@
-package com.healthcare.app.dashboard.viewmodel
+package com.healthcare.app.doctors.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.healthcare.app.core.storage.TokenManager
-import com.healthcare.app.dashboard.api.DoctorsRepository
+import com.healthcare.app.doctors.api.DoctorsRepository
 
 class DoctorsViewModelFactory(
     private val tokenManager: TokenManager

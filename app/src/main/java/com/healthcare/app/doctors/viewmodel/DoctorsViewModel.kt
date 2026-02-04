@@ -1,9 +1,9 @@
-package com.healthcare.app.dashboard.viewmodel
+package com.healthcare.app.doctors.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.healthcare.app.dashboard.api.DoctorsRepository
-import com.healthcare.app.dashboard.api.DoctorsUiState
+import com.healthcare.app.doctors.api.DoctorsRepository
+import com.healthcare.app.doctors.api.DoctorsUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch

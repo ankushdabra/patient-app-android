@@ -1,4 +1,4 @@
-package com.healthcare.app.dashboard.api
+package com.healthcare.app.doctors.api
 
 import com.healthcare.app.core.network.NetworkModule
 import com.healthcare.app.core.storage.TokenManager

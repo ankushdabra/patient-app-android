@@ -1,4 +1,4 @@
-package com.healthcare.app.dashboard.ui
+package com.healthcare.app.doctors.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -25,10 +25,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.healthcare.app.dashboard.api.DoctorDto
+import com.healthcare.app.doctors.api.DoctorDto
 
 @Composable
-fun PremiumDoctorCard(doctorDto: DoctorDto) {
+fun DoctorListItem(doctorDto: DoctorDto) {
     Card(
         modifier = Modifier
             .fillMaxWidth()

@@ -1,4 +1,4 @@
-package com.healthcare.app.dashboard.ui
+package com.healthcare.app.doctors.ui
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column

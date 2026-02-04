@@ -1,4 +1,4 @@
-package com.healthcare.app.dashboard.ui
+package com.healthcare.app.doctors.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,7 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.healthcare.app.dashboard.api.DoctorDto
+import com.healthcare.app.doctors.api.DoctorDto
 
 @Composable
 fun DoctorsList(doctors: List<DoctorDto>) {
@@ -22,7 +22,7 @@ fun DoctorsList(doctors: List<DoctorDto>) {
             DashboardHeader()
         }
         items(doctors) { doctor ->
-            PremiumDoctorCard(
+            DoctorListItem(
                 doctor
             )
         }

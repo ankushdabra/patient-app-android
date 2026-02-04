@@ -1,4 +1,4 @@
-package com.healthcare.app.dashboard.api
+package com.healthcare.app.doctors.api
 
 data class DoctorDto(
     val name: String,
