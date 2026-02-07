@@ -5,12 +5,14 @@ import androidx.lifecycle.viewModelScope
 import com.healthcare.app.auth.api.AuthRepository
 import com.healthcare.app.auth.api.RegisterRequest
 import com.healthcare.app.auth.ui.RegisterState
+import com.healthcare.app.core.storage.TokenManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class RegisterViewModel(
-    private val repository: AuthRepository
+    private val repository: AuthRepository,
+    private val tokenManager: TokenManager
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<RegisterState>(RegisterState.Idle)
@@ -35,7 +37,8 @@ class RegisterViewModel(
                     gender = gender.trim(),
                     bloodGroup = bloodGroup.trim()
                 )
-            ).onSuccess {
+            ).onSuccess { response ->
+                tokenManager.saveToken(response.token)
                 _state.value = RegisterState.Success
             }.onFailure {
                 _state.value = RegisterState.Error(it.message ?: "Registration failed")

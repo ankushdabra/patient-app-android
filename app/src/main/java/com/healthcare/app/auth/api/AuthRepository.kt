@@ -1,8 +1,11 @@
 package com.healthcare.app.auth.api
 
+import com.healthcare.app.appointments.api.AppointmentResponse
 import com.healthcare.app.core.network.ApiUrlMapper
 import com.healthcare.app.core.network.NetworkModule
 import com.healthcare.app.core.storage.TokenManager
+import com.google.gson.Gson
+import retrofit2.HttpException
 
 class AuthRepository(tokenManager: TokenManager) {
     private val api: ApiUrlMapper = NetworkModule.provideRetrofit(tokenManager)
@@ -21,14 +24,23 @@ class AuthRepository(tokenManager: TokenManager) {
         }
     }
 
-    suspend fun register(request: RegisterRequest): Result<Unit> {
+    suspend fun register(request: RegisterRequest): Result<RegisterResponse> {
         return try {
             val response = api.register(request)
             if (response.isSuccessful) {
-                Result.success(Unit)
+                Result.success(response.body()!!)
             } else {
-                Result.failure(Exception("Registration failed"))
+                Result.failure(Exception("Registration failed: ${response.code()}"))
             }
+        } catch (e: HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            val errorMessage = try {
+                val errorResponse = Gson().fromJson(errorBody, AppointmentResponse::class.java)
+                errorResponse.error ?: errorResponse.message ?: "Registration failed"
+            } catch (jsonEx: Exception) {
+                "Registration failed"
+            }
+            Result.failure(Exception(errorMessage))
         } catch (e: Exception) {
             Result.failure(e)
         }

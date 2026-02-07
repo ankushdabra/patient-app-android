@@ -13,14 +13,13 @@ class AuthInterceptor(private val tokenManager: TokenManager) : Interceptor {
         val originalRequest = chain.request()
         val path = originalRequest.url.encodedPath
 
-        // 1. Skip auth for login and register
-        if (path == "/login" || path == "/api/register") {
+        //Skip auth for login and register
+        if (path.contains("/login") || path.contains("/register")) {
             Log.d("AuthInterceptor", "Skipping Auth for: $path")
             return chain.proceed(originalRequest)
         }
 
         // 2. Retrieve token from DataStore synchronously
-        // Use .first() to ensure we wait for the DataStore to emit the current value
         val token = runBlocking {
             try {
                 val t = tokenManager.token.first()
@@ -32,7 +31,7 @@ class AuthInterceptor(private val tokenManager: TokenManager) : Interceptor {
             }
         }
 
-        // 3. Add Authorization header if token exists
+        //Add Authorization header if token exists
         val request = if (!token.isNullOrEmpty()) {
             originalRequest.newBuilder()
                 .header("Authorization", "Bearer ${token.trim()}")
