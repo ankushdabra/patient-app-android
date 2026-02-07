@@ -92,7 +92,13 @@ fun PatientDashboard(tokenManager: TokenManager) {
                 val doctorId = backStackEntry.arguments?.getString("id")!!
                 DoctorDetailBookingScreen(
                     doctorId = doctorId,
-                    tokenManager = tokenManager
+                    tokenManager = tokenManager,
+                    onBookingSuccess = {
+                        navController.navigate(PatientBottomNavItem.Appointments.route) {
+                            popUpTo(navController.graph.startDestinationId)
+                            launchSingleTop = true
+                        }
+                    }
                 )
             }
             composable(PatientBottomNavItem.Appointments.route) {
@@ -116,11 +122,11 @@ fun PatientDashboardPreview() {
         // and bypassing the ViewModel instantiation which triggers OkHttpClient/Retrofit.
         val mockState = DoctorsUiState.Success(
             doctors = listOf(
-                DoctorDto("Dr. John Smith", "Cardiologist", "15 years","10"),
-                DoctorDto("Dr. Sarah Wilson", "Neurologist", "10 years", "20")
+                DoctorDto("1", "Dr. John Smith", "Cardiologist", "15 years"),
+                DoctorDto("2", "Dr. Sarah Wilson", "Neurologist", "10 years")
             )
         )
-        
+
         Scaffold(
             bottomBar = {
                 NavigationBar {

@@ -5,6 +5,7 @@ import com.healthcare.app.appointments.api.AppointmentResponse
 import com.healthcare.app.appointments.api.DoctorDetailDto
 import com.healthcare.app.auth.api.LoginRequest
 import com.healthcare.app.auth.api.LoginResponse
+import com.healthcare.app.auth.api.RegisterRequest
 import com.healthcare.app.doctors.api.DoctorDto
 import retrofit2.Response
 import retrofit2.http.Body
@@ -14,8 +15,11 @@ import retrofit2.http.Path
 
 interface ApiUrlMapper {
 
-    @POST("/login")
+    @POST("/api/auth/login")
     suspend fun login(@Body request: LoginRequest): Response<LoginResponse>
+
+    @POST("/api/auth/register")
+    suspend fun register(@Body request: RegisterRequest): Response<Unit>
 
     @GET("/api/doctors")
     suspend fun getDoctors(): List<DoctorDto>

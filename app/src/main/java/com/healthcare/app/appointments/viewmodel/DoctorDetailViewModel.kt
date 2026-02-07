@@ -3,12 +3,15 @@ package com.healthcare.app.appointments.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.healthcare.app.appointments.api.AppointmentRequest
+import com.healthcare.app.appointments.api.AppointmentResponse
 import com.healthcare.app.appointments.api.BookingState
 import com.healthcare.app.appointments.api.DoctorDetailRepository
 import com.healthcare.app.appointments.api.DoctorDetailUiState
+import com.google.gson.Gson
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 
 class DoctorDetailViewModel(
     private val repository: DoctorDetailRepository,
@@ -45,9 +48,20 @@ class DoctorDetailViewModel(
             repository.bookAppointment(
                 AppointmentRequest(doctorId, date, time)
             ).onSuccess {
-                _bookingState.value = BookingState.Success(it.message)
-            }.onFailure {
-                _bookingState.value = BookingState.Error(it.message ?: "Booking failed")
+                _bookingState.value = BookingState.Success(it.message ?: "Success")
+            }.onFailure { exception ->
+                val errorMessage = if (exception is HttpException) {
+                    val errorBody = exception.response()?.errorBody()?.string()
+                    try {
+                        val response = Gson().fromJson(errorBody, AppointmentResponse::class.java)
+                        response.error ?: response.message ?: "Booking failed"
+                    } catch (e: Exception) {
+                        "Booking failed"
+                    }
+                } else {
+                    exception.message ?: "Booking failed"
+                }
+                _bookingState.value = BookingState.Error(errorMessage)
             }
         }
     }

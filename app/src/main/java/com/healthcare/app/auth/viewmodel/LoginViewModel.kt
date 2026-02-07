@@ -21,7 +21,7 @@ class LoginViewModel(
         viewModelScope.launch {
             _state.value = LoginState.Loading
 
-            repository.login(email, password)
+            repository.login(email.trim(), password.trim())
                 .onSuccess { token ->
                     tokenManager.saveToken(token)   // 🔐 SAVE JWT
                     _state.value = LoginState.Success

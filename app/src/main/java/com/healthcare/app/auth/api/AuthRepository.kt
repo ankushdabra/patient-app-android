@@ -20,4 +20,17 @@ class AuthRepository(tokenManager: TokenManager) {
             Result.failure(e)
         }
     }
+
+    suspend fun register(request: RegisterRequest): Result<Unit> {
+        return try {
+            val response = api.register(request)
+            if (response.isSuccessful) {
+                Result.success(Unit)
+            } else {
+                Result.failure(Exception("Registration failed"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

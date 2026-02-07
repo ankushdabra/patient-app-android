@@ -1,6 +1,7 @@
 package com.healthcare.app.appointments.ui
 
 import android.os.Build
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,6 +15,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,9 +23,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.healthcare.app.appointments.api.BookingState
 import com.healthcare.app.appointments.api.DoctorAvailabilityDto
 import com.healthcare.app.appointments.api.DoctorDetailDto
 import com.healthcare.app.appointments.api.DoctorDetailUiState
@@ -80,12 +84,28 @@ fun generateTimeSlots(
 @Composable
 fun DoctorDetailBookingScreen(
     doctorId: String,
-    tokenManager: TokenManager
+    tokenManager: TokenManager,
+    onBookingSuccess: () -> Unit = {}
 ) {
     val viewModel: DoctorDetailViewModel = viewModel(
         factory = DoctorDetailViewModelFactory(tokenManager, doctorId)
     )
     val state by viewModel.state.collectAsState()
+    val bookingState by viewModel.bookingState.collectAsState()
+    val context = LocalContext.current
+
+    LaunchedEffect(bookingState) {
+        when (val currentBookingState = bookingState) {
+            is BookingState.Success -> {
+                Toast.makeText(context, currentBookingState.message, Toast.LENGTH_SHORT).show()
+                onBookingSuccess()
+            }
+            is BookingState.Error -> {
+                Toast.makeText(context, currentBookingState.message, Toast.LENGTH_LONG).show()
+            }
+            else -> {}
+        }
+    }
 
     when (val currentState = state) {
         is DoctorDetailUiState.Loading -> {
@@ -96,6 +116,7 @@ fun DoctorDetailBookingScreen(
         is DoctorDetailUiState.Success -> {
             DoctorDetailBookingContent(
                 doctor = currentState.doctor,
+                isLoading = bookingState is BookingState.Loading,
                 onBookAppointment = { day, time ->
                     val actualDate = getNextDateForDay(day)
                     viewModel.bookAppointment(doctorId, actualDate, time)
@@ -114,6 +135,7 @@ fun DoctorDetailBookingScreen(
 @Composable
 fun DoctorDetailBookingContent(
     doctor: DoctorDetailDto,
+    isLoading: Boolean,
     onBookAppointment: (String, String) -> Unit
 ) {
     // 🔹 Map available days
@@ -135,7 +157,7 @@ fun DoctorDetailBookingContent(
 
     var selectedTime by remember(selectedDate) { mutableStateOf(timeSlots.firstOrNull()) }
 
-    val isBookingEnabled = selectedDate != null && selectedTime != null
+    val isBookingEnabled = selectedDate != null && selectedTime != null && !isLoading
 
     Column(
         modifier = Modifier
@@ -172,16 +194,20 @@ fun DoctorDetailBookingContent(
 
         Spacer(Modifier.height(16.dp))
 
-        BookAppointmentButton(
-            enabled = isBookingEnabled,
-            onClick = {
-                selectedDate?.let { day ->
-                    selectedTime?.let { time ->
-                        onBookAppointment(day, time)
+        if (isLoading) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+        } else {
+            BookAppointmentButton(
+                enabled = isBookingEnabled,
+                onClick = {
+                    selectedDate?.let { day ->
+                        selectedTime?.let { time ->
+                            onBookAppointment(day, time)
+                        }
                     }
                 }
-            }
-        )
+            )
+        }
     }
 }
 
@@ -208,6 +234,7 @@ fun DoctorDetailBookingPreview() {
                     DoctorAvailabilityDto("WED", "14:00", "18:00")
                 )
             ),
+            isLoading = false,
             onBookAppointment = { _, _ -> }
         )
     }

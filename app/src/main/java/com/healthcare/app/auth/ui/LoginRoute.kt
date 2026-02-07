@@ -36,6 +36,9 @@ fun LoginRoute(
 
     LoginScreen(
         state = state,
-        onLoginClick =  viewModel::login
+        onLoginClick = viewModel::login,
+        onRegisterClick = {
+            navController.navigate(Routes.REGISTER)
+        }
     )
 }
