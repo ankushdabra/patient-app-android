@@ -1,6 +1,6 @@
 package com.healthcare.app.auth.api
 
-import com.healthcare.app.appointments.api.AppointmentResponse
+import com.healthcare.app.doctors.detail.api.AppointmentResponse
 import com.healthcare.app.core.network.ApiUrlMapper
 import com.healthcare.app.core.network.NetworkModule
 import com.healthcare.app.core.storage.TokenManager

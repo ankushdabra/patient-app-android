@@ -1,6 +1,5 @@
 package com.healthcare.app.core.network
 
-import android.util.Log
 import com.healthcare.app.core.storage.TokenManager
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -13,41 +12,25 @@ class AuthInterceptor(private val tokenManager: TokenManager) : Interceptor {
         val originalRequest = chain.request()
         val path = originalRequest.url.encodedPath
 
-        //Skip auth for login and register
+        // Skip auth for login and register
         if (path.contains("/login") || path.contains("/register")) {
-            Log.d("AuthInterceptor", "Skipping Auth for: $path")
             return chain.proceed(originalRequest)
         }
 
-        // 2. Retrieve token from DataStore synchronously
+        // Retrieve token from DataStore synchronously
         val token = runBlocking {
-            try {
-                val t = tokenManager.token.first()
-                Log.d("AuthInterceptor", "Retrieved token from storage for $path: ${if (t.isNullOrEmpty()) "NULL" else "PRESENT"}")
-                t
-            } catch (e: Exception) {
-                Log.e("AuthInterceptor", "Error retrieving token", e)
-                null
-            }
+            tokenManager.token.first()
         }
 
-        //Add Authorization header if token exists
+        // Add Authorization header if token exists
         val request = if (!token.isNullOrEmpty()) {
             originalRequest.newBuilder()
                 .header("Authorization", "Bearer ${token.trim()}")
                 .build()
         } else {
-            Log.w("AuthInterceptor", "No token found for authenticated request to: $path")
             originalRequest
         }
 
-        val response = chain.proceed(request)
-
-        if (response.code == 403) {
-            Log.e("AuthInterceptor", "403 Forbidden received for: ${request.url}")
-            Log.e("AuthInterceptor", "Token used: ${if (token.isNullOrEmpty()) "NONE" else "YES (ends with ${token.takeLast(5)})"}")
-        }
-
-        return response
+        return chain.proceed(request)
     }
 }
