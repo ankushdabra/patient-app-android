@@ -1,46 +1,76 @@
 package com.healthcare.app.doctors.detail.ui
 
-import android.os.Build
 import android.widget.Toast
-import androidx.annotation.RequiresApi
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.CurrencyRupee
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Star
+import androidx.compose.material.icons.outlined.WorkOutline
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.healthcare.app.core.storage.TokenManager
+import com.healthcare.app.core.ui.components.LoadingState
+import com.healthcare.app.core.ui.components.ErrorState
+import com.healthcare.app.core.ui.theme.HealthcareTheme
 import com.healthcare.app.doctors.detail.api.BookingState
 import com.healthcare.app.doctors.detail.api.DoctorAvailabilityDto
 import com.healthcare.app.doctors.detail.api.DoctorDetailDto
 import com.healthcare.app.doctors.detail.api.DoctorDetailUiState
 import com.healthcare.app.doctors.detail.viewmodel.DoctorDetailViewModel
 import com.healthcare.app.doctors.detail.viewmodel.DoctorDetailViewModelFactory
-import com.healthcare.app.core.storage.TokenManager
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.TemporalAdjusters
 
-@RequiresApi(Build.VERSION_CODES.O)
+// --- Utility Functions ---
+
 fun getNextDateForDay(day: String): String {
     val dayOfWeek = when (day.uppercase()) {
         "MON" -> DayOfWeek.MONDAY
@@ -80,7 +110,8 @@ fun generateTimeSlots(
     return slots
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
+// --- Main Screen ---
+
 @Composable
 fun DoctorDetailBookingScreen(
     doctorId: String,
@@ -90,60 +121,66 @@ fun DoctorDetailBookingScreen(
     val viewModel: DoctorDetailViewModel = viewModel(
         factory = DoctorDetailViewModelFactory(tokenManager, doctorId)
     )
-    val state by viewModel.state.collectAsState()
-    val bookingState by viewModel.bookingState.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
-    LaunchedEffect(bookingState) {
-        when (val currentBookingState = bookingState) {
-            is BookingState.Success -> {
-                Toast.makeText(context, currentBookingState.message, Toast.LENGTH_SHORT).show()
+    LaunchedEffect(state) {
+        if (state is DoctorDetailUiState.Success) {
+            val bookingState = (state as DoctorDetailUiState.Success).bookingState
+            if (bookingState is BookingState.Success) {
+                Toast.makeText(context, bookingState.message, Toast.LENGTH_SHORT).show()
                 onBookingSuccess()
+                viewModel.clearBookingState()
+            } else if (bookingState is BookingState.Error) {
+                Toast.makeText(context, bookingState.message, Toast.LENGTH_LONG).show()
+                viewModel.clearBookingState()
             }
-            is BookingState.Error -> {
-                Toast.makeText(context, currentBookingState.message, Toast.LENGTH_LONG).show()
-            }
-            else -> {}
         }
     }
 
-    when (val currentState = state) {
-        is DoctorDetailUiState.Loading -> {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
-            }
-        }
-        is DoctorDetailUiState.Success -> {
-            DoctorDetailBookingContent(
-                doctor = currentState.doctor,
-                isLoading = bookingState is BookingState.Loading,
-                onBookAppointment = { day, time ->
-                    val actualDate = getNextDateForDay(day)
-                    viewModel.bookAppointment(doctorId, actualDate, time)
-                }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFFFFFFFF),
+                        Color(0xFFF2F4F8)
+                    )
+                )
             )
-        }
-        is DoctorDetailUiState.Error -> {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(text = currentState.message, color = MaterialTheme.colorScheme.error)
+    ) {
+        when (val s = state) {
+            is DoctorDetailUiState.Loading -> LoadingState()
+            is DoctorDetailUiState.Error -> ErrorState(
+                message = s.message,
+                onRetry = { /* Handle retry if needed */ })
+
+            is DoctorDetailUiState.Success -> {
+                DoctorDetailBookingContent(
+                    doctor = s.doctor,
+                    isBooking = s.bookingState is BookingState.Loading,
+                    onBookAppointment = { day, time ->
+                        val actualDate = getNextDateForDay(day)
+                        viewModel.bookAppointment(doctorId, actualDate, time)
+                    }
+                )
             }
         }
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
+// --- Consolidated UI Components ---
+
 @Composable
 fun DoctorDetailBookingContent(
     doctor: DoctorDetailDto,
-    isLoading: Boolean,
+    isBooking: Boolean,
     onBookAppointment: (String, String) -> Unit
 ) {
-    // 🔹 Map available days
     val availableDays = doctor.availability.map { it.day }
-
     var selectedDate by remember { mutableStateOf(availableDays.firstOrNull()) }
 
-    // 🔹 Map time slots for selected day
     val timeSlots = remember(selectedDate) {
         doctor.availability
             .firstOrNull { it.day == selectedDate }
@@ -156,45 +193,49 @@ fun DoctorDetailBookingContent(
     }
 
     var selectedTime by remember(selectedDate) { mutableStateOf(timeSlots.firstOrNull()) }
-
-    val isBookingEnabled = selectedDate != null && selectedTime != null && !isLoading
+    val isBookingEnabled = selectedDate != null && selectedTime != null && !isBooking
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .verticalScroll(rememberScrollState())
+            .padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-
         DoctorDetailHeader(
             name = doctor.name ?: "Doctor",
-            specialization = doctor.specialization,
+            specialization = doctor.specialization ?: "",
             experience = "${doctor.experience} yrs experience",
             fee = "₹${doctor.consultationFee}",
             rating = doctor.rating
         )
 
-        HorizontalDivider()
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFFFCFCFE)),
+            elevation = CardDefaults.cardElevation(4.dp)
+        ) {
+            Column(modifier = Modifier.padding(20.dp)) {
+                DateSelector(
+                    selectedDate = selectedDate,
+                    dates = availableDays,
+                    onDateSelected = { selectedDate = it }
+                )
 
-        // ✅ DATE SELECTION (FROM API)
-        DateSelector(
-            selectedDate = selectedDate,
-            dates = availableDays,
-            onDateSelected = {
-                selectedDate = it
+                Spacer(Modifier.height(24.dp))
+
+                TimeSelector(
+                    selectedTime = selectedTime,
+                    times = timeSlots,
+                    onTimeSelected = { selectedTime = it }
+                )
             }
-        )
+        }
 
-        // ✅ TIME SELECTION (FROM API)
-        TimeSelector(
-            selectedTime = selectedTime,
-            times = timeSlots,
-            onTimeSelected = { selectedTime = it }
-        )
+        Spacer(Modifier.weight(1f))
 
-        Spacer(Modifier.height(16.dp))
-
-        if (isLoading) {
+        if (isBooking) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
         } else {
             BookAppointmentButton(
@@ -211,12 +252,159 @@ fun DoctorDetailBookingContent(
     }
 }
 
+@Composable
+fun DoctorDetailHeader(
+    name: String,
+    specialization: String,
+    experience: String,
+    fee: String,
+    rating: Double? = null
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(80.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.primaryContainer),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.Person,
+                contentDescription = null,
+                modifier = Modifier.size(40.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
+        }
 
-@RequiresApi(Build.VERSION_CODES.O)
+        Spacer(Modifier.width(20.dp))
+
+        Column {
+            Text(
+                text = name,
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Text(
+                text = specialization,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            Spacer(Modifier.height(8.dp))
+
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                InfoTag(icon = Icons.Outlined.Star, text = rating?.toString() ?: "N/A")
+                InfoTag(icon = Icons.Outlined.WorkOutline, text = experience)
+                InfoTag(icon = Icons.Outlined.CurrencyRupee, text = fee)
+            }
+        }
+    }
+}
+
+@Composable
+fun InfoTag(icon: ImageVector, text: String) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            modifier = Modifier.size(14.dp),
+            tint = MaterialTheme.colorScheme.primary
+        )
+        Spacer(Modifier.width(4.dp))
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+@Composable
+fun DateSelector(selectedDate: String?, dates: List<String>, onDateSelected: (String) -> Unit) {
+    Column {
+        Text(
+            text = "Select Date",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(Modifier.height(12.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            dates.forEach { date ->
+                val isSelected = selectedDate == date
+                AssistChip(
+                    onClick = { onDateSelected(date) },
+                    label = { Text(date) },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = AssistChipDefaults.assistChipColors(
+                        containerColor = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
+                        labelColor = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface,
+                    ),
+                    border = if (isSelected) {
+                        null
+                    } else {
+                        BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f))
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun TimeSelector(selectedTime: String?, times: List<String>, onTimeSelected: (String) -> Unit) {
+    Column {
+        Text(
+            text = "Select Time",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(Modifier.height(12.dp))
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            times.forEach { time ->
+                FilterChip(
+                    selected = selectedTime == time,
+                    onClick = { onTimeSelected(time) },
+                    label = { Text(time) },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = MaterialTheme.colorScheme.primary,
+                        selectedLabelColor = Color.White
+                    )
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun BookAppointmentButton(enabled: Boolean, onClick: () -> Unit) {
+    Button(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp),
+        shape = RoundedCornerShape(16.dp),
+        enabled = enabled,
+        onClick = onClick
+    ) {
+        Text(
+            text = "Book Appointment",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun DoctorDetailBookingPreview() {
-    MaterialTheme {
+    HealthcareTheme {
         DoctorDetailBookingContent(
             doctor = DoctorDetailDto(
                 id = "1",
@@ -234,7 +422,7 @@ fun DoctorDetailBookingPreview() {
                     DoctorAvailabilityDto("WED", "14:00", "18:00")
                 )
             ),
-            isLoading = false,
+            isBooking = false,
             onBookAppointment = { _, _ -> }
         )
     }

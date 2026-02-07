@@ -1,4 +1,4 @@
-package com.healthcare.app.auth.ui
+package com.healthcare.app.login.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -43,12 +43,12 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.healthcare.app.R
-import com.healthcare.app.ui.theme.HealthcareTheme
+import com.healthcare.app.core.ui.theme.HealthcareTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegisterScreen(
-    state: RegisterState,
+fun SignUpScreen(
+    state: AuthUiState,
     onRegisterClick: (String, String, String, String, String, String) -> Unit
 ) {
     var name by remember { mutableStateOf("") }
@@ -315,7 +315,7 @@ fun RegisterScreen(
                             .fillMaxWidth()
                             .height(54.dp),
                         shape = RoundedCornerShape(16.dp),
-                        enabled = state !is RegisterState.Loading
+                        enabled = !state.isLoading
                     ) {
                         Text(
                             text = "Register",
@@ -325,23 +325,19 @@ fun RegisterScreen(
 
                     Spacer(Modifier.height(16.dp))
 
-                    when (state) {
-                        is RegisterState.Loading -> {
-                            CircularProgressIndicator(
-                                modifier = Modifier.align(Alignment.CenterHorizontally)
-                            )
-                        }
+                    if (state.isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
+                    }
 
-                        is RegisterState.Error -> {
-                            Text(
-                                text = state.message,
-                                color = MaterialTheme.colorScheme.error,
-                                style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier.align(Alignment.CenterHorizontally)
-                            )
-                        }
-
-                        else -> {}
+                    state.error?.let {
+                        Text(
+                            text = it,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
                     }
                 }
             }
@@ -352,10 +348,10 @@ fun RegisterScreen(
 
 @Preview(showBackground = true, device = Devices.PIXEL_6)
 @Composable
-fun RegisterScreenPreview() {
+fun SignUpScreenPreview() {
     HealthcareTheme {
-        RegisterScreen(
-            state = RegisterState.Idle,
+        SignUpScreen(
+            state = AuthUiState(),
             onRegisterClick = { _, _, _, _, _, _ -> }
         )
     }

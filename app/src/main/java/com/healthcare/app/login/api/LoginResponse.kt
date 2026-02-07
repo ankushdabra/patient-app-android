@@ -1,4 +1,4 @@
-package com.healthcare.app.auth.api
+package com.healthcare.app.login.api
 
 import com.google.gson.annotations.SerializedName
 

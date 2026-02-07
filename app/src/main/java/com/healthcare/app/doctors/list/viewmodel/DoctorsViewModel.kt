@@ -1,7 +1,9 @@
 package com.healthcare.app.doctors.list.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.healthcare.app.core.storage.TokenManager
 import com.healthcare.app.doctors.list.api.DoctorsRepository
 import com.healthcare.app.doctors.list.api.DoctorsUiState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,5 +36,20 @@ class DoctorsViewModel(
                     )
                 }
         }
+    }
+}
+
+class DoctorsViewModelFactory(
+    private val tokenManager: TokenManager
+) : ViewModelProvider.Factory {
+
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(DoctorsViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return DoctorsViewModel(
+                DoctorsRepository(tokenManager)
+            ) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel")
     }
 }

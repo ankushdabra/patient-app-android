@@ -1,4 +1,4 @@
-package com.healthcare.app.auth.ui
+package com.healthcare.app.login.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -38,11 +38,11 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.healthcare.app.R
-import com.healthcare.app.ui.theme.HealthcareTheme
+import com.healthcare.app.core.ui.theme.HealthcareTheme
 
 @Composable
 fun LoginScreen(
-    state: LoginState,
+    state: AuthUiState,
     onLoginClick: (String, String) -> Unit,
     onRegisterClick: () -> Unit = {}
 ) {
@@ -178,7 +178,7 @@ fun LoginScreen(
                             .fillMaxWidth()
                             .height(54.dp),
                         shape = RoundedCornerShape(16.dp),
-                        enabled = state !is LoginState.Loading
+                        enabled = !state.isLoading
                     ) {
                         Text(
                             text = "Sign in",
@@ -188,23 +188,19 @@ fun LoginScreen(
 
                     Spacer(Modifier.height(16.dp))
 
-                    when (state) {
-                        is LoginState.Loading -> {
-                            CircularProgressIndicator(
-                                modifier = Modifier.align(Alignment.CenterHorizontally)
-                            )
-                        }
+                    if (state.isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
+                    }
 
-                        is LoginState.Error -> {
-                            Text(
-                                text = state.message,
-                                color = MaterialTheme.colorScheme.error,
-                                style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier.align(Alignment.CenterHorizontally)
-                            )
-                        }
-
-                        else -> {}
+                    state.error?.let {
+                        Text(
+                            text = it,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
                     }
                 }
             }
@@ -227,7 +223,7 @@ fun LoginScreen(
 fun LoginScreenPreview() {
     HealthcareTheme {
         LoginScreen(
-            state = LoginState.Idle,
+            state = AuthUiState(),
             onLoginClick = { _, _ -> }
         )
     }

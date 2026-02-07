@@ -9,10 +9,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.healthcare.app.doctors.detail.ui.DoctorDetailBookingScreen
-import com.healthcare.app.auth.ui.LoginRoute
-import com.healthcare.app.auth.ui.RegisterRoute
+import com.healthcare.app.login.ui.AuthRoute
 import com.healthcare.app.core.storage.TokenManager
-import com.healthcare.app.PatientDashboard
+import com.healthcare.app.dashboard.PatientDashboard
 import com.healthcare.app.doctors.list.ui.DoctorsListScreen
 
 @Composable
@@ -39,14 +38,16 @@ fun AppNavGraph(
         startDestination = startDestination
     ) {
         composable(Routes.LOGIN) {
-            LoginRoute(
+            AuthRoute(
+                route = Routes.LOGIN,
                 navController = navController,
                 tokenManager = tokenManager
             )
         }
 
         composable(Routes.REGISTER) {
-            RegisterRoute(
+            AuthRoute(
+                route = Routes.REGISTER,
                 navController = navController,
                 tokenManager = tokenManager
             )

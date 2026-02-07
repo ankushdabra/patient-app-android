@@ -1,4 +1,4 @@
-package com.healthcare.app.auth.api
+package com.healthcare.app.login.api
 
 import com.healthcare.app.doctors.detail.api.AppointmentResponse
 import com.healthcare.app.core.network.ApiUrlMapper
@@ -7,7 +7,7 @@ import com.healthcare.app.core.storage.TokenManager
 import com.google.gson.Gson
 import retrofit2.HttpException
 
-class AuthRepository(tokenManager: TokenManager) {
+class AuthenticationRepository(tokenManager: TokenManager) {
     private val api: ApiUrlMapper = NetworkModule.provideRetrofit(tokenManager)
         .create(ApiUrlMapper::class.java)
 
