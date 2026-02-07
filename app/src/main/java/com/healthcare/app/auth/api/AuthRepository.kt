@@ -1,21 +1,14 @@
 package com.healthcare.app.auth.api
 
+import com.healthcare.app.core.network.ApiUrlMapper
 import com.healthcare.app.core.network.NetworkModule
 import com.healthcare.app.core.storage.TokenManager
 
-class AuthRepository(
-    tokenManager: TokenManager
-) {
+class AuthRepository(tokenManager: TokenManager) {
+    private val api: ApiUrlMapper = NetworkModule.provideRetrofit(tokenManager)
+        .create(ApiUrlMapper::class.java)
 
-    private val api: AuthApi =
-        NetworkModule
-            .provideRetrofit(tokenManager)
-            .create(AuthApi::class.java)
-
-    suspend fun login(
-        email: String,
-        password: String
-    ): Result<String> {
+    suspend fun login(email: String, password: String): Result<String> {
         return try {
             val response = api.login(LoginRequest(email, password))
             if (response.isSuccessful) {

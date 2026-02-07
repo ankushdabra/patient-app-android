@@ -2,6 +2,8 @@ package com.healthcare.app.appointments.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.healthcare.app.appointments.api.AppointmentRequest
+import com.healthcare.app.appointments.api.BookingState
 import com.healthcare.app.appointments.api.DoctorDetailRepository
 import com.healthcare.app.appointments.api.DoctorDetailUiState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,9 +15,11 @@ class DoctorDetailViewModel(
     doctorId: String
 ) : ViewModel() {
 
-    private val _state =
-        MutableStateFlow<DoctorDetailUiState>(DoctorDetailUiState.Loading)
+    private val _state = MutableStateFlow<DoctorDetailUiState>(DoctorDetailUiState.Loading)
     val state: StateFlow<DoctorDetailUiState> = _state
+
+    private val _bookingState = MutableStateFlow<BookingState>(BookingState.Idle)
+    val bookingState: StateFlow<BookingState> = _bookingState
 
     init {
         loadDoctor(doctorId)
@@ -32,6 +36,19 @@ class DoctorDetailViewModel(
                         it.message ?: "Failed to load doctor"
                     )
                 }
+        }
+    }
+
+    fun bookAppointment(doctorId: String, date: String, time: String) {
+        viewModelScope.launch {
+            _bookingState.value = BookingState.Loading
+            repository.bookAppointment(
+                AppointmentRequest(doctorId, date, time)
+            ).onSuccess {
+                _bookingState.value = BookingState.Success(it.message)
+            }.onFailure {
+                _bookingState.value = BookingState.Error(it.message ?: "Booking failed")
+            }
         }
     }
 }

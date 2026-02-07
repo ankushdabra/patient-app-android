@@ -1,5 +1,7 @@
 package com.healthcare.app.appointments.ui
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,8 +30,34 @@ import com.healthcare.app.appointments.api.DoctorDetailUiState
 import com.healthcare.app.appointments.viewmodel.DoctorDetailViewModel
 import com.healthcare.app.appointments.viewmodel.DoctorDetailViewModelFactory
 import com.healthcare.app.core.storage.TokenManager
+import java.time.DayOfWeek
+import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import java.time.temporal.TemporalAdjusters
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun getNextDateForDay(day: String): String {
+    val dayOfWeek = when (day.uppercase()) {
+        "MON" -> DayOfWeek.MONDAY
+        "TUE" -> DayOfWeek.TUESDAY
+        "WED" -> DayOfWeek.WEDNESDAY
+        "THU" -> DayOfWeek.THURSDAY
+        "FRI" -> DayOfWeek.FRIDAY
+        "SAT" -> DayOfWeek.SATURDAY
+        "SUN" -> DayOfWeek.SUNDAY
+        else -> DayOfWeek.MONDAY
+    }
+
+    val today = LocalDate.now()
+    val nextDate = if (today.dayOfWeek == dayOfWeek) {
+        today
+    } else {
+        today.with(TemporalAdjusters.next(dayOfWeek))
+    }
+
+    return nextDate.format(DateTimeFormatter.ISO_DATE)
+}
 
 fun generateTimeSlots(
     start: String,
@@ -48,6 +76,7 @@ fun generateTimeSlots(
     return slots
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DoctorDetailBookingScreen(
     doctorId: String,
@@ -65,7 +94,13 @@ fun DoctorDetailBookingScreen(
             }
         }
         is DoctorDetailUiState.Success -> {
-            DoctorDetailBookingContent(doctor = currentState.doctor)
+            DoctorDetailBookingContent(
+                doctor = currentState.doctor,
+                onBookAppointment = { day, time ->
+                    val actualDate = getNextDateForDay(day)
+                    viewModel.bookAppointment(doctorId, actualDate, time)
+                }
+            )
         }
         is DoctorDetailUiState.Error -> {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -75,9 +110,11 @@ fun DoctorDetailBookingScreen(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DoctorDetailBookingContent(
-    doctor: DoctorDetailDto
+    doctor: DoctorDetailDto,
+    onBookAppointment: (String, String) -> Unit
 ) {
     // 🔹 Map available days
     val availableDays = doctor.availability.map { it.day }
@@ -138,15 +175,18 @@ fun DoctorDetailBookingContent(
         BookAppointmentButton(
             enabled = isBookingEnabled,
             onClick = {
-                println(
-                    "Booking for $selectedDate at $selectedTime for doctor ${doctor.id}"
-                )
+                selectedDate?.let { day ->
+                    selectedTime?.let { time ->
+                        onBookAppointment(day, time)
+                    }
+                }
             }
         )
     }
 }
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
 fun DoctorDetailBookingPreview() {
@@ -167,7 +207,8 @@ fun DoctorDetailBookingPreview() {
                     DoctorAvailabilityDto("MON", "10:00", "13:00"),
                     DoctorAvailabilityDto("WED", "14:00", "18:00")
                 )
-            )
+            ),
+            onBookAppointment = { _, _ -> }
         )
     }
 }
