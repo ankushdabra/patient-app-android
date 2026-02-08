@@ -51,6 +51,8 @@ import com.healthcare.app.core.ui.components.LoadingState
 import com.healthcare.app.core.ui.theme.HealthcareTheme
 import com.healthcare.app.doctors.detail.api.DoctorDetailDto
 import com.healthcare.app.doctors.detail.api.DoctorTimeSlotDto
+import com.healthcare.app.login.api.UserDto
+import com.healthcare.app.prescriptions.api.PatientDto
 
 @Composable
 fun AppointmentListScreen(
@@ -381,9 +383,17 @@ fun AppointmentListScreenPreview() {
                         "MON" to listOf(DoctorTimeSlotDto("10:00", "13:00"))
                     )
                 ),
+                patient = PatientDto(
+                    id = "p1",
+                    user = UserDto("u1", "John Doe", "john@example.com", "PATIENT"),
+                    age = 30,
+                    gender = "MALE",
+                    bloodGroup = "O+"
+                ),
                 appointmentDate = "2026-02-09",
                 appointmentTime = "10:00",
-                status = "BOOKED"
+                status = "BOOKED",
+                createdAt = "2026-02-08T10:00:00"
             )
         )
         AppointmentListScreenContent(

@@ -10,6 +10,7 @@ import com.healthcare.app.login.api.SignUpRequestDto
 import com.healthcare.app.login.api.SignUpResponseDto
 import com.healthcare.app.login.api.UserDto
 import com.healthcare.app.doctors.list.api.DoctorDto
+import com.healthcare.app.prescriptions.api.PrescriptionDto
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -44,4 +45,7 @@ interface ApiUrlMapper {
 
     @GET("/api/appointments/{id}")
     suspend fun getAppointmentDetail(@Path("id") appointmentId: String): AppointmentDto
+
+    @GET("/api/prescriptions")
+    suspend fun getPrescriptions(): List<PrescriptionDto>
 }

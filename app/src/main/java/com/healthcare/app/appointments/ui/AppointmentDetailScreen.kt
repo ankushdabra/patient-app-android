@@ -56,6 +56,8 @@ import com.healthcare.app.core.ui.components.ErrorState
 import com.healthcare.app.core.ui.components.LoadingState
 import com.healthcare.app.core.ui.theme.HealthcareTheme
 import com.healthcare.app.doctors.detail.api.DoctorDetailDto
+import com.healthcare.app.login.api.UserDto
+import com.healthcare.app.prescriptions.api.PatientDto
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -499,9 +501,17 @@ fun AppointmentDetailPreview() {
                     clinicAddress = "Healthcare Clinic, City Center",
                     profileImage = null
                 ),
+                patient = PatientDto(
+                    id = "p1",
+                    user = UserDto("u1", "John Doe", "john@example.com", "PATIENT"),
+                    age = 30,
+                    gender = "MALE",
+                    bloodGroup = "O+"
+                ),
                 appointmentDate = "2026-02-09",
                 appointmentTime = "10:00:00",
-                status = "BOOKED"
+                status = "BOOKED",
+                createdAt = "2026-02-08T10:00:00"
             )
         )
     }

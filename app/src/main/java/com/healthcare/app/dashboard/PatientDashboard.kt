@@ -33,6 +33,8 @@ import com.healthcare.app.doctors.list.ui.DoctorsListScreenContent
 import com.healthcare.app.login.ui.ProfileScreen
 import com.healthcare.app.navigation.PatientBottomNavItem
 import com.healthcare.app.navigation.Routes
+import com.healthcare.app.prescriptions.ui.PrescriptionDetailScreen
+import com.healthcare.app.prescriptions.ui.PrescriptionListScreen
 
 @Composable
 fun PatientDashboard(tokenManager: TokenManager) {
@@ -55,8 +57,6 @@ fun PatientDashboard(tokenManager: TokenManager) {
                 val currentDestination = navBackStackEntry?.destination
 
                 items.forEach { item ->
-                    // Check if the current destination or any of its parents match the route
-                    // Also explicitly check if we are in detail screens to keep corresponding tab active
                     val isSelected =
                         currentDestination?.hierarchy?.any { it.route == item.route } == true ||
                                 (item == PatientBottomNavItem.Doctors && currentDestination?.route?.startsWith(
@@ -64,6 +64,9 @@ fun PatientDashboard(tokenManager: TokenManager) {
                                 ) == true) ||
                                 (item == PatientBottomNavItem.Appointments && currentDestination?.route?.startsWith(
                                     Routes.APPOINTMENT_DETAIL
+                                ) == true) ||
+                                (item == PatientBottomNavItem.Prescriptions && currentDestination?.route?.startsWith(
+                                    Routes.PRESCRIPTION_DETAIL
                                 ) == true)
 
                     NavigationBarItem(
@@ -71,18 +74,14 @@ fun PatientDashboard(tokenManager: TokenManager) {
                         onClick = {
                             if (currentDestination?.route != item.route) {
                                 navController.navigate(item.route) {
-                                    // Pop up to the start destination of the graph to
-                                    // avoid building up a large stack of destinations
                                     popUpTo(navController.graph.findStartDestination().id) {
                                         saveState = true
                                     }
-                                    // Avoid multiple copies of the same destination when
-                                    // reselecting the same item
                                     launchSingleTop = true
-
-                                    // Restore state for other tabs, but always go to list for Doctors and Appointments
                                     restoreState =
-                                        item != PatientBottomNavItem.Doctors && item != PatientBottomNavItem.Appointments
+                                        item != PatientBottomNavItem.Doctors &&
+                                                item != PatientBottomNavItem.Appointments &&
+                                                item != PatientBottomNavItem.Prescriptions
                                 }
                             }
                         },
@@ -161,7 +160,26 @@ fun PatientDashboard(tokenManager: TokenManager) {
                 )
             }
             composable(PatientBottomNavItem.Prescriptions.route) {
-                //PlaceholderScreen("Prescriptions")
+                PrescriptionListScreen(
+                    tokenManager = tokenManager,
+                    onPrescriptionClick = { id ->
+                        navController.navigate("${Routes.PRESCRIPTION_DETAIL}/$id")
+                    }
+                )
+            }
+            composable(
+                route = "${Routes.PRESCRIPTION_DETAIL}/{id}",
+                arguments = listOf(
+                    navArgument("id") {
+                        type = NavType.StringType
+                    }
+                )
+            ) { backStackEntry ->
+                val prescriptionId = backStackEntry.arguments?.getString("id")!!
+                PrescriptionDetailScreen(
+                    prescriptionId = prescriptionId,
+                    tokenManager = tokenManager
+                )
             }
             composable(PatientBottomNavItem.Profile.route) {
                 ProfileScreen(tokenManager = tokenManager)

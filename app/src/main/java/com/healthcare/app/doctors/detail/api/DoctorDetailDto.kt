@@ -1,7 +1,10 @@
 package com.healthcare.app.doctors.detail.api
 
+import com.healthcare.app.login.api.UserDto
+
 data class DoctorDetailDto(
     val id: String,
+    val user: UserDto? = null,
     val name: String?,
     val specialization: String?,
     val qualification: String?,
