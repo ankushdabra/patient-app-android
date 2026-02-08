@@ -68,14 +68,13 @@ import com.healthcare.app.core.ui.UiState
 import com.healthcare.app.core.ui.components.ErrorState
 import com.healthcare.app.core.ui.components.LoadingState
 import com.healthcare.app.core.ui.theme.HealthcareTheme
-import com.healthcare.app.doctors.detail.api.DoctorAvailabilityDto
 import com.healthcare.app.doctors.detail.api.DoctorDetailDto
+import com.healthcare.app.doctors.detail.api.DoctorTimeSlotDto
 import com.healthcare.app.doctors.detail.viewmodel.BookAppointmentViewModel
 import com.healthcare.app.doctors.detail.viewmodel.BookAppointmentViewModelFactory
 import com.healthcare.app.doctors.detail.viewmodel.BookingState
 import java.time.DayOfWeek
 import java.time.LocalDate
-import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.TemporalAdjusters
 
@@ -101,23 +100,6 @@ fun getNextDateForDay(day: String): String {
     }
 
     return nextDate.format(DateTimeFormatter.ISO_DATE)
-}
-
-fun generateTimeSlots(
-    start: String,
-    end: String,
-    intervalMinutes: Int = 30
-): List<String> {
-    val formatter = DateTimeFormatter.ofPattern("HH:mm")
-    var current = LocalTime.parse(start, formatter)
-    val endTime = LocalTime.parse(end, formatter)
-
-    val slots = mutableListOf<String>()
-    while (current.isBefore(endTime)) {
-        slots.add(current.format(formatter))
-        current = current.plusMinutes(intervalMinutes.toLong())
-    }
-    return slots
 }
 
 // --- Main Screen ---
@@ -208,21 +190,19 @@ fun DoctorDetailBookingContent(
     onBookAppointment: (String, String) -> Unit,
     bottomPadding: Dp = 0.dp
 ) {
-    val availableDays = doctor.availability.map { it.day }
-    var selectedDate by remember { mutableStateOf(availableDays.firstOrNull()) }
+    val availableDays = remember(doctor.availability) {
+        doctor.availability.keys.toList()
+    }
+    var selectedDate by remember(availableDays) { mutableStateOf(availableDays.firstOrNull()) }
 
-    val timeSlots = remember(selectedDate) {
-        doctor.availability
-            .firstOrNull { it.day == selectedDate }
-            ?.let {
-                generateTimeSlots(
-                    start = it.startTime,
-                    end = it.endTime
-                )
-            } ?: emptyList()
+    val timeSlots = remember(selectedDate, doctor.availability) {
+        doctor.availability[selectedDate] ?: emptyList()
     }
 
-    var selectedTime by remember(selectedDate) { mutableStateOf(timeSlots.firstOrNull()) }
+    var selectedTime by remember(timeSlots) { 
+        mutableStateOf(timeSlots.firstOrNull()?.startTime) 
+    }
+    
     val isBookingEnabled = selectedDate != null && selectedTime != null && !isBooking
 
     Column(
@@ -398,26 +378,36 @@ fun DoctorDetailBookingContent(
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Column(modifier = Modifier.padding(20.dp)) {
-                    DateSelector(
-                        selectedDate = selectedDate,
-                        dates = availableDays,
-                        onDateSelected = { selectedDate = it }
-                    )
+                    if (doctor.availability.isEmpty()) {
+                        Text(
+                            text = "No slots available",
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Medium,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
+                    } else {
+                        DateSelector(
+                            selectedDate = selectedDate,
+                            dates = availableDays,
+                            onDateSelected = { selectedDate = it }
+                        )
 
-                    Spacer(Modifier.height(24.dp))
+                        Spacer(Modifier.height(24.dp))
 
-                    TimeSelector(
-                        selectedTime = selectedTime,
-                        times = timeSlots,
-                        onTimeSelected = { selectedTime = it }
-                    )
+                        TimeSelector(
+                            selectedTime = selectedTime,
+                            times = timeSlots.map { it.startTime },
+                            onTimeSelected = { selectedTime = it }
+                        )
+                    }
                 }
             }
 
 
             if (isBooking) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-            } else {
+            } else if (doctor.availability.isNotEmpty()) {
                 BookAppointmentButton(
                     enabled = isBookingEnabled,
                     onClick = {
@@ -460,7 +450,10 @@ fun DateSelector(selectedDate: String?, dates: List<String>, onDateSelected: (St
             fontWeight = FontWeight.Bold
         )
         Spacer(Modifier.height(12.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
             dates.forEach { date ->
                 val isSelected = selectedDate == date
                 AssistChip(
@@ -545,9 +538,9 @@ fun DoctorDetailBookingPreview() {
                 about = "Experienced cardiologist with 12+ years of practice",
                 clinicAddress = "Delhi Heart Clinic, New Delhi",
                 profileImage = "profile.jpg",
-                availability = listOf(
-                    DoctorAvailabilityDto("MON", "10:00", "13:00"),
-                    DoctorAvailabilityDto("WED", "14:00", "18:00")
+                availability = mapOf(
+                    "MON" to listOf(DoctorTimeSlotDto("10:00", "11:00"), DoctorTimeSlotDto("12:00", "13:00")),
+                    "TUE" to listOf(DoctorTimeSlotDto("11:00", "12:00"))
                 )
             ),
             isBooking = false,

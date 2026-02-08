@@ -11,11 +11,10 @@ data class DoctorDetailDto(
     val about: String?,
     val clinicAddress: String?,
     val profileImage: String?,
-    val availability: List<DoctorAvailabilityDto> = emptyList()
+    val availability: Map<String, List<DoctorTimeSlotDto>> = emptyMap()
 )
 
-data class DoctorAvailabilityDto(
-    val day: String,        // MON, WED, FRI
+data class DoctorTimeSlotDto(
     val startTime: String,  // 10:00
     val endTime: String     // 13:00
 )

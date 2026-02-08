@@ -58,8 +58,8 @@ import com.healthcare.app.core.ui.UiState
 import com.healthcare.app.core.ui.components.ErrorState
 import com.healthcare.app.core.ui.components.LoadingState
 import com.healthcare.app.core.ui.theme.HealthcareTheme
-import com.healthcare.app.doctors.detail.api.DoctorAvailabilityDto
 import com.healthcare.app.doctors.detail.api.DoctorDetailDto
+import com.healthcare.app.doctors.detail.api.DoctorTimeSlotDto
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -395,6 +395,67 @@ fun AppointmentDetailContent(
                 }
             }
 
+            // Availability Card
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Column(modifier = Modifier.padding(20.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.Schedule,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(Modifier.width(12.dp))
+                        Text(
+                            text = "Availability",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    Spacer(Modifier.height(16.dp))
+
+                    if (appointment.doctor.availability.isEmpty()) {
+                        Text(
+                            text = "No slots available",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    } else {
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            appointment.doctor.availability.forEach { (day, slots) ->
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.Top
+                                ) {
+                                    Text(
+                                        text = day,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                    Column(horizontalAlignment = Alignment.End) {
+                                        slots.forEach { slot ->
+                                            Text(
+                                                text = "${slot.startTime} - ${slot.endTime}",
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             Spacer(Modifier.height(16.dp))
         }
     }
@@ -444,9 +505,9 @@ fun AppointmentDetailPreview() {
                     about = "Experienced cardiologist with 12+ years of practice",
                     clinicAddress = "Delhi Heart Clinic, New Delhi",
                     profileImage = "profile.jpg",
-                    availability = listOf(
-                        DoctorAvailabilityDto("MON", "10:00", "13:00"),
-                        DoctorAvailabilityDto("WED", "14:00", "18:00")
+                    availability = mapOf(
+                        "MON" to listOf(DoctorTimeSlotDto("10:00", "13:00")),
+                        "WED" to listOf(DoctorTimeSlotDto("14:00", "18:00"))
                     )
                 ),
                 appointmentDate = "2026-02-09",
