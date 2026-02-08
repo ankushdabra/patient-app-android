@@ -8,7 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.healthcare.app.doctors.detail.ui.DoctorDetailBookingScreen
+import com.healthcare.app.doctors.detail.ui.BookAppointmentScreen
 import com.healthcare.app.login.ui.AuthRoute
 import com.healthcare.app.core.storage.TokenManager
 import com.healthcare.app.dashboard.PatientDashboard
@@ -80,7 +80,7 @@ fun AppNavGraph(
             val doctorId =
                 backStackEntry.arguments?.getString("id")!!
 
-            DoctorDetailBookingScreen(
+            BookAppointmentScreen(
                 doctorId = doctorId,
                 tokenManager = tokenManager
             )

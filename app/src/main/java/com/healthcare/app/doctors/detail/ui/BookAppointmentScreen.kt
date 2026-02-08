@@ -54,15 +54,16 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.healthcare.app.core.storage.TokenManager
-import com.healthcare.app.core.ui.components.LoadingState
+import com.healthcare.app.core.ui.UiState
 import com.healthcare.app.core.ui.components.ErrorState
+import com.healthcare.app.core.ui.components.LoadingState
 import com.healthcare.app.core.ui.theme.HealthcareTheme
-import com.healthcare.app.doctors.detail.api.BookingState
 import com.healthcare.app.doctors.detail.api.DoctorAvailabilityDto
 import com.healthcare.app.doctors.detail.api.DoctorDetailDto
-import com.healthcare.app.doctors.detail.api.DoctorDetailUiState
-import com.healthcare.app.doctors.detail.viewmodel.DoctorDetailViewModel
-import com.healthcare.app.doctors.detail.viewmodel.DoctorDetailViewModelFactory
+import com.healthcare.app.doctors.detail.viewmodel.BookAppointmentData
+import com.healthcare.app.doctors.detail.viewmodel.BookingState
+import com.healthcare.app.doctors.detail.viewmodel.BookAppointmentViewModel
+import com.healthcare.app.doctors.detail.viewmodel.BookAppointmentViewModelFactory
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
@@ -113,20 +114,21 @@ fun generateTimeSlots(
 // --- Main Screen ---
 
 @Composable
-fun DoctorDetailBookingScreen(
+fun BookAppointmentScreen(
     doctorId: String,
     tokenManager: TokenManager,
     onBookingSuccess: () -> Unit = {}
 ) {
-    val viewModel: DoctorDetailViewModel = viewModel(
-        factory = DoctorDetailViewModelFactory(tokenManager, doctorId)
+    val viewModel: BookAppointmentViewModel = viewModel(
+        factory = BookAppointmentViewModelFactory(tokenManager, doctorId)
     )
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     LaunchedEffect(state) {
-        if (state is DoctorDetailUiState.Success) {
-            val bookingState = (state as DoctorDetailUiState.Success).bookingState
+        val s = state
+        if (s is UiState.Success) {
+            val bookingState = s.data.bookingState
             if (bookingState is BookingState.Success) {
                 Toast.makeText(context, bookingState.message, Toast.LENGTH_SHORT).show()
                 onBookingSuccess()
@@ -151,15 +153,15 @@ fun DoctorDetailBookingScreen(
             )
     ) {
         when (val s = state) {
-            is DoctorDetailUiState.Loading -> LoadingState()
-            is DoctorDetailUiState.Error -> ErrorState(
+            is UiState.Loading -> LoadingState()
+            is UiState.Error -> ErrorState(
                 message = s.message,
                 onRetry = { /* Handle retry if needed */ })
 
-            is DoctorDetailUiState.Success -> {
+            is UiState.Success -> {
                 DoctorDetailBookingContent(
-                    doctor = s.doctor,
-                    isBooking = s.bookingState is BookingState.Loading,
+                    doctor = s.data.doctor,
+                    isBooking = s.data.bookingState is BookingState.Loading,
                     onBookAppointment = { day, time ->
                         val actualDate = getNextDateForDay(day)
                         viewModel.bookAppointment(doctorId, actualDate, time)

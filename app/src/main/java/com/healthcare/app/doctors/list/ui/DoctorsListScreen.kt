@@ -33,14 +33,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.healthcare.app.core.storage.TokenManager
+import com.healthcare.app.core.ui.UiState
 import com.healthcare.app.core.ui.components.ErrorState
 import com.healthcare.app.core.ui.components.LoadingState
+import com.healthcare.app.core.ui.theme.HealthcareTheme
 import com.healthcare.app.doctors.list.api.DoctorDto
-import com.healthcare.app.doctors.list.api.DoctorsUiState
 import com.healthcare.app.doctors.list.viewmodel.DoctorsViewModel
 import com.healthcare.app.doctors.list.viewmodel.DoctorsViewModelFactory
 
@@ -63,7 +65,7 @@ fun DoctorsListScreen(
 
 @Composable
 fun DoctorsListScreenContent(
-    state: DoctorsUiState,
+    state: UiState<List<DoctorDto>>,
     onRetry: () -> Unit,
     onDoctorClick: (String) -> Unit
 ) {
@@ -80,20 +82,20 @@ fun DoctorsListScreenContent(
             )
     ) {
         when (state) {
-            DoctorsUiState.Loading -> {
+            UiState.Loading -> {
                 LoadingState()
             }
 
-            is DoctorsUiState.Error -> {
+            is UiState.Error -> {
                 ErrorState(
                     message = state.message,
                     onRetry = onRetry
                 )
             }
 
-            is DoctorsUiState.Success -> {
+            is UiState.Success -> {
                 DoctorsList(
-                    doctors = state.doctors,
+                    doctors = state.data,
                     onDoctorClick = onDoctorClick
                 )
             }
@@ -204,6 +206,23 @@ fun DashboardHeader() {
             text = "Book appointments with trusted specialists",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DoctorsListScreenPreview() {
+    HealthcareTheme {
+        val mockDoctors = listOf(
+            DoctorDto("1", "Dr. John Smith", "Cardiologist", "15 years"),
+            DoctorDto("2", "Dr. Sarah Wilson", "Neurologist", "10 years"),
+            DoctorDto("3", "Dr. Amit Sharma", "General Physician", "12 years")
+        )
+        DoctorsListScreenContent(
+            state = UiState.Success(mockDoctors),
+            onRetry = {},
+            onDoctorClick = {}
         )
     }
 }

@@ -1,6 +1,6 @@
 package com.healthcare.app.doctors.detail.api
 
-data class AppointmentRequest(
+data class AppointmentRequestDto(
     val doctorId: String,
     val appointmentDate: String,
     val appointmentTime: String

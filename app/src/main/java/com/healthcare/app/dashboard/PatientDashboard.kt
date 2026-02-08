@@ -3,7 +3,6 @@ package com.healthcare.app.dashboard
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
@@ -22,12 +21,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.healthcare.app.appointments.ui.AppointmentsScreen
+import com.healthcare.app.appointments.ui.AppointmentDetailScreen
+import com.healthcare.app.appointments.ui.AppointmentListScreen
 import com.healthcare.app.core.storage.TokenManager
+import com.healthcare.app.core.ui.UiState
 import com.healthcare.app.core.ui.theme.HealthcareTheme
-import com.healthcare.app.doctors.detail.ui.DoctorDetailBookingScreen
+import com.healthcare.app.doctors.detail.ui.BookAppointmentScreen
 import com.healthcare.app.doctors.list.api.DoctorDto
-import com.healthcare.app.doctors.list.api.DoctorsUiState
 import com.healthcare.app.doctors.list.ui.DoctorsListScreen
 import com.healthcare.app.doctors.list.ui.DoctorsListScreenContent
 import com.healthcare.app.navigation.PatientBottomNavItem
@@ -117,7 +117,7 @@ fun PatientDashboard(tokenManager: TokenManager) {
                 )
             ) { backStackEntry ->
                 val doctorId = backStackEntry.arguments?.getString("id")!!
-                DoctorDetailBookingScreen(
+                BookAppointmentScreen(
                     doctorId = doctorId,
                     tokenManager = tokenManager,
                     onBookingSuccess = {
@@ -129,7 +129,29 @@ fun PatientDashboard(tokenManager: TokenManager) {
                 )
             }
             composable(PatientBottomNavItem.Appointments.route) {
-                AppointmentsScreen(tokenManager = tokenManager)
+                AppointmentListScreen(
+                    tokenManager = tokenManager,
+                    onAppointmentClick = { id ->
+                        navController.navigate("${Routes.APPOINTMENT_DETAIL}/$id")
+                    }
+                )
+            }
+            composable(
+                route = "${Routes.APPOINTMENT_DETAIL}/{id}",
+                arguments = listOf(
+                    navArgument("id") {
+                        type = NavType.StringType
+                    }
+                )
+            ) { backStackEntry ->
+                val appointmentId = backStackEntry.arguments?.getString("id")!!
+                AppointmentDetailScreen(
+                    appointmentId = appointmentId,
+                    tokenManager = tokenManager,
+                    onBackClick = {
+                        navController.popBackStack()
+                    }
+                )
             }
             composable(PatientBottomNavItem.Prescriptions.route) {
                 //PlaceholderScreen("Prescriptions")
@@ -145,11 +167,9 @@ fun PatientDashboard(tokenManager: TokenManager) {
 @Composable
 fun PatientDashboardPreview() {
     HealthcareTheme {
-        val mockState = DoctorsUiState.Success(
-            doctors = listOf(
-                DoctorDto("1", "Dr. John Smith", "Cardiologist", "15 years"),
-                DoctorDto("2", "Dr. Sarah Wilson", "Neurologist", "10 years")
-            )
+        val mockDoctors = listOf(
+            DoctorDto("1", "Dr. John Smith", "Cardiologist", "15 years"),
+            DoctorDto("2", "Dr. Sarah Wilson", "Neurologist", "10 years")
         )
 
         Scaffold(
@@ -179,7 +199,7 @@ fun PatientDashboardPreview() {
         ) { padding ->
             Box(modifier = Modifier.padding(padding)) {
                 DoctorsListScreenContent(
-                    state = mockState,
+                    state = UiState.Success(mockDoctors),
                     onRetry = { },
                     onDoctorClick = { }
                 )

@@ -1,6 +1,6 @@
 package com.healthcare.app.login.api
 
-data class LoginRequest(
+data class LoginRequestDto(
     val email: String,
     val password: String
 )

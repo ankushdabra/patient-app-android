@@ -38,11 +38,12 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.healthcare.app.R
+import com.healthcare.app.core.ui.UiState
 import com.healthcare.app.core.ui.theme.HealthcareTheme
 
 @Composable
 fun LoginScreen(
-    state: AuthUiState,
+    state: UiState<Boolean>,
     onLoginClick: (String, String) -> Unit,
     onRegisterClick: () -> Unit = {}
 ) {
@@ -178,7 +179,7 @@ fun LoginScreen(
                             .fillMaxWidth()
                             .height(54.dp),
                         shape = RoundedCornerShape(16.dp),
-                        enabled = !state.isLoading
+                        enabled = state !is UiState.Loading
                     ) {
                         Text(
                             text = "Sign in",
@@ -188,15 +189,15 @@ fun LoginScreen(
 
                     Spacer(Modifier.height(16.dp))
 
-                    if (state.isLoading) {
+                    if (state is UiState.Loading) {
                         CircularProgressIndicator(
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
                     }
 
-                    state.error?.let {
+                    if (state is UiState.Error) {
                         Text(
-                            text = it,
+                            text = state.message,
                             color = MaterialTheme.colorScheme.error,
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.align(Alignment.CenterHorizontally)
@@ -223,7 +224,7 @@ fun LoginScreen(
 fun LoginScreenPreview() {
     HealthcareTheme {
         LoginScreen(
-            state = AuthUiState(),
+            state = UiState.Success(false),
             onLoginClick = { _, _ -> }
         )
     }

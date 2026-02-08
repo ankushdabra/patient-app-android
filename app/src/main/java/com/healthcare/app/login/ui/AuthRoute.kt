@@ -9,6 +9,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.healthcare.app.core.storage.TokenManager
+import com.healthcare.app.core.ui.UiState
 import com.healthcare.app.login.api.AuthenticationRepository
 import com.healthcare.app.login.viewmodel.LoginViewModel
 import com.healthcare.app.login.viewmodel.LoginViewModelFactory
@@ -35,8 +36,9 @@ fun AuthRoute(
             )
             val state by viewModel.state.collectAsStateWithLifecycle()
 
-            LaunchedEffect(state.isSuccess) {
-                if (state.isSuccess) {
+            LaunchedEffect(state) {
+                val s = state
+                if (s is UiState.Success && s.data) {
                     navController.navigate(Routes.DASHBOARD) {
                         popUpTo(Routes.LOGIN) { inclusive = true }
                     }
@@ -61,8 +63,9 @@ fun AuthRoute(
             )
             val state by viewModel.state.collectAsStateWithLifecycle()
 
-            LaunchedEffect(state.isSuccess) {
-                if (state.isSuccess) {
+            LaunchedEffect(state) {
+                val s = state
+                if (s is UiState.Success && s.data) {
                     Toast.makeText(context, "Registration Successful!", Toast.LENGTH_SHORT).show()
                     navController.navigate(Routes.DASHBOARD) {
                         popUpTo(Routes.REGISTER) { inclusive = true }

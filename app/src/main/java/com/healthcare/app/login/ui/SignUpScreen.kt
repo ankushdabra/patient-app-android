@@ -43,12 +43,13 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.healthcare.app.R
+import com.healthcare.app.core.ui.UiState
 import com.healthcare.app.core.ui.theme.HealthcareTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUpScreen(
-    state: AuthUiState,
+    state: UiState<Boolean>,
     onRegisterClick: (String, String, String, String, String, String) -> Unit
 ) {
     var name by remember { mutableStateOf("") }
@@ -315,7 +316,7 @@ fun SignUpScreen(
                             .fillMaxWidth()
                             .height(54.dp),
                         shape = RoundedCornerShape(16.dp),
-                        enabled = !state.isLoading
+                        enabled = state !is UiState.Loading
                     ) {
                         Text(
                             text = "Register",
@@ -325,15 +326,15 @@ fun SignUpScreen(
 
                     Spacer(Modifier.height(16.dp))
 
-                    if (state.isLoading) {
+                    if (state is UiState.Loading) {
                         CircularProgressIndicator(
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
                     }
 
-                    state.error?.let {
+                    if (state is UiState.Error) {
                         Text(
-                            text = it,
+                            text = state.message,
                             color = MaterialTheme.colorScheme.error,
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.align(Alignment.CenterHorizontally)
@@ -351,7 +352,7 @@ fun SignUpScreen(
 fun SignUpScreenPreview() {
     HealthcareTheme {
         SignUpScreen(
-            state = AuthUiState(),
+            state = UiState.Success(false),
             onRegisterClick = { _, _, _, _, _, _ -> }
         )
     }

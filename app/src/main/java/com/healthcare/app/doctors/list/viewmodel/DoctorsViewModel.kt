@@ -4,8 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.healthcare.app.core.storage.TokenManager
+import com.healthcare.app.core.ui.UiState
+import com.healthcare.app.doctors.list.api.DoctorDto
 import com.healthcare.app.doctors.list.api.DoctorsRepository
-import com.healthcare.app.doctors.list.api.DoctorsUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -15,8 +16,8 @@ class DoctorsViewModel(
 ) : ViewModel() {
 
     private val _state =
-        MutableStateFlow<DoctorsUiState>(DoctorsUiState.Loading)
-    val state: StateFlow<DoctorsUiState> = _state
+        MutableStateFlow<UiState<List<DoctorDto>>>(UiState.Loading)
+    val state: StateFlow<UiState<List<DoctorDto>>> = _state
 
     init {
         loadDoctors()
@@ -24,14 +25,14 @@ class DoctorsViewModel(
 
     fun loadDoctors() {
         viewModelScope.launch {
-            _state.value = DoctorsUiState.Loading
+            _state.value = UiState.Loading
 
             repository.getDoctors()
                 .onSuccess {
-                    _state.value = DoctorsUiState.Success(it)
+                    _state.value = UiState.Success(it)
                 }
                 .onFailure {
-                    _state.value = DoctorsUiState.Error(
+                    _state.value = UiState.Error(
                         it.message ?: "Unable to load doctors"
                     )
                 }

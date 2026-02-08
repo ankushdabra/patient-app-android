@@ -1,6 +1,7 @@
 package com.healthcare.app.appointments.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,27 +42,33 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.healthcare.app.appointments.api.AppointmentDto
 import com.healthcare.app.appointments.api.AppointmentsRepository
 import com.healthcare.app.core.storage.TokenManager
-import com.healthcare.app.doctors.list.ui.ErrorState
-import com.healthcare.app.doctors.list.ui.LoadingState
+import com.healthcare.app.core.ui.UiState
+import com.healthcare.app.core.ui.components.ErrorState
+import com.healthcare.app.core.ui.components.LoadingState
 import com.healthcare.app.core.ui.theme.HealthcareTheme
 
 @Composable
-fun AppointmentsScreen(tokenManager: TokenManager) {
-    val viewModel: AppointmentsViewModel = viewModel(
-        factory = AppointmentsViewModelFactory(AppointmentsRepository(tokenManager))
+fun AppointmentListScreen(
+    tokenManager: TokenManager,
+    onAppointmentClick: (String) -> Unit
+) {
+    val viewModel: AppointmentListViewModel = viewModel(
+        factory = AppointmentListViewModelFactory(AppointmentsRepository(tokenManager))
     )
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    AppointmentsScreenContent(
+    AppointmentListScreenContent(
         uiState = uiState,
-        onRetry = viewModel::loadAppointments
+        onRetry = viewModel::loadAppointments,
+        onAppointmentClick = onAppointmentClick
     )
 }
 
 @Composable
-fun AppointmentsScreenContent(
-    uiState: AppointmentsUiState,
-    onRetry: () -> Unit
+fun AppointmentListScreenContent(
+    uiState: UiState<List<AppointmentDto>>,
+    onRetry: () -> Unit,
+    onAppointmentClick: (String) -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -76,14 +83,14 @@ fun AppointmentsScreenContent(
             )
     ) {
         when (val state = uiState) {
-            is AppointmentsUiState.Loading -> {
+            is UiState.Loading -> {
                 LoadingState()
             }
-            is AppointmentsUiState.Success -> {
+            is UiState.Success -> {
                 Column(modifier = Modifier.fillMaxSize()) {
-                    AppointmentsHeader()
+                    AppointmentListHeader()
                     
-                    if (state.appointments.isEmpty()) {
+                    if (state.data.isEmpty()) {
                         Box(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
@@ -100,19 +107,21 @@ fun AppointmentsScreenContent(
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             items(
-                                items = state.appointments,
+                                items = state.data,
                                 key = { it.id }
                             ) { appointment ->
-                                AppointmentItem(
+                                AppointmentListItem(
                                     appointment = appointment,
-                                    modifier = Modifier.padding(horizontal = 16.dp)
+                                    modifier = Modifier
+                                        .padding(horizontal = 16.dp)
+                                        .clickable { onAppointmentClick(appointment.id) }
                                 )
                             }
                         }
                     }
                 }
             }
-            is AppointmentsUiState.Error -> {
+            is UiState.Error -> {
                 ErrorState(
                     message = state.message,
                     onRetry = onRetry
@@ -123,7 +132,7 @@ fun AppointmentsScreenContent(
 }
 
 @Composable
-fun AppointmentsHeader() {
+fun AppointmentListHeader() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -145,7 +154,7 @@ fun AppointmentsHeader() {
 }
 
 @Composable
-fun AppointmentItem(
+fun AppointmentListItem(
     appointment: AppointmentDto,
     modifier: Modifier = Modifier
 ) {
@@ -233,7 +242,7 @@ fun AppointmentItem(
 
 @Preview(showBackground = true)
 @Composable
-fun AppointmentsScreenPreview() {
+fun AppointmentListScreenPreview() {
     HealthcareTheme {
         val mockAppointments = listOf(
             AppointmentDto(
@@ -264,9 +273,10 @@ fun AppointmentsScreenPreview() {
                 status = "BOOKED"
             )
         )
-        AppointmentsScreenContent(
-            uiState = AppointmentsUiState.Success(mockAppointments),
-            onRetry = {}
+        AppointmentListScreenContent(
+            uiState = UiState.Success(mockAppointments),
+            onRetry = {},
+            onAppointmentClick = {}
         )
     }
 }

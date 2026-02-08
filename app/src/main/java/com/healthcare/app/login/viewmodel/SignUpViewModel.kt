@@ -3,14 +3,13 @@ package com.healthcare.app.login.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.healthcare.app.login.api.AuthenticationRepository
-import com.healthcare.app.login.api.RegisterRequest
-import com.healthcare.app.login.ui.AuthUiState
 import com.healthcare.app.core.storage.TokenManager
+import com.healthcare.app.core.ui.UiState
+import com.healthcare.app.login.api.AuthenticationRepository
+import com.healthcare.app.login.api.SignUpRequestDto
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class SignUpViewModel(
@@ -18,8 +17,8 @@ class SignUpViewModel(
     private val tokenManager: TokenManager
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(AuthUiState())
-    val state: StateFlow<AuthUiState> = _state.asStateFlow()
+    private val _state = MutableStateFlow<UiState<Boolean>>(UiState.Success(false))
+    val state: StateFlow<UiState<Boolean>> = _state.asStateFlow()
 
     fun register(
         name: String,
@@ -30,9 +29,9 @@ class SignUpViewModel(
         bloodGroup: String
     ) {
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = true, error = null, isSuccess = false) }
+            _state.value = UiState.Loading
             repository.register(
-                RegisterRequest(
+                SignUpRequestDto(
                     name = name.trim(),
                     email = email.trim(),
                     password = password.trim(),
@@ -42,16 +41,15 @@ class SignUpViewModel(
                 )
             ).onSuccess { response ->
                 tokenManager.saveToken(response.token)
-                _state.update { it.copy(isLoading = false, isSuccess = true) }
+                _state.value = UiState.Success(true)
             }.onFailure { exception ->
-                _state.update { 
-                    it.copy(
-                        isLoading = false, 
-                        error = exception.message ?: "Registration failed"
-                    ) 
-                }
+                _state.value = UiState.Error(exception.message ?: "Registration failed")
             }
         }
+    }
+
+    fun resetState() {
+        _state.value = UiState.Success(false)
     }
 }
 
@@ -67,4 +65,3 @@ class SignUpViewModelFactory(
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
-

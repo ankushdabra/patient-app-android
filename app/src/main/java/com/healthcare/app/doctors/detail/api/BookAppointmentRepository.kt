@@ -4,7 +4,7 @@ import com.healthcare.app.core.network.ApiUrlMapper
 import com.healthcare.app.core.network.NetworkModule
 import com.healthcare.app.core.storage.TokenManager
 
-class DoctorDetailRepository(tokenManager: TokenManager) {
+class BookAppointmentRepository(tokenManager: TokenManager) {
     private val api = NetworkModule.provideRetrofit(tokenManager)
         .create(ApiUrlMapper::class.java)
 
@@ -16,7 +16,7 @@ class DoctorDetailRepository(tokenManager: TokenManager) {
         }
     }
 
-    suspend fun bookAppointment(request: AppointmentRequest): Result<AppointmentResponse> {
+    suspend fun bookAppointment(request: AppointmentRequestDto): Result<AppointmentResponseDto> {
         return try {
             Result.success(api.bookAppointment(request))
         } catch (e: Exception) {
