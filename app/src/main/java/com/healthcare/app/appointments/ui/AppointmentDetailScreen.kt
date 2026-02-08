@@ -21,9 +21,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.outlined.AccountBalance
 import androidx.compose.material.icons.outlined.Event
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.MedicalServices
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.School
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -42,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -54,6 +58,8 @@ import com.healthcare.app.core.ui.UiState
 import com.healthcare.app.core.ui.components.ErrorState
 import com.healthcare.app.core.ui.components.LoadingState
 import com.healthcare.app.core.ui.theme.HealthcareTheme
+import com.healthcare.app.doctors.detail.api.DoctorAvailabilityDto
+import com.healthcare.app.doctors.detail.api.DoctorDetailDto
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -73,15 +79,8 @@ fun AppointmentDetailScreen(
         topBar = {
             TopAppBar(
                 title = { },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            tint = Color.White
-                        )
-                    }
-                },
+                // Back button hidden as requested
+                navigationIcon = { },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Transparent,
                     scrolledContainerColor = Color.Transparent
@@ -145,7 +144,7 @@ fun AppointmentDetailContent(
                     shape = RoundedCornerShape(bottomStart = 40.dp, bottomEnd = 40.dp)
                 )
                 .padding(horizontal = 24.dp)
-                .padding(top = 80.dp, bottom = 40.dp) // Top padding accounts for status bar + back button
+                .padding(top = 48.dp, bottom = 40.dp) 
         ) {
             Column {
                 Row(
@@ -167,9 +166,10 @@ fun AppointmentDetailContent(
                     }
 
                     Surface(
-                        color = if (appointment.status == "BOOKED") Color(0xFF4CAF50) else Color.White.copy(
-                            alpha = 0.2f
-                        ),
+                        color = if (appointment.status == "BOOKED") 
+                            Color(0xFF4CAF50)
+                        else 
+                            Color.White.copy(alpha = 0.15f),
                         shape = RoundedCornerShape(16.dp)
                     ) {
                         Text(
@@ -182,7 +182,7 @@ fun AppointmentDetailContent(
                     }
                 }
 
-                Spacer(Modifier.height(24.dp))
+                Spacer(Modifier.height(16.dp))
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
@@ -202,16 +202,59 @@ fun AppointmentDetailContent(
                     Spacer(Modifier.width(16.dp))
                     Column {
                         Text(
-                            text = appointment.doctorName,
+                            text = appointment.doctor.name ?: "Unknown Doctor",
                             style = MaterialTheme.typography.headlineMedium,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
                         )
-                        Text(
-                            text = appointment.specialization,
-                            style = MaterialTheme.typography.titleMedium,
-                            color = Color.White.copy(alpha = 0.8f)
-                        )
+
+                        Surface(
+                            color = Color.White.copy(alpha = 0.15f),
+                            shape = RoundedCornerShape(6.dp)
+                        ) {
+                            Text(
+                                text = (appointment.doctor.specialization ?: "Specialist").uppercase(),
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = Color.White,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+
+                        Spacer(Modifier.height(8.dp))
+
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Outlined.School,
+                                contentDescription = null,
+                                tint = Color.White.copy(alpha = 0.8f),
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Text(
+                                text = appointment.doctor.qualification ?: "MBBS, MD",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color.White.copy(alpha = 0.8f)
+                            )
+                        }
+
+                        Spacer(Modifier.height(4.dp))
+
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Outlined.AccountBalance,
+                                contentDescription = null,
+                                tint = Color.White.copy(alpha = 0.8f),
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Text(
+                                text = appointment.doctor.clinicAddress
+                                    ?: "Healthcare Clinic, City Center",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color.White.copy(alpha = 0.8f)
+                            )
+                        }
                     }
                 }
 
@@ -289,29 +332,28 @@ fun AppointmentDetailContent(
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             // Instructions Card
-            Text(
-                text = "Instructions",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
-            )
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.White),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
-                Row(
-                    modifier = Modifier.padding(20.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Event,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(28.dp)
-                    )
-                    Spacer(Modifier.width(16.dp))
+                Column(modifier = Modifier.padding(20.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Outlined.Event,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(Modifier.width(12.dp))
+                        Text(
+                            text = "Instructions",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    Spacer(Modifier.height(12.dp))
                     Text(
                         text = "Your appointment is successfully confirmed. Please ensure you carry your previous medical records and arrive 15 minutes before the scheduled time.",
                         style = MaterialTheme.typography.bodyMedium,
@@ -319,14 +361,7 @@ fun AppointmentDetailContent(
                     )
                 }
             }
-
             // About Doctor Card
-            Text(
-                text = "About Doctor",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
-            )
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp),
@@ -343,14 +378,17 @@ fun AppointmentDetailContent(
                         )
                         Spacer(Modifier.width(12.dp))
                         Text(
-                            text = "Doctor Description",
+                            text = "About Doctor",
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.Bold
                         )
                     }
-                    Spacer(Modifier.height(12.dp))
+
+                    Spacer(Modifier.height(16.dp))
+
                     Text(
-                        text = "${appointment.doctorName} is a highly experienced ${appointment.specialization.lowercase()} with over 10 years of clinical practice. They are known for their patient-centric approach and expertise in advanced medical treatments.",
+                        text = appointment.doctor.about
+                            ?: "${appointment.doctor.name} is a highly experienced ${appointment.doctor.specialization?.lowercase()} with over ${appointment.doctor.experience ?: 0} years of clinical practice. They are known for their patient-centric approach and expertise in advanced medical treatments.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -362,16 +400,55 @@ fun AppointmentDetailContent(
     }
 }
 
+@Composable
+fun DetailRow(icon: ImageVector, label: String, value: String) {
+    Row(verticalAlignment = Alignment.Top) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(18.dp)
+        )
+        Spacer(Modifier.width(12.dp))
+        Column {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+            )
+            Text(
+                text = value,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun AppointmentDetailPreview() {
     HealthcareTheme {
         AppointmentDetailContent(
             appointment = AppointmentDto(
-                id = "1",
-                doctorId = "d1",
-                doctorName = "Dr. Amit Sharma",
-                specialization = "Cardiology",
+                id = "99581a2c-f643-4b4d-aa26-4bd563150e3d",
+                doctor = DoctorDetailDto(
+                    id = "33333333-3333-3333-3333-333333333333",
+                    name = "Dr Amit Sharma",
+                    specialization = "Cardiology",
+                    qualification = "MBBS, MD (Cardiology)",
+                    experience = 12,
+                    rating = 4.7,
+                    consultationFee = 800.0,
+                    about = "Experienced cardiologist with 12+ years of practice",
+                    clinicAddress = "Delhi Heart Clinic, New Delhi",
+                    profileImage = "profile.jpg",
+                    availability = listOf(
+                        DoctorAvailabilityDto("MON", "10:00", "13:00"),
+                        DoctorAvailabilityDto("WED", "14:00", "18:00")
+                    )
+                ),
                 appointmentDate = "2026-02-09",
                 appointmentTime = "10:00:00",
                 status = "BOOKED"

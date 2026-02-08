@@ -20,8 +20,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AccountBalance
 import androidx.compose.material.icons.outlined.CurrencyRupee
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.MedicalServices
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.School
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.icons.outlined.WorkOutline
 import androidx.compose.material3.AssistChip
@@ -30,11 +34,16 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -50,6 +59,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -60,10 +70,9 @@ import com.healthcare.app.core.ui.components.LoadingState
 import com.healthcare.app.core.ui.theme.HealthcareTheme
 import com.healthcare.app.doctors.detail.api.DoctorAvailabilityDto
 import com.healthcare.app.doctors.detail.api.DoctorDetailDto
-import com.healthcare.app.doctors.detail.viewmodel.BookAppointmentData
-import com.healthcare.app.doctors.detail.viewmodel.BookingState
 import com.healthcare.app.doctors.detail.viewmodel.BookAppointmentViewModel
 import com.healthcare.app.doctors.detail.viewmodel.BookAppointmentViewModelFactory
+import com.healthcare.app.doctors.detail.viewmodel.BookingState
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
@@ -113,11 +122,13 @@ fun generateTimeSlots(
 
 // --- Main Screen ---
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BookAppointmentScreen(
     doctorId: String,
     tokenManager: TokenManager,
-    onBookingSuccess: () -> Unit = {}
+    onBookingSuccess: () -> Unit = {},
+    onBackClick: () -> Unit = {}
 ) {
     val viewModel: BookAppointmentViewModel = viewModel(
         factory = BookAppointmentViewModelFactory(tokenManager, doctorId)
@@ -140,33 +151,49 @@ fun BookAppointmentScreen(
         }
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFFFFFFFF),
-                        Color(0xFFF2F4F8)
-                    )
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { },
+                // Back button hidden as requested
+                navigationIcon = { },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Transparent,
+                    scrolledContainerColor = Color.Transparent
                 )
             )
-    ) {
-        when (val s = state) {
-            is UiState.Loading -> LoadingState()
-            is UiState.Error -> ErrorState(
-                message = s.message,
-                onRetry = { /* Handle retry if needed */ })
-
-            is UiState.Success -> {
-                DoctorDetailBookingContent(
-                    doctor = s.data.doctor,
-                    isBooking = s.data.bookingState is BookingState.Loading,
-                    onBookAppointment = { day, time ->
-                        val actualDate = getNextDateForDay(day)
-                        viewModel.bookAppointment(doctorId, actualDate, time)
-                    }
+        },
+        containerColor = Color.Transparent
+    ) { padding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color(0xFFFFFFFF),
+                            Color(0xFFF2F4F8)
+                        )
+                    )
                 )
+        ) {
+            when (val s = state) {
+                is UiState.Loading -> LoadingState()
+                is UiState.Error -> ErrorState(
+                    message = s.message,
+                    onRetry = { /* Handle retry if needed */ })
+
+                is UiState.Success -> {
+                    DoctorDetailBookingContent(
+                        doctor = s.data.doctor,
+                        isBooking = s.data.bookingState is BookingState.Loading,
+                        onBookAppointment = { day, time ->
+                            val actualDate = getNextDateForDay(day)
+                            viewModel.bookAppointment(doctorId, actualDate, time)
+                        },
+                        bottomPadding = padding.calculateBottomPadding()
+                    )
+                }
             }
         }
     }
@@ -178,7 +205,8 @@ fun BookAppointmentScreen(
 fun DoctorDetailBookingContent(
     doctor: DoctorDetailDto,
     isBooking: Boolean,
-    onBookAppointment: (String, String) -> Unit
+    onBookAppointment: (String, String) -> Unit,
+    bottomPadding: Dp = 0.dp
 ) {
     val availableDays = doctor.availability.map { it.day }
     var selectedDate by remember { mutableStateOf(availableDays.firstOrNull()) }
@@ -201,126 +229,224 @@ fun DoctorDetailBookingContent(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+            .padding(bottom = bottomPadding)
     ) {
-        DoctorDetailHeader(
-            name = doctor.name ?: "Doctor",
-            specialization = doctor.specialization ?: "",
-            experience = "${doctor.experience} yrs experience",
-            fee = "₹${doctor.consultationFee}",
-            rating = doctor.rating
-        )
-
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFFCFCFE)),
-            elevation = CardDefaults.cardElevation(4.dp)
+        // --- Hero Header Section ---
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            MaterialTheme.colorScheme.primary,
+                            MaterialTheme.colorScheme.primary.copy(alpha = 0.85f)
+                        )
+                    ),
+                    shape = RoundedCornerShape(bottomStart = 40.dp, bottomEnd = 40.dp)
+                )
+                .padding(horizontal = 24.dp)
+                .padding(top = 48.dp, bottom = 40.dp) // Adjusted bottom padding to match DoctorsListScreen
         ) {
-            Column(modifier = Modifier.padding(20.dp)) {
-                DateSelector(
-                    selectedDate = selectedDate,
-                    dates = availableDays,
-                    onDateSelected = { selectedDate = it }
-                )
+            Column {
+                Surface(
+                    color = Color.White.copy(alpha = 0.2f),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text(
+                        text = "DOCTOR DETAILS",
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
 
-                Spacer(Modifier.height(24.dp))
+                Spacer(Modifier.height(16.dp))
 
-                TimeSelector(
-                    selectedTime = selectedTime,
-                    times = timeSlots,
-                    onTimeSelected = { selectedTime = it }
-                )
-            }
-        }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(80.dp)
+                            .clip(CircleShape)
+                            .background(Color.White.copy(alpha = 0.2f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Person,
+                            contentDescription = null,
+                            modifier = Modifier.size(44.dp),
+                            tint = Color.White
+                        )
+                    }
+                    Spacer(Modifier.width(16.dp))
+                    Column {
+                        Text(
+                            text = doctor.name ?: "Doctor",
+                            style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                        Surface(
+                            color = Color.White.copy(alpha = 0.15f),
+                            shape = RoundedCornerShape(6.dp)
+                        ) {
+                            Text(
+                                text = (doctor.specialization ?: "Specialist").uppercase(),
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = Color.White,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
 
-        Spacer(Modifier.weight(1f))
+                        Spacer(Modifier.height(8.dp))
 
-        if (isBooking) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-        } else {
-            BookAppointmentButton(
-                enabled = isBookingEnabled,
-                onClick = {
-                    selectedDate?.let { day ->
-                        selectedTime?.let { time ->
-                            onBookAppointment(day, time)
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Outlined.School,
+                                contentDescription = null,
+                                tint = Color.White.copy(alpha = 0.8f),
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Text(
+                                text = doctor.qualification ?: "MBBS, MD",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color.White.copy(alpha = 0.8f)
+                            )
+                        }
+
+                        Spacer(Modifier.height(4.dp))
+
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Outlined.AccountBalance,
+                                contentDescription = null,
+                                tint = Color.White.copy(alpha = 0.8f),
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Text(
+                                text = doctor.clinicAddress ?: "Healthcare Clinic, City Center",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color.White.copy(alpha = 0.8f)
+                            )
+                        }
+
+                        Spacer(Modifier.height(12.dp))
+                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                            HeaderInfoTag(
+                                icon = Icons.Outlined.Star,
+                                text = doctor.rating?.toString() ?: "N/A"
+                            )
+                            HeaderInfoTag(
+                                icon = Icons.Outlined.WorkOutline,
+                                text = "${doctor.experience ?: 0} yrs"
+                            )
+                            HeaderInfoTag(
+                                icon = Icons.Outlined.CurrencyRupee,
+                                text = "₹${doctor.consultationFee ?: 0.0}"
+                            )
                         }
                     }
                 }
-            )
+            }
         }
-    }
-}
 
-@Composable
-fun DoctorDetailHeader(
-    name: String,
-    specialization: String,
-    experience: String,
-    fee: String,
-    rating: Double? = null
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(
+        Column(
             modifier = Modifier
-                .size(80.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primaryContainer),
-            contentAlignment = Alignment.Center
+                .fillMaxWidth()
+                .padding(start = 24.dp, end = 24.dp, top = 24.dp, bottom = 48.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            Icon(
-                imageVector = Icons.Outlined.Person,
-                contentDescription = null,
-                modifier = Modifier.size(40.dp),
-                tint = MaterialTheme.colorScheme.primary
-            )
-        }
+            // About Doctor Card
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Column(modifier = Modifier.padding(20.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Outlined.Info,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(Modifier.width(12.dp))
+                        Text(
+                            text = "About Doctor",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    Spacer(Modifier.height(12.dp))
+                    Text(
+                        text = doctor.about
+                            ?: "${doctor.name ?: "Doctor"} is a highly experienced ${doctor.specialization?.lowercase() ?: "specialist"} with over ${doctor.experience ?: 0} years of clinical practice. They are known for their patient-centric approach and expertise in advanced medical treatments.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+            // Selection Card
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Column(modifier = Modifier.padding(20.dp)) {
+                    DateSelector(
+                        selectedDate = selectedDate,
+                        dates = availableDays,
+                        onDateSelected = { selectedDate = it }
+                    )
 
-        Spacer(Modifier.width(20.dp))
+                    Spacer(Modifier.height(24.dp))
 
-        Column {
-            Text(
-                text = name,
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
-            )
-            Text(
-                text = specialization,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+                    TimeSelector(
+                        selectedTime = selectedTime,
+                        times = timeSlots,
+                        onTimeSelected = { selectedTime = it }
+                    )
+                }
+            }
 
-            Spacer(Modifier.height(8.dp))
 
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                InfoTag(icon = Icons.Outlined.Star, text = rating?.toString() ?: "N/A")
-                InfoTag(icon = Icons.Outlined.WorkOutline, text = experience)
-                InfoTag(icon = Icons.Outlined.CurrencyRupee, text = fee)
+            if (isBooking) {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+            } else {
+                BookAppointmentButton(
+                    enabled = isBookingEnabled,
+                    onClick = {
+                        selectedDate?.let { day ->
+                            selectedTime?.let { time ->
+                                onBookAppointment(day, time)
+                            }
+                        }
+                    }
+                )
             }
         }
     }
 }
 
 @Composable
-fun InfoTag(icon: ImageVector, text: String) {
+fun HeaderInfoTag(icon: ImageVector, text: String) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Icon(
             imageVector = icon,
             contentDescription = null,
             modifier = Modifier.size(14.dp),
-            tint = MaterialTheme.colorScheme.primary
+            tint = Color.White
         )
         Spacer(Modifier.width(4.dp))
         Text(
             text = text,
             style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = Color.White
         )
     }
 }
@@ -409,16 +535,16 @@ fun DoctorDetailBookingPreview() {
     HealthcareTheme {
         DoctorDetailBookingContent(
             doctor = DoctorDetailDto(
-                id = "1",
-                name = "Dr. Amit Sharma",
-                specialization = "Cardiologist",
-                qualification = null,
-                experience = 10,
-                rating = 4.8,
-                consultationFee = 500,
-                about = null,
-                clinicAddress = null,
-                profileImage = null,
+                id = "33333333-3333-3333-3333-333333333333",
+                name = "Dr Amit Sharma",
+                specialization = "Cardiology",
+                qualification = "MBBS, MD (Cardiology)",
+                experience = 12,
+                rating = 4.7,
+                consultationFee = 800.0,
+                about = "Experienced cardiologist with 12+ years of practice",
+                clinicAddress = "Delhi Heart Clinic, New Delhi",
+                profileImage = "profile.jpg",
                 availability = listOf(
                     DoctorAvailabilityDto("MON", "10:00", "13:00"),
                     DoctorAvailabilityDto("WED", "14:00", "18:00")

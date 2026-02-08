@@ -4,5 +4,8 @@ data class DoctorDto(
     val id: String,
     val name: String,
     val specialization: String,
-    val experience: String
+    val experience: Int,
+    val consultationFee: Double,
+    val rating: Double,
+    val profileImage: String?
 )

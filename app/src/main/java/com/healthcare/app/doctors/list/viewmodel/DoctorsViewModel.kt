@@ -24,19 +24,34 @@ class DoctorsViewModel(
     }
 
     fun loadDoctors() {
+        // If we already have data, don't show loading state to avoid flickering
+        if (_state.value is UiState.Success) {
+            refreshDoctors()
+            return
+        }
+
         viewModelScope.launch {
             _state.value = UiState.Loading
-
-            repository.getDoctors()
-                .onSuccess {
-                    _state.value = UiState.Success(it)
-                }
-                .onFailure {
-                    _state.value = UiState.Error(
-                        it.message ?: "Unable to load doctors"
-                    )
-                }
+            fetchDoctors()
         }
+    }
+
+    private fun refreshDoctors() {
+        viewModelScope.launch {
+            fetchDoctors()
+        }
+    }
+
+    private suspend fun fetchDoctors() {
+        repository.getDoctors()
+            .onSuccess {
+                _state.value = UiState.Success(it)
+            }
+            .onFailure {
+                _state.value = UiState.Error(
+                    it.message ?: "Unable to load doctors"
+                )
+            }
     }
 }
 

@@ -55,25 +55,34 @@ fun PatientDashboard(tokenManager: TokenManager) {
 
                 items.forEach { item ->
                     // Check if the current destination or any of its parents match the route
-                    // Also explicitly check if we are in doctor_detail to keep "Doctors" tab active
-                    val isSelected = currentDestination?.hierarchy?.any { it.route == item.route } == true ||
-                            (item == PatientBottomNavItem.Doctors && currentDestination?.route?.startsWith(Routes.DOCTOR_DETAIL) == true)
+                    // Also explicitly check if we are in detail screens to keep corresponding tab active
+                    val isSelected =
+                        currentDestination?.hierarchy?.any { it.route == item.route } == true ||
+                                (item == PatientBottomNavItem.Doctors && currentDestination?.route?.startsWith(
+                                    Routes.DOCTOR_DETAIL
+                                ) == true) ||
+                                (item == PatientBottomNavItem.Appointments && currentDestination?.route?.startsWith(
+                                    Routes.APPOINTMENT_DETAIL
+                                ) == true)
 
                     NavigationBarItem(
                         selected = isSelected,
                         onClick = {
-                            navController.navigate(item.route) {
-                                // Pop up to the start destination of the graph to
-                                // avoid building up a large stack of destinations
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
+                            if (currentDestination?.route != item.route) {
+                                navController.navigate(item.route) {
+                                    // Pop up to the start destination of the graph to
+                                    // avoid building up a large stack of destinations
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    // Avoid multiple copies of the same destination when
+                                    // reselecting the same item
+                                    launchSingleTop = true
+
+                                    // Restore state for other tabs, but always go to list for Doctors and Appointments
+                                    restoreState =
+                                        item != PatientBottomNavItem.Doctors && item != PatientBottomNavItem.Appointments
                                 }
-                                // Avoid multiple copies of the same destination when
-                                // reselecting the same item
-                                launchSingleTop = true
-                                
-                                // Restore state for other tabs, but always go to list for Doctors
-                                restoreState = item != PatientBottomNavItem.Doctors
                             }
                         },
                         icon = {
@@ -125,8 +134,10 @@ fun PatientDashboard(tokenManager: TokenManager) {
                             popUpTo(navController.graph.findStartDestination().id)
                             launchSingleTop = true
                         }
-                    }
-                )
+                    },
+                    onBackClick = {
+                        navController.popBackStack()
+                    })
             }
             composable(PatientBottomNavItem.Appointments.route) {
                 AppointmentListScreen(
@@ -157,7 +168,7 @@ fun PatientDashboard(tokenManager: TokenManager) {
                 //PlaceholderScreen("Prescriptions")
             }
             composable(PatientBottomNavItem.Profile.route) {
-               // PlaceholderScreen("Profile")
+                // PlaceholderScreen("Profile")
             }
         }
     }
@@ -168,8 +179,8 @@ fun PatientDashboard(tokenManager: TokenManager) {
 fun PatientDashboardPreview() {
     HealthcareTheme {
         val mockDoctors = listOf(
-            DoctorDto("1", "Dr. John Smith", "Cardiologist", "15 years"),
-            DoctorDto("2", "Dr. Sarah Wilson", "Neurologist", "10 years")
+            DoctorDto("1", "Dr. John Smith", "Cardiologist", 15, 100.0, 4.5, null),
+            DoctorDto("2", "Dr. Sarah Wilson", "Neurologist", 10, 120.0, 4.8, null)
         )
 
         Scaffold(
