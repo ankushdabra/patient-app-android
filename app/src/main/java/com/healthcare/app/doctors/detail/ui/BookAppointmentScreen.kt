@@ -23,7 +23,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountBalance
 import androidx.compose.material.icons.outlined.CurrencyRupee
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.MedicalServices
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.School
 import androidx.compose.material.icons.outlined.Star
@@ -109,8 +108,7 @@ fun getNextDateForDay(day: String): String {
 fun BookAppointmentScreen(
     doctorId: String,
     tokenManager: TokenManager,
-    onBookingSuccess: () -> Unit = {},
-    onBackClick: () -> Unit = {}
+    onBookingSuccess: () -> Unit = {}
 ) {
     val viewModel: BookAppointmentViewModel = viewModel(
         factory = BookAppointmentViewModelFactory(tokenManager, doctorId)
@@ -163,7 +161,7 @@ fun BookAppointmentScreen(
                 is UiState.Loading -> LoadingState()
                 is UiState.Error -> ErrorState(
                     message = s.message,
-                    onRetry = { /* Handle retry if needed */ })
+                    onRetry = { viewModel.loadDoctor(doctorId) })
 
                 is UiState.Success -> {
                     DoctorDetailBookingContent(
@@ -199,10 +197,10 @@ fun DoctorDetailBookingContent(
         doctor.availability[selectedDate] ?: emptyList()
     }
 
-    var selectedTime by remember(timeSlots) { 
-        mutableStateOf(timeSlots.firstOrNull()?.startTime) 
+    var selectedTime by remember(timeSlots) {
+        mutableStateOf(timeSlots.firstOrNull()?.startTime)
     }
-    
+
     val isBookingEnabled = selectedDate != null && selectedTime != null && !isBooking
 
     Column(
@@ -233,7 +231,7 @@ fun DoctorDetailBookingContent(
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     Text(
-                        text = "DOCTOR DETAILS",
+                        text = "BOOK APPOINTMENT",
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
                         style = MaterialTheme.typography.labelSmall,
                         color = Color.White,
@@ -370,6 +368,7 @@ fun DoctorDetailBookingContent(
                     )
                 }
             }
+
             // Selection Card
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -403,7 +402,6 @@ fun DoctorDetailBookingContent(
                     }
                 }
             }
-
 
             if (isBooking) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))

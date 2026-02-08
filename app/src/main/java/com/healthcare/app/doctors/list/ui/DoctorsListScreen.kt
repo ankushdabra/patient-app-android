@@ -21,9 +21,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.outlined.CurrencyRupee
+import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.icons.outlined.WorkOutline
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -38,13 +40,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.healthcare.app.core.storage.TokenManager
 import com.healthcare.app.core.ui.UiState
-import com.healthcare.app.core.ui.components.ErrorState
 import com.healthcare.app.core.ui.components.LoadingState
 import com.healthcare.app.core.ui.theme.HealthcareTheme
 import com.healthcare.app.doctors.list.api.DoctorDto
@@ -92,8 +94,7 @@ fun DoctorsListScreenContent(
             }
 
             is UiState.Error -> {
-                ErrorState(
-                    message = state.message,
+                EnhancedErrorState(
                     onRetry = onRetry
                 )
             }
@@ -104,6 +105,71 @@ fun DoctorsListScreenContent(
                     onDoctorClick = onDoctorClick
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun EnhancedErrorState(
+    onRetry: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Box(
+            modifier = Modifier
+                .size(120.dp)
+                .background(
+                    color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.2f),
+                    shape = CircleShape
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.ErrorOutline,
+                contentDescription = null,
+                modifier = Modifier.size(64.dp),
+                tint = MaterialTheme.colorScheme.error
+            )
+        }
+        
+        Spacer(Modifier.height(32.dp))
+        
+        Text(
+            text = "Something went wrong",
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        
+        Spacer(Modifier.height(12.dp))
+        
+        Text(
+            text = "Unable to load doctors. Please check your internet connection and try again.",
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth(0.8f)
+        )
+        
+        Spacer(Modifier.height(48.dp))
+        
+        Button(
+            onClick = onRetry,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp),
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            Text(
+                text = "Try Again",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
         }
     }
 }
@@ -314,6 +380,18 @@ fun DoctorsListScreenPreview() {
         )
         DoctorsListScreenContent(
             state = UiState.Success(mockDoctors),
+            onRetry = {},
+            onDoctorClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DoctorsListErrorPreview() {
+    HealthcareTheme {
+        DoctorsListScreenContent(
+            state = UiState.Error("Connection timed out. Please check your internet and try again."),
             onRetry = {},
             onDoctorClick = {}
         )

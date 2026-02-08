@@ -8,6 +8,7 @@ import com.healthcare.app.login.api.LoginRequestDto
 import com.healthcare.app.login.api.LoginResponseDto
 import com.healthcare.app.login.api.SignUpRequestDto
 import com.healthcare.app.login.api.SignUpResponseDto
+import com.healthcare.app.login.api.UserDto
 import com.healthcare.app.doctors.list.api.DoctorDto
 import retrofit2.Response
 import retrofit2.http.Body
@@ -22,6 +23,12 @@ interface ApiUrlMapper {
 
     @POST("/api/auth/register")
     suspend fun register(@Body request: SignUpRequestDto): Response<SignUpResponseDto>
+
+    @POST("/api/auth/logout")
+    suspend fun logout(): Response<Unit>
+
+    @GET("/api/profile")
+    suspend fun getProfile(): UserDto
 
     @GET("/api/doctors")
     suspend fun getDoctors(): List<DoctorDto>

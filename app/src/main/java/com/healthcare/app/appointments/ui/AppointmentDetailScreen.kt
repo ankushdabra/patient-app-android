@@ -18,20 +18,17 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.outlined.AccountBalance
 import androidx.compose.material.icons.outlined.Event
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.MedicalServices
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.School
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -59,15 +56,13 @@ import com.healthcare.app.core.ui.components.ErrorState
 import com.healthcare.app.core.ui.components.LoadingState
 import com.healthcare.app.core.ui.theme.HealthcareTheme
 import com.healthcare.app.doctors.detail.api.DoctorDetailDto
-import com.healthcare.app.doctors.detail.api.DoctorTimeSlotDto
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppointmentDetailScreen(
     appointmentId: String,
-    tokenManager: TokenManager,
-    onBackClick: () -> Unit
+    tokenManager: TokenManager
 ) {
     val repository = AppointmentsRepository(tokenManager)
     val viewModel: AppointmentDetailViewModel = viewModel(
@@ -89,8 +84,6 @@ fun AppointmentDetailScreen(
         },
         containerColor = Color.Transparent
     ) { _ ->
-        // We ignore the padding from Scaffold because the parent NavHost already handles 
-        // the bottom bar padding, and we want the header to draw behind the TopAppBar.
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -144,7 +137,7 @@ fun AppointmentDetailContent(
                     shape = RoundedCornerShape(bottomStart = 40.dp, bottomEnd = 40.dp)
                 )
                 .padding(horizontal = 24.dp)
-                .padding(top = 48.dp, bottom = 40.dp) 
+                .padding(top = 48.dp, bottom = 40.dp)
         ) {
             Column {
                 Row(
@@ -166,9 +159,9 @@ fun AppointmentDetailContent(
                     }
 
                     Surface(
-                        color = if (appointment.status == "BOOKED") 
+                        color = if (appointment.status == "BOOKED")
                             Color(0xFF4CAF50)
-                        else 
+                        else
                             Color.White.copy(alpha = 0.15f),
                         shape = RoundedCornerShape(16.dp)
                     ) {
@@ -405,7 +398,7 @@ fun AppointmentDetailContent(
                 Column(modifier = Modifier.padding(20.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
-                            imageVector = Icons.Default.Schedule,
+                            imageVector = Icons.Outlined.Event,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(24.dp)
@@ -493,22 +486,18 @@ fun AppointmentDetailPreview() {
     HealthcareTheme {
         AppointmentDetailContent(
             appointment = AppointmentDto(
-                id = "99581a2c-f643-4b4d-aa26-4bd563150e3d",
+                id = "1",
                 doctor = DoctorDetailDto(
-                    id = "33333333-3333-3333-3333-333333333333",
-                    name = "Dr Amit Sharma",
+                    id = "d1",
+                    name = "Dr. Amit Sharma",
                     specialization = "Cardiology",
-                    qualification = "MBBS, MD (Cardiology)",
+                    qualification = "MBBS, MD",
                     experience = 12,
-                    rating = 4.7,
+                    rating = 4.5,
                     consultationFee = 800.0,
-                    about = "Experienced cardiologist with 12+ years of practice",
-                    clinicAddress = "Delhi Heart Clinic, New Delhi",
-                    profileImage = "profile.jpg",
-                    availability = mapOf(
-                        "MON" to listOf(DoctorTimeSlotDto("10:00", "13:00")),
-                        "WED" to listOf(DoctorTimeSlotDto("14:00", "18:00"))
-                    )
+                    about = null,
+                    clinicAddress = "Healthcare Clinic, City Center",
+                    profileImage = null
                 ),
                 appointmentDate = "2026-02-09",
                 appointmentTime = "10:00:00",

@@ -21,8 +21,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material.icons.outlined.Event
+import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -37,6 +38,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -45,10 +47,10 @@ import com.healthcare.app.appointments.api.AppointmentDto
 import com.healthcare.app.appointments.api.AppointmentsRepository
 import com.healthcare.app.core.storage.TokenManager
 import com.healthcare.app.core.ui.UiState
-import com.healthcare.app.core.ui.components.ErrorState
 import com.healthcare.app.core.ui.components.LoadingState
 import com.healthcare.app.core.ui.theme.HealthcareTheme
 import com.healthcare.app.doctors.detail.api.DoctorDetailDto
+import com.healthcare.app.doctors.detail.api.DoctorTimeSlotDto
 
 @Composable
 fun AppointmentListScreen(
@@ -127,11 +129,75 @@ fun AppointmentListScreenContent(
             }
 
             is UiState.Error -> {
-                ErrorState(
-                    message = state.message,
+                AppointmentListErrorState(
                     onRetry = onRetry
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun AppointmentListErrorState(
+    onRetry: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Box(
+            modifier = Modifier
+                .size(120.dp)
+                .background(
+                    color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.2f),
+                    shape = CircleShape
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.ErrorOutline,
+                contentDescription = null,
+                modifier = Modifier.size(64.dp),
+                tint = MaterialTheme.colorScheme.error
+            )
+        }
+
+        Spacer(Modifier.height(32.dp))
+
+        Text(
+            text = "Something went wrong",
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+
+        Spacer(Modifier.height(12.dp))
+
+        Text(
+            text = "Unable to load appointments. Please check your internet connection and try again.",
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth(0.8f)
+        )
+
+        Spacer(Modifier.height(48.dp))
+
+        Button(
+            onClick = onRetry,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp),
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            Text(
+                text = "Try Again",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
         }
     }
 }
@@ -233,7 +299,7 @@ fun AppointmentListItem(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(Modifier.height(8.dp))
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -310,33 +376,30 @@ fun AppointmentListScreenPreview() {
                     consultationFee = 800.0,
                     about = null,
                     clinicAddress = null,
-                    profileImage = null
+                    profileImage = null,
+                    availability = mapOf(
+                        "MON" to listOf(DoctorTimeSlotDto("10:00", "13:00"))
+                    )
                 ),
                 appointmentDate = "2026-02-09",
                 appointmentTime = "10:00",
                 status = "BOOKED"
-            ),
-            AppointmentDto(
-                id = "2",
-                doctor = DoctorDetailDto(
-                    id = "d2",
-                    name = "Dr. Priya Das",
-                    specialization = "Dermatology",
-                    qualification = "MBBS, MD",
-                    experience = 8,
-                    rating = 4.8,
-                    consultationFee = 600.0,
-                    about = null,
-                    clinicAddress = null,
-                    profileImage = null
-                ),
-                appointmentDate = "2026-02-12",
-                appointmentTime = "15:30",
-                status = "COMPLETED"
             )
         )
         AppointmentListScreenContent(
             uiState = UiState.Success(mockAppointments),
+            onRetry = {},
+            onAppointmentClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AppointmentListErrorPreview() {
+    HealthcareTheme {
+        AppointmentListScreenContent(
+            uiState = UiState.Error("Connection timed out"),
             onRetry = {},
             onAppointmentClick = {}
         )

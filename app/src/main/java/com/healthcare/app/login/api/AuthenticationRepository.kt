@@ -45,4 +45,26 @@ class AuthenticationRepository(tokenManager: TokenManager) {
             Result.failure(e)
         }
     }
+
+    suspend fun getProfile(): Result<UserDto> {
+        return try {
+            val response = api.getProfile()
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun logout(): Result<Unit> {
+        return try {
+            val response = api.logout()
+            if (response.isSuccessful) {
+                Result.success(Unit)
+            } else {
+                Result.failure(Exception("Logout failed"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

@@ -30,6 +30,7 @@ import com.healthcare.app.doctors.detail.ui.BookAppointmentScreen
 import com.healthcare.app.doctors.list.api.DoctorDto
 import com.healthcare.app.doctors.list.ui.DoctorsListScreen
 import com.healthcare.app.doctors.list.ui.DoctorsListScreenContent
+import com.healthcare.app.login.ui.ProfileScreen
 import com.healthcare.app.navigation.PatientBottomNavItem
 import com.healthcare.app.navigation.Routes
 
@@ -134,10 +135,8 @@ fun PatientDashboard(tokenManager: TokenManager) {
                             popUpTo(navController.graph.findStartDestination().id)
                             launchSingleTop = true
                         }
-                    },
-                    onBackClick = {
-                        navController.popBackStack()
-                    })
+                    }
+                )
             }
             composable(PatientBottomNavItem.Appointments.route) {
                 AppointmentListScreen(
@@ -158,17 +157,14 @@ fun PatientDashboard(tokenManager: TokenManager) {
                 val appointmentId = backStackEntry.arguments?.getString("id")!!
                 AppointmentDetailScreen(
                     appointmentId = appointmentId,
-                    tokenManager = tokenManager,
-                    onBackClick = {
-                        navController.popBackStack()
-                    }
+                    tokenManager = tokenManager
                 )
             }
             composable(PatientBottomNavItem.Prescriptions.route) {
                 //PlaceholderScreen("Prescriptions")
             }
             composable(PatientBottomNavItem.Profile.route) {
-                // PlaceholderScreen("Profile")
+                ProfileScreen(tokenManager = tokenManager)
             }
         }
     }

@@ -31,7 +31,7 @@ sealed interface BookingState {
 
 class BookAppointmentViewModel(
     private val repository: BookAppointmentRepository,
-    doctorId: String
+    private val doctorId: String
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<UiState<BookAppointmentData>>(UiState.Loading)
@@ -41,7 +41,7 @@ class BookAppointmentViewModel(
         loadDoctor(doctorId)
     }
 
-    private fun loadDoctor(doctorId: String) {
+    fun loadDoctor(doctorId: String) {
         viewModelScope.launch {
             _state.value = UiState.Loading
             repository.getDoctorDetail(doctorId)
@@ -60,7 +60,7 @@ class BookAppointmentViewModel(
         if (currentState !is UiState.Success) return
 
         viewModelScope.launch {
-            _state.update { 
+            _state.update {
                 UiState.Success(currentState.data.copy(bookingState = BookingState.Loading))
             }
 
@@ -90,7 +90,13 @@ class BookAppointmentViewModel(
                     exception.message ?: "Booking failed"
                 }
                 _state.update {
-                    UiState.Success(currentState.data.copy(bookingState = BookingState.Error(errorMessage)))
+                    UiState.Success(
+                        currentState.data.copy(
+                            bookingState = BookingState.Error(
+                                errorMessage
+                            )
+                        )
+                    )
                 }
             }
         }

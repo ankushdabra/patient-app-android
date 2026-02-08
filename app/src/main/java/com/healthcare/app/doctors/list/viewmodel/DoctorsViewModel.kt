@@ -15,8 +15,7 @@ class DoctorsViewModel(
     private val repository: DoctorsRepository
 ) : ViewModel() {
 
-    private val _state =
-        MutableStateFlow<UiState<List<DoctorDto>>>(UiState.Loading)
+    private val _state = MutableStateFlow<UiState<List<DoctorDto>>>(UiState.Loading)
     val state: StateFlow<UiState<List<DoctorDto>>> = _state
 
     init {
