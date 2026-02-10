@@ -84,8 +84,8 @@ fun LoginScreen(
                 .background(
                     brush = Brush.verticalGradient(
                         colors = listOf(
-                            Color(0xFFFFFFFF),
-                            Color(0xFFF2F4F8)
+                            MaterialTheme.colorScheme.background,
+                            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
                         )
                     )
                 )
@@ -124,7 +124,7 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFFFCFCFE)
+                    containerColor = MaterialTheme.colorScheme.surface
                 ),
                 elevation = CardDefaults.cardElevation(4.dp)
             ) {

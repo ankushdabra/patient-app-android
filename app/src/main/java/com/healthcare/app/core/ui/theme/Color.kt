@@ -2,42 +2,44 @@ package com.healthcare.app.core.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
-
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
-
-// Healthcare App Colors - Light (Updated to Lavender/Purple Theme)
-val PrimaryLight = Color(0xFF6750A4)
+// Healthcare App Colors - Primary Brand Color (Vibrant Deep Blue/Purple)
+val PrimaryLight = Color(0xFF2B57E5) // More vibrant, visible blue
 val OnPrimaryLight = Color(0xFFFFFFFF)
-val PrimaryContainerLight = Color(0xFFEADDFF)
-val OnPrimaryContainerLight = Color(0xFF21005D)
+val PrimaryContainerLight = Color(0xFFDDE1FF)
+val OnPrimaryContainerLight = Color(0xFF001258)
 
-val SecondaryLight = Color(0xFF625B71)
+val SecondaryLight = Color(0xFF585D71)
 val OnSecondaryLight = Color(0xFFFFFFFF)
-val SecondaryContainerLight = Color(0xFFE8DEF8)
-val OnSecondaryContainerLight = Color(0xFF1D182A)
+val SecondaryContainerLight = Color(0xFFDCE1F9)
+val OnSecondaryContainerLight = Color(0xFF151B2C)
 
-val TertiaryLight = Color(0xFF7D5260)
+val TertiaryLight = Color(0xFF745470)
 val OnTertiaryLight = Color(0xFFFFFFFF)
-val TertiaryContainerLight = Color(0xFFFFD8E4)
-val OnTertiaryContainerLight = Color(0xFF31111D)
+val TertiaryContainerLight = Color(0xFFFFD6F8)
+val OnTertiaryContainerLight = Color(0xFF2B122A)
 
-// Healthcare App Colors - Dark
-val PrimaryDark = Color(0xFFD0BCFF)
-val OnPrimaryDark = Color(0xFF381E72)
-val PrimaryContainerDark = Color(0xFF4F378B)
-val OnPrimaryContainerDark = Color(0xFFEADDFF)
+// Background & Surface for Light mode
+val BackgroundLight = Color(0xFFF8F9FF)
+val SurfaceLight = Color(0xFFFFFFFF)
 
-val SecondaryDark = Color(0xFFCCC2DC)
-val OnSecondaryDark = Color(0xFF332D41)
-val SecondaryContainerDark = Color(0xFF4A4458)
-val OnSecondaryContainerDark = Color(0xFFE8DEF8)
+// Healthcare App Colors - Dark Mode (Vibrant & High Contrast)
+val PrimaryDark = Color(0xFFADC6FF) // Softer but bright blue for dark mode
+val OnPrimaryDark = Color(0xFF002D6F)
+val PrimaryContainerDark = Color(0xFF00439E)
+val OnPrimaryContainerDark = Color(0xFFD8E2FF)
 
-val TertiaryDark = Color(0xFFEFB8C8)
-val OnTertiaryDark = Color(0xFF492532)
-val TertiaryContainerDark = Color(0xFF633B48)
-val OnTertiaryContainerDark = Color(0xFFFFD8E4)
+val SecondaryDark = Color(0xFFC0C6DC)
+val OnSecondaryDark = Color(0xFF2A3042)
+val SecondaryContainerDark = Color(0xFF404659)
+val OnSecondaryContainerDark = Color(0xFFDCE2F9)
+
+val TertiaryDark = Color(0xFFDEBCDF)
+val OnTertiaryDark = Color(0xFF402843)
+val TertiaryContainerDark = Color(0xFF583E5B)
+val OnTertiaryContainerDark = Color(0xFFFBD7FC)
+
+// Background & Surface for Dark mode
+val BackgroundDark = Color(0xFF0F1117)
+val SurfaceDark = Color(0xFF1A1C22)
+val OnSurfaceDark = Color(0xFFE2E2E6)
+val OnBackgroundDark = Color(0xFFE2E2E6)

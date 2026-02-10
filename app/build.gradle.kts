@@ -21,7 +21,12 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8080/\"")
+//            buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8080/\"")
+            buildConfigField(
+                "String",
+                "BASE_URL",
+                "\"https://patient-app-spring-boot-production.up.railway.app/\""
+            )
         }
         release {
             isMinifyEnabled = false
@@ -51,7 +56,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
-    
+
     // Network
     implementation(libs.retrofit.v300)
     implementation(libs.converter.gson.v300)

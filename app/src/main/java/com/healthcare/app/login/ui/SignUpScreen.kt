@@ -35,7 +35,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -134,8 +133,8 @@ fun SignUpScreen(
                 .background(
                     brush = Brush.verticalGradient(
                         colors = listOf(
-                            Color(0xFFFFFFFF),
-                            Color(0xFFF2F4F8)
+                            MaterialTheme.colorScheme.background,
+                            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
                         )
                     )
                 )
@@ -176,12 +175,12 @@ fun SignUpScreen(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFFFCFCFE)
+                    containerColor = MaterialTheme.colorScheme.surface
                 ),
                 elevation = CardDefaults.cardElevation(4.dp)
             ) {
                 Column(
-                    modifier = Modifier.padding(24.dp)
+                    modifier = Modifier.padding(20.dp)
                 ) {
 
                     OutlinedTextField(

@@ -76,7 +76,6 @@ fun AppointmentDetailScreen(
         topBar = {
             TopAppBar(
                 title = { },
-                // Back button hidden as requested
                 navigationIcon = { },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Transparent,
@@ -92,8 +91,8 @@ fun AppointmentDetailScreen(
                 .background(
                     brush = Brush.verticalGradient(
                         colors = listOf(
-                            Color(0xFFFFFFFF),
-                            Color(0xFFF2F4F8)
+                            MaterialTheme.colorScheme.background,
+                            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
                         )
                     )
                 )
@@ -148,14 +147,14 @@ fun AppointmentDetailContent(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Surface(
-                        color = Color.White.copy(alpha = 0.2f),
+                        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.2f),
                         shape = RoundedCornerShape(8.dp)
                     ) {
                         Text(
                             text = "APPOINTMENT DETAILS",
                             modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
                             style = MaterialTheme.typography.labelSmall,
-                            color = Color.White,
+                            color = MaterialTheme.colorScheme.onPrimary,
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -164,14 +163,14 @@ fun AppointmentDetailContent(
                         color = if (appointment.status == "BOOKED")
                             Color(0xFF4CAF50)
                         else
-                            Color.White.copy(alpha = 0.15f),
+                            MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.15f),
                         shape = RoundedCornerShape(16.dp)
                     ) {
                         Text(
                             text = appointment.status,
                             modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
                             style = MaterialTheme.typography.labelMedium,
-                            color = Color.White,
+                            color = MaterialTheme.colorScheme.onPrimary,
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -184,14 +183,14 @@ fun AppointmentDetailContent(
                         modifier = Modifier
                             .size(80.dp)
                             .clip(CircleShape)
-                            .background(Color.White.copy(alpha = 0.2f)),
+                            .background(MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.2f)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Person,
                             contentDescription = null,
                             modifier = Modifier.size(44.dp),
-                            tint = Color.White
+                            tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                     Spacer(Modifier.width(16.dp))
@@ -200,18 +199,18 @@ fun AppointmentDetailContent(
                             text = appointment.doctor.name ?: "Unknown Doctor",
                             style = MaterialTheme.typography.headlineMedium,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
 
                         Surface(
-                            color = Color.White.copy(alpha = 0.15f),
+                            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.15f),
                             shape = RoundedCornerShape(6.dp)
                         ) {
                             Text(
                                 text = (appointment.doctor.specialization ?: "Specialist").uppercase(),
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
                                 style = MaterialTheme.typography.labelSmall,
-                                color = Color.White,
+                                color = MaterialTheme.colorScheme.onPrimary,
                                 fontWeight = FontWeight.SemiBold
                             )
                         }
@@ -222,14 +221,14 @@ fun AppointmentDetailContent(
                             Icon(
                                 imageVector = Icons.Outlined.School,
                                 contentDescription = null,
-                                tint = Color.White.copy(alpha = 0.8f),
+                                tint = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
                                 modifier = Modifier.size(16.dp)
                             )
                             Spacer(Modifier.width(8.dp))
                             Text(
                                 text = appointment.doctor.qualification ?: "MBBS, MD",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = Color.White.copy(alpha = 0.8f)
+                                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
                             )
                         }
 
@@ -239,7 +238,7 @@ fun AppointmentDetailContent(
                             Icon(
                                 imageVector = Icons.Outlined.AccountBalance,
                                 contentDescription = null,
-                                tint = Color.White.copy(alpha = 0.8f),
+                                tint = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
                                 modifier = Modifier.size(16.dp)
                             )
                             Spacer(Modifier.width(8.dp))
@@ -247,7 +246,7 @@ fun AppointmentDetailContent(
                                 text = appointment.doctor.clinicAddress
                                     ?: "Healthcare Clinic, City Center",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = Color.White.copy(alpha = 0.8f)
+                                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
                             )
                         }
                     }
@@ -257,7 +256,7 @@ fun AppointmentDetailContent(
 
                 // Schedule Card (Glassmorphism Style)
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.15f)),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.15f)),
                     shape = RoundedCornerShape(20.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -272,19 +271,19 @@ fun AppointmentDetailContent(
                             Icon(
                                 Icons.Default.CalendarToday,
                                 null,
-                                tint = Color.White,
+                                tint = MaterialTheme.colorScheme.onPrimary,
                                 modifier = Modifier.size(24.dp)
                             )
                             Spacer(Modifier.height(8.dp))
                             Text(
                                 appointment.appointmentDate,
-                                color = Color.White,
+                                color = MaterialTheme.colorScheme.onPrimary,
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
                                 "Date",
-                                color = Color.White.copy(alpha = 0.7f),
+                                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f),
                                 style = MaterialTheme.typography.labelSmall
                             )
                         }
@@ -292,25 +291,25 @@ fun AppointmentDetailContent(
                             modifier = Modifier
                                 .width(1.dp)
                                 .height(48.dp)
-                                .background(Color.White.copy(alpha = 0.2f))
+                                .background(MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.2f))
                         )
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Icon(
                                 Icons.Default.Schedule,
                                 null,
-                                tint = Color.White,
+                                tint = MaterialTheme.colorScheme.onPrimary,
                                 modifier = Modifier.size(24.dp)
                             )
                             Spacer(Modifier.height(8.dp))
                             Text(
                                 appointment.appointmentTime,
-                                color = Color.White,
+                                color = MaterialTheme.colorScheme.onPrimary,
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
                                 "Time",
-                                color = Color.White.copy(alpha = 0.7f),
+                                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f),
                                 style = MaterialTheme.typography.labelSmall
                             )
                         }
@@ -330,7 +329,7 @@ fun AppointmentDetailContent(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Column(modifier = Modifier.padding(20.dp)) {
@@ -360,7 +359,7 @@ fun AppointmentDetailContent(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Column(modifier = Modifier.padding(20.dp)) {
@@ -394,7 +393,7 @@ fun AppointmentDetailContent(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Column(modifier = Modifier.padding(20.dp)) {
