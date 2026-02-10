@@ -3,6 +3,7 @@ package com.healthcare.app.dashboard
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
@@ -11,8 +12,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
@@ -50,7 +52,7 @@ fun PatientDashboard(tokenManager: TokenManager) {
     Scaffold(
         bottomBar = {
             NavigationBar(
-                containerColor = Color(0xFFF3EDF7),
+                containerColor = MaterialTheme.colorScheme.surface,
                 tonalElevation = NavigationBarDefaults.Elevation
             ) {
                 val navBackStackEntry = navController.currentBackStackEntryAsState().value
@@ -89,14 +91,19 @@ fun PatientDashboard(tokenManager: TokenManager) {
                             Icon(item.icon, contentDescription = item.label)
                         },
                         label = {
-                            Text(item.label)
+                            Text(
+                                text = item.label,
+                                style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
                         },
                         colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = Color(0xFF1D192B),
-                            selectedTextColor = Color(0xFF1D192B),
-                            indicatorColor = Color(0xFFE8DEF8),
-                            unselectedIconColor = Color(0xFF49454F),
-                            unselectedTextColor = Color(0xFF49454F)
+                            selectedIconColor = MaterialTheme.colorScheme.primary,
+                            selectedTextColor = MaterialTheme.colorScheme.primary,
+                            indicatorColor = MaterialTheme.colorScheme.primaryContainer,
+                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     )
                 }
@@ -200,7 +207,7 @@ fun PatientDashboardPreview() {
         Scaffold(
             bottomBar = {
                 NavigationBar(
-                    containerColor = Color(0xFFF3EDF7)
+                    containerColor = MaterialTheme.colorScheme.surface
                 ) {
                     val items = listOf(
                         PatientBottomNavItem.Doctors,
@@ -213,9 +220,16 @@ fun PatientDashboardPreview() {
                             selected = item == PatientBottomNavItem.Doctors,
                             onClick = { },
                             icon = { Icon(item.icon, contentDescription = item.label) },
-                            label = { Text(item.label) },
+                            label = { 
+                                Text(
+                                    text = item.label,
+                                    style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            },
                             colors = NavigationBarItemDefaults.colors(
-                                indicatorColor = Color(0xFFE8DEF8)
+                                indicatorColor = MaterialTheme.colorScheme.primaryContainer
                             )
                         )
                     }

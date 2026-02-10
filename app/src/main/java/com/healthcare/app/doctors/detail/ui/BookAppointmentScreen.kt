@@ -151,8 +151,8 @@ fun BookAppointmentScreen(
                 .background(
                     brush = Brush.verticalGradient(
                         colors = listOf(
-                            Color(0xFFFFFFFF),
-                            Color(0xFFF2F4F8)
+                            MaterialTheme.colorScheme.background,
+                            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
                         )
                     )
                 )
@@ -227,14 +227,14 @@ fun DoctorDetailBookingContent(
         ) {
             Column {
                 Surface(
-                    color = Color.White.copy(alpha = 0.2f),
+                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.2f),
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     Text(
                         text = "BOOK APPOINTMENT",
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
                         style = MaterialTheme.typography.labelSmall,
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.onPrimary,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -246,14 +246,14 @@ fun DoctorDetailBookingContent(
                         modifier = Modifier
                             .size(80.dp)
                             .clip(CircleShape)
-                            .background(Color.White.copy(alpha = 0.2f)),
+                            .background(MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.2f)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Person,
                             contentDescription = null,
                             modifier = Modifier.size(44.dp),
-                            tint = Color.White
+                            tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                     Spacer(Modifier.width(16.dp))
@@ -262,17 +262,17 @@ fun DoctorDetailBookingContent(
                             text = doctor.name ?: "Doctor",
                             style = MaterialTheme.typography.headlineMedium,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                         Surface(
-                            color = Color.White.copy(alpha = 0.15f),
+                            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.15f),
                             shape = RoundedCornerShape(6.dp)
                         ) {
                             Text(
                                 text = (doctor.specialization ?: "Specialist").uppercase(),
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
                                 style = MaterialTheme.typography.labelSmall,
-                                color = Color.White,
+                                color = MaterialTheme.colorScheme.onPrimary,
                                 fontWeight = FontWeight.SemiBold
                             )
                         }
@@ -283,14 +283,14 @@ fun DoctorDetailBookingContent(
                             Icon(
                                 imageVector = Icons.Outlined.School,
                                 contentDescription = null,
-                                tint = Color.White.copy(alpha = 0.8f),
+                                tint = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
                                 modifier = Modifier.size(16.dp)
                             )
                             Spacer(Modifier.width(8.dp))
                             Text(
                                 text = doctor.qualification ?: "MBBS, MD",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = Color.White.copy(alpha = 0.8f)
+                                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
                             )
                         }
 
@@ -300,14 +300,14 @@ fun DoctorDetailBookingContent(
                             Icon(
                                 imageVector = Icons.Outlined.AccountBalance,
                                 contentDescription = null,
-                                tint = Color.White.copy(alpha = 0.8f),
+                                tint = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
                                 modifier = Modifier.size(16.dp)
                             )
                             Spacer(Modifier.width(8.dp))
                             Text(
                                 text = doctor.clinicAddress ?: "Healthcare Clinic, City Center",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = Color.White.copy(alpha = 0.8f)
+                                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
                             )
                         }
 
@@ -341,7 +341,7 @@ fun DoctorDetailBookingContent(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Column(modifier = Modifier.padding(20.dp)) {
@@ -373,7 +373,7 @@ fun DoctorDetailBookingContent(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Column(modifier = Modifier.padding(20.dp)) {
@@ -428,13 +428,13 @@ fun HeaderInfoTag(icon: ImageVector, text: String) {
             imageVector = icon,
             contentDescription = null,
             modifier = Modifier.size(14.dp),
-            tint = Color.White
+            tint = MaterialTheme.colorScheme.onPrimary
         )
         Spacer(Modifier.width(4.dp))
         Text(
             text = text,
             style = MaterialTheme.typography.labelSmall,
-            color = Color.White
+            color = MaterialTheme.colorScheme.onPrimary
         )
     }
 }
@@ -460,7 +460,7 @@ fun DateSelector(selectedDate: String?, dates: List<String>, onDateSelected: (St
                     shape = RoundedCornerShape(12.dp),
                     colors = AssistChipDefaults.assistChipColors(
                         containerColor = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
-                        labelColor = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface,
+                        labelColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
                     ),
                     border = if (isSelected) {
                         null
@@ -494,7 +494,7 @@ fun TimeSelector(selectedTime: String?, times: List<String>, onTimeSelected: (St
                     shape = RoundedCornerShape(12.dp),
                     colors = FilterChipDefaults.filterChipColors(
                         selectedContainerColor = MaterialTheme.colorScheme.primary,
-                        selectedLabelColor = Color.White
+                        selectedLabelColor = MaterialTheme.colorScheme.onPrimary
                     )
                 )
             }
