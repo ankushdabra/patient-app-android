@@ -97,37 +97,41 @@ fun AppointmentListScreenContent(
             }
 
             is UiState.Success -> {
-                Column(modifier = Modifier.fillMaxSize()) {
-                    AppointmentListHeader()
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(bottom = 24.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    item {
+                        AppointmentListHeader()
+                    }
 
                     if (state.data.isEmpty()) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "No appointments found.",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onBackground
-                            )
-                        }
-                    } else {
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(bottom = 24.dp),
-                            verticalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            items(
-                                items = state.data,
-                                key = { it.id }
-                            ) { appointment ->
-                                AppointmentListItem(
-                                    appointment = appointment,
-                                    modifier = Modifier
-                                        .padding(horizontal = 24.dp)
-                                        .clickable { onAppointmentClick(appointment.id) }
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 64.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "No appointments found.",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
+                        }
+                    } else {
+                        items(
+                            items = state.data,
+                            key = { it.id }
+                        ) { appointment ->
+                            AppointmentListItem(
+                                appointment = appointment,
+                                modifier = Modifier
+                                    .padding(horizontal = 24.dp)
+                                    .clickable { onAppointmentClick(appointment.id) }
+                            )
                         }
                     }
                 }
@@ -254,7 +258,6 @@ fun AppointmentListHeader() {
             )
         }
     }
-    Spacer(Modifier.height(16.dp))
 }
 
 @Composable

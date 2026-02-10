@@ -42,15 +42,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.healthcare.app.appointments.api.AppointmentDto
 import com.healthcare.app.core.storage.TokenManager
 import com.healthcare.app.core.ui.UiState
 import com.healthcare.app.core.ui.components.ErrorState
 import com.healthcare.app.core.ui.components.LoadingState
 import com.healthcare.app.core.ui.theme.HealthcareTheme
-import com.healthcare.app.doctors.detail.api.DoctorDetailDto
-import com.healthcare.app.login.api.UserDto
-import com.healthcare.app.prescriptions.api.PatientDto
 import com.healthcare.app.prescriptions.api.PrescriptionDto
 import com.healthcare.app.prescriptions.api.PrescriptionsRepository
 import com.healthcare.app.prescriptions.viewmodel.PrescriptionDetailViewModel
@@ -73,8 +69,8 @@ fun PrescriptionDetailScreen(
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
-                        Color(0xFFFFFFFF),
-                        Color(0xFFF2F4F8)
+                        MaterialTheme.colorScheme.background,
+                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
                     )
                 )
             )
@@ -122,14 +118,14 @@ fun PrescriptionDetailContent(
         ) {
             Column {
                 Surface(
-                    color = Color.White.copy(alpha = 0.2f),
+                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.2f),
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     Text(
                         text = "PRESCRIPTION DETAILS",
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
                         style = MaterialTheme.typography.labelSmall,
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.onPrimary,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -141,28 +137,28 @@ fun PrescriptionDetailContent(
                         modifier = Modifier
                             .size(72.dp)
                             .clip(CircleShape)
-                            .background(Color.White.copy(alpha = 0.2f)),
+                            .background(MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.2f)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Person,
                             contentDescription = null,
                             modifier = Modifier.size(40.dp),
-                            tint = Color.White
+                            tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                     Spacer(Modifier.width(16.dp))
                     Column {
                         Text(
-                            text = prescription.appointment.doctor.name ?: "Unknown Doctor",
+                            text = prescription.doctorName,
                             style = MaterialTheme.typography.headlineSmall,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                         Text(
-                            text = prescription.appointment.doctor.specialization ?: "Specialist",
+                            text = "Consultation Record",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = Color.White.copy(alpha = 0.8f)
+                            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
                         )
                         
                         Spacer(Modifier.height(8.dp))
@@ -171,14 +167,14 @@ fun PrescriptionDetailContent(
                             Icon(
                                 imageVector = Icons.Outlined.CalendarToday,
                                 contentDescription = null,
-                                tint = Color.White.copy(alpha = 0.8f),
+                                tint = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
                                 modifier = Modifier.size(14.dp)
                             )
                             Spacer(Modifier.width(6.dp))
                             Text(
                                 text = "Dated: ${prescription.prescriptionDate}",
                                 style = MaterialTheme.typography.labelMedium,
-                                color = Color.White.copy(alpha = 0.8f)
+                                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
                             )
                         }
                     }
@@ -230,7 +226,9 @@ fun PrescriptionCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
@@ -245,7 +243,8 @@ fun PrescriptionCard(
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
             
@@ -272,39 +271,14 @@ fun PrescriptionDetailPreview() {
         PrescriptionDetailContent(
             prescription = PrescriptionDto(
                 id = "1",
-                patientId = "p1",
-                doctorId = "d1",
-                appointment = AppointmentDto(
-                    id = "a1",
-                    doctor = DoctorDetailDto(
-                        id = "d1",
-                        name = "Dr. Amit Sharma",
-                        specialization = "Cardiology",
-                        qualification = "MBBS, MD",
-                        experience = 12,
-                        rating = 4.5,
-                        consultationFee = 800.0,
-                        about = null,
-                        clinicAddress = null,
-                        profileImage = null
-                    ),
-                    patient = PatientDto(
-                        id = "p1",
-                        user = UserDto("u1", "John Doe", "john@example.com", "PATIENT"),
-                        age = 30,
-                        gender = "MALE",
-                        bloodGroup = "O+"
-                    ),
-                    appointmentDate = "2026-02-09",
-                    appointmentTime = "10:00:00",
-                    status = "COMPLETED",
-                    createdAt = "2026-02-08T10:00:00"
-                ),
                 medications = "1. Amoxicillin 500mg - 3 times a day\n2. Paracetamol 500mg - As needed for fever\n3. Vitamin C 500mg - Once daily",
                 instructions = "Complete the full course of antibiotics. Drink plenty of water and take rest.",
                 notes = "Follow up in 7 days if symptoms persist.",
                 prescriptionDate = "2026-02-09",
-                createdAt = "2026-02-09T11:00:00"
+                appointmentId = "a1",
+                appointmentDate = "2026-02-09",
+                doctorName = "Dr. Amit Sharma",
+                patientName = "John Doe"
             )
         )
     }
