@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -36,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Devices
@@ -138,13 +140,14 @@ fun SignUpScreen(
                         )
                     )
                 )
-                .padding(horizontal = 24.dp)
-                .verticalScroll(rememberScrollState()),
+                .imePadding()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Top // Changed to Top for better scrolling behavior
         ) {
 
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height(64.dp))
 
             // 🔷 LOGO
             Image(
@@ -193,7 +196,10 @@ fun SignUpScreen(
                         isError = nameError != null,
                         supportingText = nameError?.let { { Text(it) } },
                         singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions(
+                            imeAction = ImeAction.Next
+                        )
                     )
 
                     Spacer(Modifier.height(12.dp))
@@ -210,7 +216,8 @@ fun SignUpScreen(
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
                         keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Email
+                            keyboardType = KeyboardType.Email,
+                            imeAction = ImeAction.Next
                         )
                     )
 
@@ -229,7 +236,8 @@ fun SignUpScreen(
                         visualTransformation = PasswordVisualTransformation(),
                         modifier = Modifier.fillMaxWidth(),
                         keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Password
+                            keyboardType = KeyboardType.Password,
+                            imeAction = ImeAction.Next
                         )
                     )
 
@@ -250,7 +258,8 @@ fun SignUpScreen(
                             singleLine = true,
                             modifier = Modifier.weight(1f),
                             keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Number
+                                keyboardType = KeyboardType.Number,
+                                imeAction = ImeAction.Next
                             )
                         )
 
@@ -300,7 +309,10 @@ fun SignUpScreen(
                         isError = bloodGroupError != null,
                         supportingText = bloodGroupError?.let { { Text(it) } },
                         singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions(
+                            imeAction = ImeAction.Done
+                        )
                     )
 
                     Spacer(Modifier.height(24.dp))

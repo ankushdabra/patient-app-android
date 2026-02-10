@@ -9,10 +9,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -29,9 +32,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Devices
@@ -75,8 +78,7 @@ fun LoginScreen(
     }
 
     Surface(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
         Column(
             modifier = Modifier
@@ -89,17 +91,20 @@ fun LoginScreen(
                         )
                     )
                 )
+                .imePadding()
+                .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Top
         ) {
+
+            Spacer(modifier = Modifier.height(64.dp))
 
             // 🔷 LOGO
             Image(
                 painter = painterResource(id = R.drawable.ic_healthcare_logo),
                 contentDescription = "App Logo",
-                modifier = Modifier
-                    .size(120.dp)
+                modifier = Modifier.size(120.dp)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -144,7 +149,8 @@ fun LoginScreen(
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
                         keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Email
+                            keyboardType = KeyboardType.Email,
+                            imeAction = ImeAction.Next
                         )
                     )
 
@@ -163,7 +169,8 @@ fun LoginScreen(
                         visualTransformation = PasswordVisualTransformation(),
                         modifier = Modifier.fillMaxWidth(),
                         keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Password
+                            keyboardType = KeyboardType.Password,
+                            imeAction = ImeAction.Done
                         )
                     )
 
@@ -215,6 +222,8 @@ fun LoginScreen(
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.clickable { onRegisterClick() }
             )
+
+            Spacer(modifier = Modifier.height(48.dp))
         }
     }
 }
