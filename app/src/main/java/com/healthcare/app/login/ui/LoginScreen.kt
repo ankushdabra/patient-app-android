@@ -111,7 +111,7 @@ fun LoginScreen(
 
             // 🔷 APP NAME
             Text(
-                text = "Healthcare",
+                text = "VitalSync",
                 style = MaterialTheme.typography.displaySmall,
                 color = MaterialTheme.colorScheme.primary
             )

@@ -1,36 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="96dp"
-    android:height="96dp"
-    android:viewportWidth="100"
-    android:viewportHeight="100">
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
 
-    <!-- Hexagon background -->
-    <path
-        android:fillColor="#E53935"
-        android:pathData="
-            M50,5
-            L85,25
-            L85,75
-            L50,95
-            L15,75
-            L15,25
-            Z"/>
+    <!-- Stylized 'V' merging into a Pulse Line for VitalSync -->
+    <!-- Matches the App Icon but optimized for internal UI -->
 
-    <!-- Medical plus -->
+    <!-- Thick background stroke for better visibility on gradients -->
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="
-            M45,30
-            H55
-            V45
-            H70
-            V55
-            H55
-            V70
-            H45
-            V55
-            H30
-            V45
-            H45
-            Z"/>
+        android:strokeWidth="10"
+        android:strokeColor="#202B57E5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M30,40 L45,75 L58,48 L64,65 L72,30 L78,55 L88,55" />
+
+    <path
+        android:strokeWidth="6"
+        android:strokeColor="#2B57E5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M30,40 L45,75 L58,48 L64,65 L72,30 L78,55 L88,55" />
+
 </vector>
