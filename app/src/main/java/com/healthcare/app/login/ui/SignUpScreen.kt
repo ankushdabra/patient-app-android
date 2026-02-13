@@ -153,15 +153,13 @@ fun SignUpScreen(
             Image(
                 painter = painterResource(id = R.drawable.ic_healthcare_logo),
                 contentDescription = "App Logo",
-                modifier = Modifier.size(100.dp)
+                modifier = Modifier.size(120.dp)
             )
-
-            Spacer(modifier = Modifier.height(16.dp))
 
             // 🔷 APP NAME
             Text(
-                text = "Join Healthcare",
-                style = MaterialTheme.typography.headlineMedium,
+                text = "Join VitalSync",
+                style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.primary
             )
 

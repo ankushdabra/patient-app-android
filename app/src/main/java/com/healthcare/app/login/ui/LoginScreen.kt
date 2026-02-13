@@ -107,12 +107,10 @@ fun LoginScreen(
                 modifier = Modifier.size(120.dp)
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
-
             // 🔷 APP NAME
             Text(
                 text = "VitalSync",
-                style = MaterialTheme.typography.displaySmall,
+                style = MaterialTheme.typography.displayMedium,
                 color = MaterialTheme.colorScheme.primary
             )
 
