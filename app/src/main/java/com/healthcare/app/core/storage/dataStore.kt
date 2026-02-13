@@ -13,11 +13,17 @@ class TokenManager(private val context: Context) {
 
     companion object {
         private val TOKEN_KEY = stringPreferencesKey("jwt_token")
+        private val THEME_KEY = stringPreferencesKey("theme_mode")
     }
 
     val token: Flow<String?> = context.dataStore.data
         .map { preferences ->
             preferences[TOKEN_KEY]
+        }
+
+    val themeMode: Flow<String> = context.dataStore.data
+        .map { preferences ->
+            preferences[THEME_KEY] ?: "FOLLOW_SYSTEM"
         }
 
     suspend fun saveToken(token: String) {
@@ -29,6 +35,12 @@ class TokenManager(private val context: Context) {
     suspend fun clearToken() {
         context.dataStore.edit { prefs ->
             prefs.remove(TOKEN_KEY)
+        }
+    }
+
+    suspend fun saveThemeMode(mode: String) {
+        context.dataStore.edit { prefs ->
+            prefs[THEME_KEY] = mode
         }
     }
 }

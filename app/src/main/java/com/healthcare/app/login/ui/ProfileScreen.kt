@@ -21,8 +21,11 @@ import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Bloodtype
 import androidx.compose.material.icons.outlined.Cake
+import androidx.compose.material.icons.outlined.DarkMode
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.ErrorOutline
+import androidx.compose.material.icons.outlined.LightMode
+import androidx.compose.material.icons.outlined.SettingsSuggest
 import androidx.compose.material.icons.outlined.Transgender
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -31,6 +34,9 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -50,6 +56,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.healthcare.app.core.storage.TokenManager
 import com.healthcare.app.core.ui.UiState
 import com.healthcare.app.core.ui.components.LoadingState
+import com.healthcare.app.core.ui.components.ScreenHeader
 import com.healthcare.app.core.ui.theme.HealthcareTheme
 import com.healthcare.app.login.api.AuthenticationRepository
 import com.healthcare.app.login.api.UserDto
@@ -65,6 +72,7 @@ fun ProfileScreen(
         factory = ProfileViewModelFactory(repository, tokenManager)
     )
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val themeMode by viewModel.themeMode.collectAsStateWithLifecycle()
 
     Box(
         modifier = Modifier
@@ -86,6 +94,8 @@ fun ProfileScreen(
             is UiState.Success -> {
                 ProfileContent(
                     user = state.data,
+                    themeMode = themeMode,
+                    onThemeChange = viewModel::setThemeMode,
                     onLogoutClick = viewModel::logout
                 )
             }
@@ -161,6 +171,8 @@ fun ProfileErrorState(
 @Composable
 fun ProfileContent(
     user: UserDto,
+    themeMode: String,
+    onThemeChange: (String) -> Unit,
     onLogoutClick: () -> Unit
 ) {
     Column(
@@ -169,21 +181,7 @@ fun ProfileContent(
             .verticalScroll(rememberScrollState())
     ) {
         // --- Hero Header Section ---
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            MaterialTheme.colorScheme.primary,
-                            MaterialTheme.colorScheme.primary.copy(alpha = 0.85f)
-                        )
-                    ),
-                    shape = RoundedCornerShape(bottomStart = 40.dp, bottomEnd = 40.dp)
-                )
-                .padding(horizontal = 24.dp)
-                .padding(top = 64.dp, bottom = 40.dp)
-        ) {
+        ScreenHeader(title = "PROFILE") {
             Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
                 Box(
                     modifier = Modifier
@@ -232,13 +230,73 @@ fun ProfileContent(
             }
         }
 
-        // --- Details Section ---
+        // --- Content Section ---
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
+            // --- Theme Settings ---
+            Text(
+                text = "App Settings",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Column(modifier = Modifier.padding(20.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Outlined.SettingsSuggest,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(Modifier.width(12.dp))
+                        Text(
+                            text = "Theme Mode",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    
+                    Spacer(Modifier.height(16.dp))
+
+                    val options = listOf("LIGHT", "DARK", "FOLLOW_SYSTEM")
+                    val labels = listOf("Light", "Dark", "System")
+                    val icons = listOf(Icons.Outlined.LightMode, Icons.Outlined.DarkMode, Icons.Outlined.SettingsSuggest)
+                    
+                    SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+                        options.forEachIndexed { index, option ->
+                            SegmentedButton(
+                                selected = themeMode == option,
+                                onClick = { onThemeChange(option) },
+                                shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size),
+                                icon = {
+                                    SegmentedButtonDefaults.Icon(active = themeMode == option) {
+                                        Icon(
+                                            imageVector = icons[index],
+                                            contentDescription = null,
+                                            modifier = Modifier.size(SegmentedButtonDefaults.IconSize)
+                                        )
+                                    }
+                                }
+                            ) {
+                                Text(labels[index])
+                            }
+                        }
+                    }
+                }
+            }
+
+            // --- Personal Details ---
             Text(
                 text = "Personal Information",
                 style = MaterialTheme.typography.titleLarge,
@@ -355,6 +413,8 @@ fun ProfileScreenPreview() {
                 gender = "Male",
                 bloodGroup = "O+"
             ),
+            themeMode = "FOLLOW_SYSTEM",
+            onThemeChange = {},
             onLogoutClick = {}
         )
     }

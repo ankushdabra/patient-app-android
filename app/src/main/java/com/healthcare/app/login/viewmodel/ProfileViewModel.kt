@@ -10,6 +10,8 @@ import com.healthcare.app.login.api.UserDto
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class ProfileViewModel(
@@ -19,6 +21,9 @@ class ProfileViewModel(
 
     private val _uiState = MutableStateFlow<UiState<UserDto>>(UiState.Loading)
     val uiState: StateFlow<UiState<UserDto>> = _uiState.asStateFlow()
+
+    val themeMode: StateFlow<String> = tokenManager.themeMode
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "FOLLOW_SYSTEM")
 
     init {
         loadProfile()
@@ -34,6 +39,12 @@ class ProfileViewModel(
                 .onFailure { error ->
                     _uiState.value = UiState.Error(error.message ?: "Failed to load profile")
                 }
+        }
+    }
+
+    fun setThemeMode(mode: String) {
+        viewModelScope.launch {
+            tokenManager.saveThemeMode(mode)
         }
     }
 
