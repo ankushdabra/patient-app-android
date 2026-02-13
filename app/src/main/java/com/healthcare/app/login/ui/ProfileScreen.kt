@@ -28,7 +28,6 @@ import androidx.compose.material.icons.outlined.LightMode
 import androidx.compose.material.icons.outlined.SettingsSuggest
 import androidx.compose.material.icons.outlined.Transgender
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -56,7 +55,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.healthcare.app.core.storage.TokenManager
 import com.healthcare.app.core.ui.UiState
 import com.healthcare.app.core.ui.components.LoadingState
-import com.healthcare.app.core.ui.components.ScreenHeader
 import com.healthcare.app.core.ui.theme.HealthcareTheme
 import com.healthcare.app.login.api.AuthenticationRepository
 import com.healthcare.app.login.api.UserDto
@@ -181,8 +179,25 @@ fun ProfileContent(
             .verticalScroll(rememberScrollState())
     ) {
         // --- Hero Header Section ---
-        ScreenHeader(title = "PROFILE") {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            MaterialTheme.colorScheme.primary,
+                            MaterialTheme.colorScheme.primary.copy(alpha = 0.85f)
+                        )
+                    ),
+                    shape = RoundedCornerShape(bottomStart = 40.dp, bottomEnd = 40.dp)
+                )
+                .padding(horizontal = 24.dp)
+                .padding(top = 48.dp, bottom = 40.dp)
+        ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+
+                Spacer(Modifier.height(24.dp))
+
                 Box(
                     modifier = Modifier
                         .size(100.dp)
@@ -263,7 +278,8 @@ fun ProfileContent(
                         Text(
                             text = "Theme Mode",
                             style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     }
                     
@@ -289,7 +305,10 @@ fun ProfileContent(
                                     }
                                 }
                             ) {
-                                Text(labels[index])
+                                Text(
+                                    text = labels[index],
+                                    color = if (themeMode == option) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
+                                )
                             }
                         }
                     }
@@ -338,24 +357,24 @@ fun ProfileContent(
                     .fillMaxWidth()
                     .height(56.dp),
                 shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = MaterialTheme.colorScheme.error
-                ),
-                border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
-                    brush = Brush.linearGradient(listOf(MaterialTheme.colorScheme.error, MaterialTheme.colorScheme.error.copy(alpha = 0.5f)))
+                border = androidx.compose.foundation.BorderStroke(
+                    1.dp,
+                    MaterialTheme.colorScheme.error
                 )
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.Logout,
                         contentDescription = "Logout",
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(20.dp),
+                        tint = MaterialTheme.colorScheme.error
                     )
                     Spacer(Modifier.width(12.dp))
                     Text(
                         text = "Sign Out",
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.error
                     )
                 }
             }
