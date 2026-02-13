@@ -15,8 +15,6 @@ val OnSecondaryContainerLight = Color(0xFF151B2C)
 
 val TertiaryLight = Color(0xFF745470)
 val OnTertiaryLight = Color(0xFFFFFFFF)
-val TertiaryContainerLight = Color(0xFFFFD6F8)
-val OnTertiaryContainerLight = Color(0xFF2B122A)
 
 // Background & Surface for Light mode
 val BackgroundLight = Color(0xFFF8F9FF)
@@ -35,17 +33,9 @@ val OnSecondaryContainerDark = Color(0xFFDCE1F9)
 
 val TertiaryDark = Color(0xFFE2BBDC)
 val OnTertiaryDark = Color(0xFF422740)
-val TertiaryContainerDark = Color(0xFF5A3D57)
-val OnTertiaryContainerDark = Color(0xFFFFD6F8)
 
 // Background & Surface for Dark mode - Increased contrast for better card visibility
 val BackgroundDark = Color(0xFF0B0D11) // Deeper background
 val SurfaceDark = Color(0xFF1E2129)    // Lighter surface for cards to pop
-val SurfaceVariantDark = Color(0xFF2B2E38)
 val OnSurfaceDark = Color(0xFFE2E2E6)
-val OnSurfaceVariantDark = Color(0xFFC5C6D0)
 val OnBackgroundDark = Color(0xFFE2E2E6)
-val ErrorDark = Color(0xFFFFB4AB)
-val OnErrorDark = Color(0xFF690005)
-val ErrorContainerDark = Color(0xFF93000A)
-val OnErrorContainerDark = Color(0xFFFFDAD6)

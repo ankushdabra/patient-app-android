@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -18,6 +19,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.outlined.AccountBalance
@@ -29,6 +31,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -40,12 +43,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.healthcare.app.appointments.api.AppointmentDto
@@ -55,6 +60,8 @@ import com.healthcare.app.core.ui.UiState
 import com.healthcare.app.core.ui.components.ErrorState
 import com.healthcare.app.core.ui.components.LoadingState
 import com.healthcare.app.core.ui.theme.HealthcareTheme
+import com.healthcare.app.core.ui.theme.PrimaryLight
+import com.healthcare.app.core.ui.theme.SecondaryLight
 import com.healthcare.app.doctors.detail.api.DoctorDetailDto
 import com.healthcare.app.login.api.UserDto
 import com.healthcare.app.prescriptions.api.PatientDto
@@ -64,7 +71,8 @@ import com.healthcare.app.prescriptions.api.PatientDto
 @Composable
 fun AppointmentDetailScreen(
     appointmentId: String,
-    tokenManager: TokenManager
+    tokenManager: TokenManager,
+    onBackClick: () -> Unit = {}
 ) {
     val repository = AppointmentsRepository(tokenManager)
     val viewModel: AppointmentDetailViewModel = viewModel(
@@ -76,7 +84,15 @@ fun AppointmentDetailScreen(
         topBar = {
             TopAppBar(
                 title = { },
-                navigationIcon = { },
+                navigationIcon = {
+                    IconButton(onClick = onBackClick) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            tint = Color.White
+                        )
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Transparent,
                     scrolledContainerColor = Color.Transparent
@@ -124,129 +140,157 @@ fun AppointmentDetailContent(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
-        // --- Hero Header Section ---
+        // --- Hero Header Section (Matching AppointmentListHeader design) ---
         Box(
             modifier = Modifier
                 .fillMaxWidth()
+                .clip(RoundedCornerShape(bottomStart = 40.dp, bottomEnd = 40.dp))
                 .background(
-                    brush = Brush.verticalGradient(
+                    brush = Brush.linearGradient(
                         colors = listOf(
-                            MaterialTheme.colorScheme.primary,
-                            MaterialTheme.colorScheme.primary.copy(alpha = 0.85f)
-                        )
-                    ),
-                    shape = RoundedCornerShape(bottomStart = 40.dp, bottomEnd = 40.dp)
+                            PrimaryLight,
+                            SecondaryLight.copy(alpha = 0.8f)
+                        ),
+                        start = Offset(0f, 0f),
+                        end = Offset(1000f, 1000f)
+                    )
                 )
-                .padding(horizontal = 24.dp)
-                .padding(top = 48.dp, bottom = 40.dp)
         ) {
-            Column {
+            // Decorative background elements
+            Box(
+                modifier = Modifier
+                    .offset(x = 260.dp, y = (-30).dp)
+                    .size(180.dp)
+                    .background(
+                        color = Color.White.copy(alpha = 0.08f),
+                        shape = CircleShape
+                    )
+            )
+            
+            Box(
+                modifier = Modifier
+                    .offset(x = (-20).dp, y = 120.dp)
+                    .size(100.dp)
+                    .background(
+                        color = Color.White.copy(alpha = 0.05f),
+                        shape = CircleShape
+                    )
+            )
+
+            Column(
+                modifier = Modifier
+                    .padding(horizontal = 24.dp)
+                    .padding(top = 64.dp, bottom = 40.dp)
+            ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Surface(
-                        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.2f),
+                        color = Color.White.copy(alpha = 0.2f),
                         shape = RoundedCornerShape(8.dp)
                     ) {
                         Text(
                             text = "APPOINTMENT DETAILS",
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            fontWeight = FontWeight.Bold
+                            color = Color.White,
+                            fontWeight = FontWeight.ExtraBold,
+                            letterSpacing = 1.sp
                         )
                     }
 
                     Surface(
                         color = if (appointment.status == "BOOKED")
-                            Color(0xFF4CAF50)
+                            Color(0xFF4CAF50).copy(alpha = 0.9f)
                         else
-                            MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.15f),
+                            Color.White.copy(alpha = 0.15f),
                         shape = RoundedCornerShape(16.dp)
                     ) {
                         Text(
                             text = appointment.status,
                             modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
                             style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onPrimary,
+                            color = Color.White,
                             fontWeight = FontWeight.Bold
                         )
                     }
                 }
 
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(24.dp))
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
                         modifier = Modifier
                             .size(80.dp)
                             .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.2f)),
+                            .background(Color.White.copy(alpha = 0.2f)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Person,
                             contentDescription = null,
                             modifier = Modifier.size(44.dp),
-                            tint = MaterialTheme.colorScheme.onPrimary
+                            tint = Color.White
                         )
                     }
                     Spacer(Modifier.width(16.dp))
                     Column {
                         Text(
                             text = appointment.doctor.name ?: "Unknown Doctor",
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onPrimary
+                            style = MaterialTheme.typography.headlineSmall.copy(
+                                fontWeight = FontWeight.Black,
+                                letterSpacing = (-0.5).sp
+                            ),
+                            color = Color.White
                         )
 
                         Surface(
-                            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.15f),
+                            color = Color.White.copy(alpha = 0.15f),
                             shape = RoundedCornerShape(6.dp)
                         ) {
                             Text(
                                 text = (appointment.doctor.specialization ?: "Specialist").uppercase(),
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
                                 style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                fontWeight = FontWeight.SemiBold
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold
                             )
                         }
 
-                        Spacer(Modifier.height(8.dp))
+                        Spacer(Modifier.height(10.dp))
 
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 imageVector = Icons.Outlined.School,
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
-                                modifier = Modifier.size(16.dp)
+                                tint = Color.White.copy(alpha = 0.8f),
+                                modifier = Modifier.size(14.dp)
                             )
-                            Spacer(Modifier.width(8.dp))
+                            Spacer(Modifier.width(6.dp))
                             Text(
                                 text = appointment.doctor.qualification ?: "MBBS, MD",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
+                                color = Color.White.copy(alpha = 0.8f)
                             )
                         }
-
-                        Spacer(Modifier.height(4.dp))
 
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 imageVector = Icons.Outlined.AccountBalance,
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
-                                modifier = Modifier.size(16.dp)
+                                tint = Color.White.copy(alpha = 0.8f),
+                                modifier = Modifier.size(14.dp)
                             )
-                            Spacer(Modifier.width(8.dp))
+                            Spacer(Modifier.width(6.dp))
                             Text(
                                 text = appointment.doctor.clinicAddress
                                     ?: "Healthcare Clinic, City Center",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
+                                color = Color.White.copy(alpha = 0.8f),
+                                maxLines = 1,
+                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                             )
                         }
                     }
@@ -254,9 +298,9 @@ fun AppointmentDetailContent(
 
                 Spacer(Modifier.height(32.dp))
 
-                // Schedule Card (Glassmorphism Style)
-                Card(
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.15f)),
+                // Schedule Card (Enhanced Glassmorphism Style)
+                Surface(
+                    color = Color.White.copy(alpha = 0.12f),
                     shape = RoundedCornerShape(20.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -271,45 +315,45 @@ fun AppointmentDetailContent(
                             Icon(
                                 Icons.Default.CalendarToday,
                                 null,
-                                tint = MaterialTheme.colorScheme.onPrimary,
+                                tint = Color.White,
                                 modifier = Modifier.size(24.dp)
                             )
                             Spacer(Modifier.height(8.dp))
                             Text(
                                 appointment.appointmentDate,
-                                color = MaterialTheme.colorScheme.onPrimary,
+                                color = Color.White,
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
                                 "Date",
-                                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f),
+                                color = Color.White.copy(alpha = 0.6f),
                                 style = MaterialTheme.typography.labelSmall
                             )
                         }
                         Box(
                             modifier = Modifier
                                 .width(1.dp)
-                                .height(48.dp)
-                                .background(MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.2f))
+                                .height(40.dp)
+                                .background(Color.White.copy(alpha = 0.2f))
                         )
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Icon(
                                 Icons.Default.Schedule,
                                 null,
-                                tint = MaterialTheme.colorScheme.onPrimary,
+                                tint = Color.White,
                                 modifier = Modifier.size(24.dp)
                             )
                             Spacer(Modifier.height(8.dp))
                             Text(
                                 appointment.appointmentTime,
-                                color = MaterialTheme.colorScheme.onPrimary,
+                                color = Color.White,
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
                                 "Time",
-                                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f),
+                                color = Color.White.copy(alpha = 0.6f),
                                 style = MaterialTheme.typography.labelSmall
                             )
                         }
@@ -451,32 +495,6 @@ fun AppointmentDetailContent(
             }
 
             Spacer(Modifier.height(16.dp))
-        }
-    }
-}
-
-@Composable
-fun DetailRow(icon: ImageVector, label: String, value: String) {
-    Row(verticalAlignment = Alignment.Top) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(18.dp)
-        )
-        Spacer(Modifier.width(12.dp))
-        Column {
-            Text(
-                text = label,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-            )
-            Text(
-                text = value,
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface
-            )
         }
     }
 }

@@ -136,6 +136,7 @@ fun PatientDashboard(tokenManager: TokenManager) {
                 BookAppointmentScreen(
                     doctorId = doctorId,
                     tokenManager = tokenManager,
+                    onBackClick = { navController.popBackStack() },
                     onBookingSuccess = {
                         navController.navigate(PatientBottomNavItem.Appointments.route) {
                             popUpTo(navController.graph.findStartDestination().id)
@@ -163,7 +164,8 @@ fun PatientDashboard(tokenManager: TokenManager) {
                 val appointmentId = backStackEntry.arguments?.getString("id")!!
                 AppointmentDetailScreen(
                     appointmentId = appointmentId,
-                    tokenManager = tokenManager
+                    tokenManager = tokenManager,
+                    onBackClick = { navController.popBackStack() }
                 )
             }
             composable(PatientBottomNavItem.Prescriptions.route) {
@@ -185,7 +187,8 @@ fun PatientDashboard(tokenManager: TokenManager) {
                 val prescriptionId = backStackEntry.arguments?.getString("id")!!
                 PrescriptionDetailScreen(
                     prescriptionId = prescriptionId,
-                    tokenManager = tokenManager
+                    tokenManager = tokenManager,
+                    onBackClick = { navController.popBackStack() }
                 )
             }
             composable(PatientBottomNavItem.Profile.route) {

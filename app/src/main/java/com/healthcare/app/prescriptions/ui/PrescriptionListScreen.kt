@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -23,6 +24,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.MedicalServices
+import androidx.compose.material.icons.outlined.ReceiptLong
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -35,15 +37,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.healthcare.app.core.storage.TokenManager
 import com.healthcare.app.core.ui.UiState
 import com.healthcare.app.core.ui.components.LoadingState
+import com.healthcare.app.core.ui.theme.HealthcareTheme
+import com.healthcare.app.core.ui.theme.PrimaryLight
+import com.healthcare.app.core.ui.theme.SecondaryLight
 import com.healthcare.app.prescriptions.api.PrescriptionDto
 import com.healthcare.app.prescriptions.api.PrescriptionsRepository
 import com.healthcare.app.prescriptions.viewmodel.PrescriptionListViewModel
@@ -182,7 +191,7 @@ fun PrescriptionsList(
         contentPadding = PaddingValues(bottom = 24.dp)
     ) {
         item {
-            PrescriptionListHeader()
+            PrescriptionListHeader(count = prescriptions.size)
         }
         
         if (prescriptions.isEmpty()) {
@@ -300,50 +309,201 @@ fun PrescriptionListItem(
 }
 
 @Composable
-fun PrescriptionListHeader() {
+fun PrescriptionListHeader(count: Int) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
+            .clip(RoundedCornerShape(bottomStart = 40.dp, bottomEnd = 40.dp))
             .background(
-                brush = Brush.verticalGradient(
+                brush = Brush.linearGradient(
                     colors = listOf(
-                        MaterialTheme.colorScheme.primary,
-                        MaterialTheme.colorScheme.primary.copy(alpha = 0.85f)
-                    )
-                ),
-                shape = RoundedCornerShape(bottomStart = 40.dp, bottomEnd = 40.dp)
-            )
-            .padding(horizontal = 24.dp)
-            .padding(top = 48.dp, bottom = 40.dp)
-    ) {
-        Column {
-            Surface(
-                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.2f),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Text(
-                    text = "RECORDS",
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    fontWeight = FontWeight.Bold
+                        PrimaryLight,
+                        SecondaryLight.copy(alpha = 0.8f)
+                    ),
+                    start = Offset(0f, 0f),
+                    end = Offset(1000f, 1000f)
                 )
+            )
+    ) {
+        // Decorative background elements
+        Box(
+            modifier = Modifier
+                .offset(x = 260.dp, y = (-30).dp)
+                .size(180.dp)
+                .background(
+                    color = Color.White.copy(alpha = 0.08f),
+                    shape = CircleShape
+                )
+        )
+        
+        Box(
+            modifier = Modifier
+                .offset(x = (-20).dp, y = 120.dp)
+                .size(100.dp)
+                .background(
+                    color = Color.White.copy(alpha = 0.05f),
+                    shape = CircleShape
+                )
+        )
+
+        Column(
+            modifier = Modifier
+                .padding(horizontal = 24.dp)
+                .padding(top = 64.dp, bottom = 48.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Surface(
+                    color = Color.White.copy(alpha = 0.2f),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text(
+                        text = "MY HEALTH",
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color.White,
+                        fontWeight = FontWeight.ExtraBold,
+                        letterSpacing = 1.sp
+                    )
+                }
+                
+                if (count > 0) {
+                    Surface(
+                        color = Color.White.copy(alpha = 0.15f),
+                        shape = CircleShape
+                    ) {
+                        Text(
+                            text = "$count Total",
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
             }
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(24.dp))
 
-            Text(
-                text = "Prescriptions",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onPrimary
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Prescriptions",
+                        style = MaterialTheme.typography.headlineLarge.copy(
+                            fontWeight = FontWeight.Black,
+                            letterSpacing = (-0.5).sp,
+                            fontSize = 32.sp
+                        ),
+                        color = Color.White
+                    )
 
-            Text(
-                text = "Access your medical records and medications",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
-            )
+                    Spacer(Modifier.height(8.dp))
+
+                    Text(
+                        text = "Access and manage your prescribed medications and medical records.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.White.copy(alpha = 0.9f),
+                        lineHeight = 20.sp
+                    )
+                }
+                
+                Box(
+                    modifier = Modifier
+                        .size(56.dp)
+                        .background(
+                            color = Color.White.copy(alpha = 0.2f),
+                            shape = RoundedCornerShape(16.dp)
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.ReceiptLong,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
+            }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PrescriptionListScreenSuccessPreview() {
+    HealthcareTheme {
+        PrescriptionListScreenContent(
+            state = UiState.Success(
+                listOf(
+                    PrescriptionDto(
+                        id = "1",
+                        medications = "Amoxicillin 500mg, Paracetamol 500mg",
+                        instructions = "Take 1 tablet every 8 hours",
+                        notes = "Drink plenty of fluids",
+                        prescriptionDate = "24 Oct 2023",
+                        appointmentId = "app1",
+                        appointmentDate = "24 Oct 2023",
+                        doctorName = "Dr. Sarah Wilson",
+                        patientName = "John Doe"
+                    ),
+                    PrescriptionDto(
+                        id = "2",
+                        medications = "Cetirizine 10mg",
+                        instructions = "Take 1 tablet daily at night",
+                        notes = null,
+                        prescriptionDate = "15 Oct 2023",
+                        appointmentId = "app2",
+                        appointmentDate = "15 Oct 2023",
+                        doctorName = "Dr. Michael Chen",
+                        patientName = "John Doe"
+                    )
+                )
+            ),
+            onRetry = {},
+            onPrescriptionClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PrescriptionListScreenEmptyPreview() {
+    HealthcareTheme {
+        PrescriptionListScreenContent(
+            state = UiState.Success(emptyList()),
+            onRetry = {},
+            onPrescriptionClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PrescriptionListScreenLoadingPreview() {
+    HealthcareTheme {
+        PrescriptionListScreenContent(
+            state = UiState.Loading,
+            onRetry = {},
+            onPrescriptionClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PrescriptionListScreenErrorPreview() {
+    HealthcareTheme {
+        PrescriptionListScreenContent(
+            state = UiState.Error("Something went wrong"),
+            onRetry = {},
+            onPrescriptionClick = {}
+        )
     }
 }
