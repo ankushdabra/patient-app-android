@@ -94,6 +94,7 @@ fun ProfileScreen(
             is UiState.Error -> ProfileErrorState(
                 onRetry = viewModel::loadProfile
             )
+
             is UiState.Success -> {
                 ProfileContent(
                     user = state.data,
@@ -209,7 +210,7 @@ fun ProfileContent(
                         shape = CircleShape
                     )
             )
-            
+
             Box(
                 modifier = Modifier
                     .offset(x = (-20).dp, y = 120.dp)
@@ -226,22 +227,6 @@ fun ProfileContent(
                     .fillMaxWidth()
                     .padding(top = 64.dp, bottom = 48.dp)
             ) {
-                Surface(
-                    color = Color.White.copy(alpha = 0.2f),
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    Text(
-                        text = "MY PROFILE",
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = Color.White,
-                        fontWeight = FontWeight.ExtraBold,
-                        letterSpacing = 1.sp
-                    )
-                }
-
-                Spacer(Modifier.height(24.dp))
-
                 Box(
                     modifier = Modifier
                         .size(100.dp)
@@ -256,9 +241,9 @@ fun ProfileContent(
                         tint = Color.White
                     )
                 }
-                
+
                 Spacer(Modifier.height(16.dp))
-                
+
                 Text(
                     text = user.name,
                     style = MaterialTheme.typography.headlineMedium.copy(
@@ -267,9 +252,9 @@ fun ProfileContent(
                     ),
                     color = Color.White
                 )
-                
+
                 Spacer(Modifier.height(8.dp))
-                
+
                 Surface(
                     color = Color.White.copy(alpha = 0.15f),
                     shape = RoundedCornerShape(12.dp)
@@ -333,19 +318,26 @@ fun ProfileContent(
                             color = MaterialTheme.colorScheme.onSurface
                         )
                     }
-                    
+
                     Spacer(Modifier.height(16.dp))
 
                     val options = listOf("LIGHT", "DARK", "FOLLOW_SYSTEM")
                     val labels = listOf("Light", "Dark", "System")
-                    val icons = listOf(Icons.Outlined.LightMode, Icons.Outlined.DarkMode, Icons.Outlined.SettingsSuggest)
-                    
+                    val icons = listOf(
+                        Icons.Outlined.LightMode,
+                        Icons.Outlined.DarkMode,
+                        Icons.Outlined.SettingsSuggest
+                    )
+
                     SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
                         options.forEachIndexed { index, option ->
                             SegmentedButton(
                                 selected = themeMode == option,
                                 onClick = { onThemeChange(option) },
-                                shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size),
+                                shape = SegmentedButtonDefaults.itemShape(
+                                    index = index,
+                                    count = options.size
+                                ),
                                 icon = {
                                     SegmentedButtonDefaults.Icon(active = themeMode == option) {
                                         Icon(
@@ -380,7 +372,10 @@ fun ProfileContent(
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
-                Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                Column(
+                    modifier = Modifier.padding(20.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
                     ProfileDetailRow(
                         icon = Icons.Outlined.Cake,
                         label = "Age",
