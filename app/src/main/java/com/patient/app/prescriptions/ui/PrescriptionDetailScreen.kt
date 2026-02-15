@@ -116,6 +116,7 @@ fun PrescriptionDetailScreen(
                     message = state.message,
                     onRetry = viewModel::loadPrescriptionDetail
                 )
+
                 is UiState.Success -> {
                     PrescriptionDetailContent(
                         prescription = state.data
@@ -162,7 +163,7 @@ fun PrescriptionDetailContent(
                         shape = CircleShape
                     )
             )
-            
+
             Box(
                 modifier = Modifier
                     .offset(x = (-20).dp, y = 120.dp)
@@ -176,7 +177,7 @@ fun PrescriptionDetailContent(
             Column(
                 modifier = Modifier
                     .padding(horizontal = 24.dp)
-                    .padding(top = 64.dp, bottom = 48.dp)
+                    .padding(top = 48.dp, bottom = 48.dp)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -238,7 +239,7 @@ fun PrescriptionDetailContent(
                             ),
                             color = Color.White
                         )
-                        
+
                         Surface(
                             color = Color.White.copy(alpha = 0.15f),
                             shape = RoundedCornerShape(6.dp)
@@ -348,9 +349,9 @@ fun PrescriptionCard(
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }
-            
+
             Spacer(Modifier.height(12.dp))
-            
+
             Text(
                 text = content,
                 style = MaterialTheme.typography.bodyMedium,

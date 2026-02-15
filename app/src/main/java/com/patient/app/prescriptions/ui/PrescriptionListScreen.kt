@@ -349,7 +349,7 @@ fun PrescriptionListHeader(count: Int) {
         Column(
             modifier = Modifier
                 .padding(horizontal = 24.dp)
-                .padding(top = 64.dp, bottom = 48.dp)
+                .padding(top = 48.dp, bottom = 48.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
