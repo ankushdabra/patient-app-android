@@ -7,5 +7,6 @@ data class DoctorDto(
     val experience: Int,
     val consultationFee: Double,
     val rating: Double,
-    val profileImage: String?
+    val profileImage: String?,
+    val nextAvailable: String? = null
 )
