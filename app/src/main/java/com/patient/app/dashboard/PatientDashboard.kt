@@ -27,12 +27,12 @@ import androidx.navigation.navArgument
 import com.patient.app.appointments.ui.AppointmentDetailScreen
 import com.patient.app.appointments.ui.AppointmentListScreen
 import com.patient.app.core.storage.TokenManager
-import com.patient.app.core.ui.UiState
 import com.patient.app.core.ui.theme.HealthcareTheme
 import com.patient.app.doctors.detail.ui.BookAppointmentScreen
 import com.patient.app.doctors.list.api.DoctorDto
 import com.patient.app.doctors.list.ui.DoctorsListScreen
 import com.patient.app.doctors.list.ui.DoctorsListScreenContent
+import com.patient.app.doctors.list.viewmodel.DoctorsScreenState
 import com.patient.app.login.ui.ProfileScreen
 import com.patient.app.navigation.PatientBottomNavItem
 import com.patient.app.navigation.Routes
@@ -235,8 +235,8 @@ fun PatientDashboardPreview() {
         ) { padding ->
             Box(modifier = Modifier.padding(padding)) {
                 DoctorsListScreenContent(
-                    state = UiState.Success(mockDoctors),
-                    onRetry = { },
+                    state = DoctorsScreenState(doctors = mockDoctors),
+                    onLoadMore = { },
                     onDoctorClick = { }
                 )
             }

@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -23,8 +22,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.EventAvailable
 import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Button
@@ -39,7 +38,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -54,10 +52,9 @@ import com.patient.app.appointments.api.AppointmentDto
 import com.patient.app.appointments.api.AppointmentsRepository
 import com.patient.app.core.storage.TokenManager
 import com.patient.app.core.ui.UiState
+import com.patient.app.core.ui.components.DashboardHeader
 import com.patient.app.core.ui.components.LoadingState
 import com.patient.app.core.ui.theme.HealthcareTheme
-import com.patient.app.core.ui.theme.PrimaryLight
-import com.patient.app.core.ui.theme.SecondaryLight
 import com.patient.app.doctors.detail.api.DoctorDetailDto
 import com.patient.app.doctors.detail.api.DoctorTimeSlotDto
 import com.patient.app.login.api.UserDto
@@ -111,7 +108,13 @@ fun AppointmentListScreenContent(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     item {
-                        AppointmentListHeader(count = state.data.size)
+                        DashboardHeader(
+                            title = "My",
+                            subtitle = "Appointments",
+                            count = state.data.size,
+                            countLabel = "Total",
+                            icon = Icons.Default.EventAvailable
+                        )
                     }
 
                     if (state.data.isEmpty()) {
@@ -215,133 +218,6 @@ fun AppointmentListErrorState(
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
-        }
-    }
-}
-
-@Composable
-fun AppointmentListHeader(count: Int) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
-            .background(
-                brush = Brush.linearGradient(
-                    colors = listOf(
-                        PrimaryLight,
-                        SecondaryLight.copy(alpha = 0.8f)
-                    ),
-                    start = Offset(0f, 0f),
-                    end = Offset(1000f, 1000f)
-                )
-            )
-    ) {
-        // Decorative background elements
-        Box(
-            modifier = Modifier
-                .offset(x = 260.dp, y = (-30).dp)
-                .size(180.dp)
-                .background(
-                    color = Color.White.copy(alpha = 0.08f),
-                    shape = CircleShape
-                )
-        )
-        
-        Box(
-            modifier = Modifier
-                .offset(x = (-20).dp, y = 120.dp)
-                .size(100.dp)
-                .background(
-                    color = Color.White.copy(alpha = 0.05f),
-                    shape = CircleShape
-                )
-        )
-
-        Column(
-            modifier = Modifier
-                .padding(horizontal = 24.dp)
-                .padding(top = 48.dp, bottom = 48.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Surface(
-                    color = Color.White.copy(alpha = 0.2f),
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    Text(
-                        text = "SCHEDULE",
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = Color.White,
-                        fontWeight = FontWeight.ExtraBold,
-                        letterSpacing = 1.sp
-                    )
-                }
-                
-                if (count > 0) {
-                    Surface(
-                        color = Color.White.copy(alpha = 0.15f),
-                        shape = CircleShape
-                    ) {
-                        Text(
-                            text = "$count Total",
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-                            style = MaterialTheme.typography.labelMedium,
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                }
-            }
-
-            Spacer(Modifier.height(24.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = "My Appointments",
-                        style = MaterialTheme.typography.headlineLarge.copy(
-                            fontWeight = FontWeight.Black,
-                            letterSpacing = (-0.5).sp,
-                            fontSize = 32.sp
-                        ),
-                        color = Color.White
-                    )
-
-                    Spacer(Modifier.height(8.dp))
-
-                    Text(
-                        text = "Track and manage your upcoming visits with healthcare professionals.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.White.copy(alpha = 0.9f),
-                        lineHeight = 20.sp
-                    )
-                }
-                
-                Box(
-                    modifier = Modifier
-                        .size(56.dp)
-                        .background(
-                            color = Color.White.copy(alpha = 0.2f),
-                            shape = RoundedCornerShape(16.dp)
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.CalendarMonth,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(32.dp)
-                    )
-                }
-            }
         }
     }
 }

@@ -16,46 +16,45 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.CurrencyRupee
 import androidx.compose.material.icons.outlined.ErrorOutline
-import androidx.compose.material.icons.outlined.MedicalInformation
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.WorkOutline
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.patient.app.core.storage.TokenManager
-import com.patient.app.core.ui.UiState
+import com.patient.app.core.ui.components.DashboardHeader
 import com.patient.app.core.ui.components.LoadingState
-import com.patient.app.core.ui.theme.HealthcareTheme
-import com.patient.app.core.ui.theme.PrimaryLight
-import com.patient.app.core.ui.theme.SecondaryLight
 import com.patient.app.doctors.list.api.DoctorDto
+import com.patient.app.doctors.list.viewmodel.DoctorsScreenState
 import com.patient.app.doctors.list.viewmodel.DoctorsViewModel
 import com.patient.app.doctors.list.viewmodel.DoctorsViewModelFactory
 
@@ -71,46 +70,45 @@ fun DoctorsListScreen(
 
     DoctorsListScreenContent(
         state = state,
-        onRetry = viewModel::loadDoctors,
+        onLoadMore = viewModel::loadDoctors,
         onDoctorClick = onDoctorClick
     )
 }
 
 @Composable
 fun DoctorsListScreenContent(
-    state: UiState<List<DoctorDto>>,
-    onRetry: () -> Unit,
+    state: DoctorsScreenState,
+    onLoadMore: () -> Unit,
     onDoctorClick: (String) -> Unit
 ) {
+    val backgroundColor = MaterialTheme.colorScheme.background
+    val surfaceVariantColor = MaterialTheme.colorScheme.surfaceVariant
+    val backgroundBrush = remember(backgroundColor, surfaceVariantColor) {
+        Brush.verticalGradient(
+            colors = listOf(
+                backgroundColor,
+                surfaceVariantColor.copy(alpha = 0.3f)
+            )
+        )
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        MaterialTheme.colorScheme.background,
-                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                    )
-                )
-            )
+            .background(brush = backgroundBrush)
     ) {
-        when (state) {
-            UiState.Loading -> {
-                LoadingState()
-            }
-
-            is UiState.Error -> {
-                EnhancedErrorState(
-                    onRetry = onRetry
-                )
-            }
-
-            is UiState.Success -> {
-                DoctorsList(
-                    doctors = state.data,
-                    onDoctorClick = onDoctorClick
-                )
-            }
+        if (state.isLoading && state.doctors.isEmpty()) {
+            LoadingState()
+        } else if (state.error != null && state.doctors.isEmpty()) {
+            EnhancedErrorState(
+                onRetry = onLoadMore
+            )
+        } else {
+            DoctorsList(
+                state = state,
+                onLoadMore = onLoadMore,
+                onDoctorClick = onDoctorClick
+            )
         }
     }
 }
@@ -182,7 +180,8 @@ fun EnhancedErrorState(
 
 @Composable
 fun DoctorsList(
-    doctors: List<DoctorDto>,
+    state: DoctorsScreenState,
+    onLoadMore: () -> Unit,
     onDoctorClick: (String) -> Unit
 ) {
     LazyColumn(
@@ -190,15 +189,47 @@ fun DoctorsList(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         contentPadding = PaddingValues(bottom = 24.dp)
     ) {
-        item {
-            DashboardHeader(count = doctors.size)
+        item(contentType = "header") {
+            DashboardHeader(
+                title = "Find Your",
+                subtitle = "Specialist Doctor",
+                count = state.doctors.size,
+                countLabel = "Specialists"
+            )
         }
-        items(doctors, key = { it.id }) { doctor ->
+        itemsIndexed(
+            items = state.doctors, 
+            key = { _, doctor -> doctor.id },
+            contentType = { _, _ -> "doctor" }
+        ) { index, doctor ->
             DoctorListItem(
                 doctorDto = doctor,
                 modifier = Modifier.padding(horizontal = 12.dp),
                 onBookNowClick = { onDoctorClick(doctor.id) }
             )
+
+            if (index >= state.doctors.size - 1 && !state.endReached && !state.isLoadingMore) {
+                LaunchedEffect(Unit) {
+                    onLoadMore()
+                }
+            }
+        }
+
+        if (state.isLoadingMore) {
+            item(contentType = "loader") {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
         }
     }
 }
@@ -346,8 +377,7 @@ fun DoctorListItem(
                     Text(
                         text = "Next: ${doctorDto.nextAvailable ?: "Today, 04:30 PM"}",
                         modifier = Modifier
-                            .padding(horizontal = 12.dp, vertical = 6.dp)
-                            .weight(1f, fill = false),
+                            .padding(horizontal = 12.dp, vertical = 6.dp),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSecondaryContainer,
                         fontWeight = FontWeight.SemiBold,
@@ -378,7 +408,7 @@ fun DoctorListItem(
 
 @Composable
 fun InfoChip(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     text: String
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -395,162 +425,6 @@ fun InfoChip(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
-        )
-    }
-}
-
-@Composable
-fun DashboardHeader(count: Int) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
-            .background(
-                brush = Brush.linearGradient(
-                    colors = listOf(
-                        PrimaryLight,
-                        SecondaryLight.copy(alpha = 0.8f)
-                    ),
-                    start = Offset(0f, 0f),
-                    end = Offset(1000f, 1000f)
-                )
-            )
-    ) {
-        // Decorative background elements
-        Box(
-            modifier = Modifier
-                .offset(x = 260.dp, y = (-30).dp)
-                .size(180.dp)
-                .background(
-                    color = Color.White.copy(alpha = 0.08f),
-                    shape = CircleShape
-                )
-        )
-        
-        Box(
-            modifier = Modifier
-                .offset(x = (-20).dp, y = 120.dp)
-                .size(100.dp)
-                .background(
-                    color = Color.White.copy(alpha = 0.05f),
-                    shape = CircleShape
-                )
-        )
-
-        Column(
-            modifier = Modifier
-                .padding(horizontal = 24.dp)
-                .padding(top = 48.dp, bottom = 48.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Surface(
-                    color = Color.White.copy(alpha = 0.2f),
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    Text(
-                        text = "HEALTHCARE",
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = Color.White,
-                        fontWeight = FontWeight.ExtraBold,
-                        letterSpacing = 1.sp
-                    )
-                }
-                
-                if (count > 0) {
-                    Surface(
-                        color = Color.White.copy(alpha = 0.15f),
-                        shape = CircleShape
-                    ) {
-                        Text(
-                            text = "$count Specialists",
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-                            style = MaterialTheme.typography.labelMedium,
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                }
-            }
-
-            Spacer(Modifier.height(24.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = "Find Your Doctor",
-                        style = MaterialTheme.typography.headlineLarge.copy(
-                            fontWeight = FontWeight.Black,
-                            letterSpacing = (-0.5).sp,
-                            fontSize = 32.sp
-                        ),
-                        color = Color.White
-                    )
-
-                    Spacer(Modifier.height(8.dp))
-
-                    Text(
-                        text = "Book appointments with our top-rated specialists for better care.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.White.copy(alpha = 0.9f),
-                        lineHeight = 20.sp
-                    )
-                }
-                
-                Box(
-                    modifier = Modifier
-                        .size(56.dp)
-                        .background(
-                            color = Color.White.copy(alpha = 0.2f),
-                            shape = RoundedCornerShape(16.dp)
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.MedicalInformation,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(32.dp)
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DoctorsListScreenPreview() {
-    HealthcareTheme {
-        val mockDoctors = listOf(
-            DoctorDto("33333333-3333-3333-3333-333333333333", "Dr Amit Sharma", "Cardiology", 12, 800.0, 4.7, "profile.jpg"),
-            DoctorDto("1", "Dr. John Smith", "Cardiologist", 15, 1000.0, 4.8, null),
-            DoctorDto("2", "Dr. Sarah Wilson", "Neurologist", 10, 1200.0, 4.9, null)
-        )
-        DoctorsListScreenContent(
-            state = UiState.Success(mockDoctors),
-            onRetry = {},
-            onDoctorClick = {}
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DoctorsListErrorPreview() {
-    HealthcareTheme {
-        DoctorsListScreenContent(
-            state = UiState.Error("Connection timed out. Please check your internet and try again."),
-            onRetry = {},
-            onDoctorClick = {}
         )
     }
 }

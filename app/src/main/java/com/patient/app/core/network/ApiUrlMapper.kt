@@ -10,12 +10,14 @@ import com.patient.app.login.api.SignUpRequestDto
 import com.patient.app.login.api.SignUpResponseDto
 import com.patient.app.login.api.UserDto
 import com.patient.app.doctors.list.api.DoctorDto
+import com.patient.app.doctors.list.api.PagedResponse
 import com.patient.app.prescriptions.api.PrescriptionDto
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface ApiUrlMapper {
 
@@ -32,7 +34,10 @@ interface ApiUrlMapper {
     suspend fun getProfile(): UserDto
 
     @GET("/api/doctors")
-    suspend fun getDoctors(): List<DoctorDto>
+    suspend fun getDoctors(
+        @Query("page") page: Int,
+        @Query("size") size: Int
+    ): PagedResponse<DoctorDto>
 
     @GET("/api/doctors/{id}")
     suspend fun getDoctorDetail(@Path("id") doctorId: String): DoctorDetailDto

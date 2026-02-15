@@ -9,9 +9,9 @@ class DoctorsRepository(tokenManager: TokenManager) {
     private val api = NetworkModule.provideRetrofit(tokenManager)
         .create(ApiUrlMapper::class.java)
 
-    suspend fun getDoctors(): Result<List<DoctorDto>> {
+    suspend fun getDoctors(page: Int, size: Int): Result<PagedResponse<DoctorDto>> {
         return try {
-            Result.success(api.getDoctors())
+            Result.success(api.getDoctors(page, size))
         } catch (e: Exception) {
             Result.failure(e)
         }
