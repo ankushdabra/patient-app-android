@@ -55,6 +55,7 @@ import com.patient.app.core.storage.TokenManager
 import com.patient.app.core.ui.components.DashboardHeader
 import com.patient.app.core.ui.components.LoadingState
 import com.patient.app.core.ui.theme.HealthcareTheme
+import com.patient.app.core.ui.theme.SuccessGreen
 import com.patient.app.doctors.list.api.DoctorDto
 import com.patient.app.doctors.list.viewmodel.DoctorsScreenState
 import com.patient.app.doctors.list.viewmodel.DoctorsViewModel
@@ -295,7 +296,7 @@ fun DoctorListItem(
                         Spacer(Modifier.width(8.dp))
                         
                         Surface(
-                            color = Color(0xFFFFB300).copy(alpha = 0.12f),
+                            color = SuccessGreen.copy(alpha = 0.12f),
                             shape = RoundedCornerShape(8.dp)
                         ) {
                             Row(
@@ -306,14 +307,14 @@ fun DoctorListItem(
                                     imageVector = Icons.Filled.Star,
                                     contentDescription = null,
                                     modifier = Modifier.size(14.dp),
-                                    tint = Color(0xFFFFB300)
+                                    tint = SuccessGreen
                                 )
                                 Spacer(Modifier.width(4.dp))
                                 Text(
                                     text = doctorDto.rating.toString(),
                                     style = MaterialTheme.typography.labelMedium,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color(0xFF856404)
+                                    color = SuccessGreen
                                 )
                             }
                         }
@@ -359,8 +360,24 @@ fun DoctorListItem(
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                     )
+                    val nextAvailableText = remember(doctorDto.nextAvailable) {
+                        doctorDto.nextAvailable?.let { text ->
+                            val parts = text.split(", ")
+                            if (parts.size >= 2) {
+                                val day = parts[0]
+                                val formattedDay = if (day.equals("Today", ignoreCase = true) || day.equals("Tomorrow", ignoreCase = true)) {
+                                    day
+                                } else {
+                                    day.take(3)
+                                }
+                                "$formattedDay, ${parts[1]}"
+                            } else {
+                                if (text.equals("Today", ignoreCase = true) || text.equals("Tomorrow", ignoreCase = true)) text else text.take(3)
+                            }
+                        } ?: "Today, 04:30 PM"
+                    }
                     Text(
-                        text = doctorDto.nextAvailable ?: "Today, 04:30 PM",
+                        text = nextAvailableText,
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.Bold
@@ -440,7 +457,7 @@ fun DoctorsListScreenPreview() {
                 consultationFee = 1000.0,
                 rating = 4.9,
                 profileImage = null,
-                nextAvailable = "Today, 06:30 PM"
+                nextAvailable = "Wednesday, 06:30 PM"
             )
         )
         

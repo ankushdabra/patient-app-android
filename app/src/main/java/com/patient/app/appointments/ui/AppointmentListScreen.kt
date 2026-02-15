@@ -21,7 +21,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.EventAvailable
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.outlined.ErrorOutline
@@ -35,9 +34,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -59,6 +58,8 @@ import com.patient.app.doctors.detail.api.DoctorDetailDto
 import com.patient.app.doctors.detail.api.DoctorTimeSlotDto
 import com.patient.app.login.api.UserDto
 import com.patient.app.prescriptions.api.PatientDto
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun AppointmentListScreen(
@@ -102,6 +103,13 @@ fun AppointmentListScreenContent(
             }
 
             is UiState.Success -> {
+                val sortedAppointments = remember(state.data) {
+                    state.data.sortedBy { it.appointmentDate }
+                }
+                val groupedAppointments = remember(sortedAppointments) {
+                    sortedAppointments.groupBy { it.appointmentDate }
+                }
+
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(bottom = 24.dp),
@@ -109,7 +117,7 @@ fun AppointmentListScreenContent(
                 ) {
                     item {
                         DashboardHeader(
-                            title = "My",
+                            title = "View Your",
                             subtitle = "Appointments",
                             count = state.data.size,
                             countLabel = "Total",
@@ -133,16 +141,21 @@ fun AppointmentListScreenContent(
                             }
                         }
                     } else {
-                        items(
-                            items = state.data,
-                            key = { it.id }
-                        ) { appointment ->
-                            AppointmentListItem(
-                                appointment = appointment,
-                                modifier = Modifier
-                                    .padding(horizontal = 12.dp)
-                                    .clickable { onAppointmentClick(appointment.id) }
-                            )
+                        groupedAppointments.forEach { (date, appointments) ->
+                            item(key = date) {
+                                DateHeader(date = date)
+                            }
+                            items(
+                                items = appointments,
+                                key = { it.id }
+                            ) { appointment ->
+                                AppointmentListItem(
+                                    appointment = appointment,
+                                    modifier = Modifier
+                                        .padding(horizontal = 12.dp)
+                                        .clickable { onAppointmentClick(appointment.id) }
+                                )
+                            }
                         }
                     }
                 }
@@ -154,6 +167,44 @@ fun AppointmentListScreenContent(
                 )
             }
         }
+    }
+}
+
+@Composable
+fun DateHeader(date: String) {
+    val relativeDate = remember(date) { getRelativeDateText(date) }
+    
+    Text(
+        text = relativeDate,
+        style = MaterialTheme.typography.titleMedium,
+        fontWeight = FontWeight.Bold,
+        color = MaterialTheme.colorScheme.primary,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+    )
+}
+
+private fun getRelativeDateText(dateString: String): String {
+    return try {
+        val date = LocalDate.parse(dateString)
+        val today = LocalDate.now()
+        val tomorrow = today.plusDays(1)
+        val fullFormatter = DateTimeFormatter.ofPattern("EEE, MMM dd")
+        
+        when {
+            date.isEqual(today) -> "Today, ${date.format(DateTimeFormatter.ofPattern("MMM dd"))}"
+            date.isEqual(tomorrow) -> "Tomorrow, ${date.format(DateTimeFormatter.ofPattern("MMM dd"))}"
+            date.isAfter(today) && date.isBefore(today.plusDays(7)) -> {
+                date.format(fullFormatter)
+            }
+            else -> {
+                val formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy")
+                date.format(formatter)
+            }
+        }
+    } catch (e: Exception) {
+        dateString
     }
 }
 
@@ -229,11 +280,11 @@ fun AppointmentListItem(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(28.dp),
+        shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.5.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
@@ -242,20 +293,20 @@ fun AppointmentListItem(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                // Circular Avatar with soft background
-                Box(
-                    modifier = Modifier
-                        .size(60.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)),
-                    contentAlignment = Alignment.Center
+                // Profile Circle with soft background
+                Surface(
+                    modifier = Modifier.size(60.dp),
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f)
                 ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Person,
-                        contentDescription = "Doctor",
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(34.dp)
-                    )
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = Icons.Outlined.Person,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
                 }
 
                 Spacer(Modifier.width(16.dp))
@@ -263,107 +314,90 @@ fun AppointmentListItem(
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = appointment.doctor.name ?: "Doctor",
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 17.sp
                         ),
                         color = MaterialTheme.colorScheme.onSurface,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
-
                     Text(
                         text = appointment.doctor.specialization ?: "Specialist",
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.SemiBold,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        fontWeight = FontWeight.Medium
                     )
                 }
 
-                Surface(
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                    shape = CircleShape,
-                    modifier = Modifier.size(36.dp)
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(18.dp)
-                        )
-                    }
-                }
-            }
-
-            Spacer(Modifier.height(20.dp))
-
-            // Info Bar for Date, Time and Status
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
-                    .padding(horizontal = 12.dp, vertical = 10.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.CalendarToday,
-                            contentDescription = "Date",
-                            modifier = Modifier.size(14.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = appointment.appointmentDate,
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.Schedule,
-                            contentDescription = "Time",
-                            modifier = Modifier.size(14.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = appointment.appointmentTime,
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                }
-
                 val (statusColor, statusBgColor) = when (appointment.status) {
-                    "BOOKED" -> Color(0xFF4CAF50) to Color(0xFF4CAF50).copy(alpha = 0.12f)
-                    "CANCELLED" -> MaterialTheme.colorScheme.error to MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.4f)
-                    else -> MaterialTheme.colorScheme.secondary to MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4f)
+                    "BOOKED" -> Color(0xFF4CAF50) to Color(0xFF4CAF50).copy(alpha = 0.1f)
+                    "CANCELLED" -> MaterialTheme.colorScheme.error to MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.12f)
+                    else -> MaterialTheme.colorScheme.secondary to MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.12f)
                 }
 
                 Surface(
                     color = statusBgColor,
-                    shape = RoundedCornerShape(10.dp)
+                    shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(
                         text = appointment.status,
                         modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = statusColor,
-                        fontWeight = FontWeight.ExtraBold
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            fontWeight = FontWeight.ExtraBold,
+                            letterSpacing = 0.5.sp
+                        ),
+                        color = statusColor
                     )
+                }
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            // Sub-container for Time and Action
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.Schedule,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            text = appointment.appointmentTime,
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text(
+                            text = "View Details",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
             }
         }
@@ -399,10 +433,68 @@ fun AppointmentListScreenPreview() {
                     gender = "MALE",
                     bloodGroup = "O+"
                 ),
-                appointmentDate = "2026-02-09",
+                appointmentDate = LocalDate.now().toString(),
                 appointmentTime = "10:00",
                 status = "BOOKED",
                 createdAt = "2026-02-08T10:00:00"
+            ),
+            AppointmentDto(
+                id = "2",
+                doctor = DoctorDetailDto(
+                    id = "d2",
+                    name = "Dr. Priya Das",
+                    specialization = "Dermatology",
+                    qualification = "MBBS, MD",
+                    experience = 8,
+                    rating = 4.2,
+                    consultationFee = 600.0,
+                    about = null,
+                    clinicAddress = null,
+                    profileImage = null,
+                    availability = mapOf(
+                        "MON" to listOf(DoctorTimeSlotDto("14:00", "16:00"))
+                    )
+                ),
+                patient = PatientDto(
+                    id = "p1",
+                    user = UserDto("u1", "John Doe", "john@example.com", "PATIENT"),
+                    age = 30,
+                    gender = "MALE",
+                    bloodGroup = "O+"
+                ),
+                appointmentDate = LocalDate.now().plusDays(1).toString(),
+                appointmentTime = "15:00",
+                status = "BOOKED",
+                createdAt = "2026-02-08T11:00:00"
+            ),
+            AppointmentDto(
+                id = "3",
+                doctor = DoctorDetailDto(
+                    id = "d3",
+                    name = "Dr. Sanjay Gupta",
+                    specialization = "Neurology",
+                    qualification = "MBBS, MD",
+                    experience = 20,
+                    rating = 4.8,
+                    consultationFee = 1200.0,
+                    about = null,
+                    clinicAddress = null,
+                    profileImage = null,
+                    availability = mapOf(
+                        "TUE" to listOf(DoctorTimeSlotDto("09:00", "12:00"))
+                    )
+                ),
+                patient = PatientDto(
+                    id = "p1",
+                    user = UserDto("u1", "John Doe", "john@example.com", "PATIENT"),
+                    age = 30,
+                    gender = "MALE",
+                    bloodGroup = "O+"
+                ),
+                appointmentDate = LocalDate.now().plusDays(2).toString(),
+                appointmentTime = "09:30",
+                status = "BOOKED",
+                createdAt = "2026-02-08T12:00:00"
             )
         )
         AppointmentListScreenContent(

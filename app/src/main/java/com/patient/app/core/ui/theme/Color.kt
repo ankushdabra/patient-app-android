@@ -16,6 +16,10 @@ val OnSecondaryContainerLight = Color(0xFF151B2C)
 val TertiaryLight = Color(0xFF745470)
 val OnTertiaryLight = Color(0xFFFFFFFF)
 
+// Success / Rating Colors
+val SuccessGreen = Color(0xFF4CAF50)
+val OnSuccessGreen = Color(0xFFFFFFFF)
+
 // Background & Surface for Light mode
 val BackgroundLight = Color(0xFFF8F9FF)
 val SurfaceLight = Color(0xFFFFFFFF)
@@ -23,8 +27,8 @@ val SurfaceLight = Color(0xFFFFFFFF)
 // Healthcare App Colors - Dark Mode (Higher Contrast)
 val PrimaryDark = Color(0xFFB9C3FF)
 val OnPrimaryDark = Color(0xFF00258B)
-val PrimaryContainerDark = Color(0xFF0038C0)
-val OnPrimaryContainerDark = Color(0xFFDDE1FF)
+val PrimaryContainerDark = Color(0xFF2B57E5)
+val OnPrimaryContainerDark = Color(0xFFFFFFFF)
 
 val SecondaryDark = Color(0xFFC0C5DD)
 val OnSecondaryDark = Color(0xFF2A2F42)
