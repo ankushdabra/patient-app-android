@@ -16,7 +16,7 @@
             <item android:offset="1" android:color="#FF1A36BA" />
         </gradient>
     </path>
-    <!-- Subtle decorative circles matching the app headers -->
+    <!-- Subtle decorative circles matching the com.patient.app headers -->
     <path
         android:fillColor="#1AFFFFFF"
         android:pathData="M80,20m-15,0a15,15 0,1 1,30 0a15,15 0,1 1,-30 0" />

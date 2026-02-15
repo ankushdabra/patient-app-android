@@ -17,7 +17,7 @@ Modern Android app built with **Jetpack Compose**, **MVVM**, and **JWT secured A
 
 ## 📂 Project Structure
 
-com.healthcare.app
+com.patient.app
 │
 ├── auth
 ├── dashboard

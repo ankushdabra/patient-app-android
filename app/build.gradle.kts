@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.healthcare.app"
+    namespace = "com.patient.app"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.healthcare.app"
+        applicationId = "com.patient.app"
         minSdk = 26
         targetSdk = 35
         versionCode = 1
