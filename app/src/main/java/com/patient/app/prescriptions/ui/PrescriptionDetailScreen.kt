@@ -260,7 +260,7 @@ fun PrescriptionDetailContent(
                                 imageVector = Icons.Outlined.CalendarToday,
                                 contentDescription = null,
                                 tint = Color.White.copy(alpha = 0.8f),
-                                modifier = Modifier.size(16.dp)
+                                modifier = Modifier.size(24.dp)
                             )
                             Spacer(Modifier.width(8.dp))
                             Column {

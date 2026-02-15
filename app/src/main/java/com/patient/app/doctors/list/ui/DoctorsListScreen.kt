@@ -344,7 +344,7 @@ fun DoctorListItem(
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(
-                        text = "Next: Today, 04:30 PM",
+                        text = "Next: ${doctorDto.nextAvailable ?: "Today, 04:30 PM"}",
                         modifier = Modifier
                             .padding(horizontal = 12.dp, vertical = 6.dp)
                             .weight(1f, fill = false),
