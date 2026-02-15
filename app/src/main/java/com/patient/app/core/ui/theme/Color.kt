@@ -36,6 +36,6 @@ val OnTertiaryDark = Color(0xFF422740)
 
 // Background & Surface for Dark mode - Increased contrast for better card visibility
 val BackgroundDark = Color(0xFF0B0D11) // Deeper background
-val SurfaceDark = Color(0xFF1E2129)    // Lighter surface for cards to pop
+val SurfaceDark = Color(0xFF2C3039)    // Brighter surface for cards (config update)
 val OnSurfaceDark = Color(0xFFE2E2E6)
 val OnBackgroundDark = Color(0xFFE2E2E6)

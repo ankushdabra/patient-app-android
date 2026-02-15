@@ -214,7 +214,7 @@ fun PrescriptionsList(
                 PrescriptionListItem(
                     prescription = prescription,
                     modifier = Modifier
-                        .padding(horizontal = 24.dp)
+                        .padding(horizontal = 12.dp)
                         .clickable { onPrescriptionClick(prescription.id) }
                 )
             }
@@ -236,7 +236,7 @@ fun PrescriptionListItem(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
@@ -313,7 +313,7 @@ fun PrescriptionListHeader(count: Int) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(bottomStart = 40.dp, bottomEnd = 40.dp))
+            .clip(RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
             .background(
                 brush = Brush.linearGradient(
                     colors = listOf(
