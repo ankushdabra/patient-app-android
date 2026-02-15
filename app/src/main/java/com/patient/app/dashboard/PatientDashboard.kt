@@ -11,6 +11,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -49,68 +50,61 @@ fun PatientDashboard(tokenManager: TokenManager) {
         PatientBottomNavItem.Profile
     )
 
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
+    val currentRoute = currentDestination?.route
+
+    // Check if the current route is a main bottom nav route
+    val showBottomBar = items.any { it.route == currentRoute }
+
     Scaffold(
         bottomBar = {
-            NavigationBar(
-                containerColor = MaterialTheme.colorScheme.surface,
-                tonalElevation = NavigationBarDefaults.Elevation
-            ) {
-                val navBackStackEntry = navController.currentBackStackEntryAsState().value
-                val currentDestination = navBackStackEntry?.destination
+            if (showBottomBar) {
+                NavigationBar(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    tonalElevation = NavigationBarDefaults.Elevation
+                ) {
+                    items.forEach { item ->
+                        val isSelected =
+                            currentDestination?.hierarchy?.any { it.route == item.route } == true
 
-                items.forEach { item ->
-                    val isSelected =
-                        currentDestination?.hierarchy?.any { it.route == item.route } == true ||
-                                (item == PatientBottomNavItem.Doctors && currentDestination?.route?.startsWith(
-                                    Routes.DOCTOR_DETAIL
-                                ) == true) ||
-                                (item == PatientBottomNavItem.Appointments && currentDestination?.route?.startsWith(
-                                    Routes.APPOINTMENT_DETAIL
-                                ) == true) ||
-                                (item == PatientBottomNavItem.Prescriptions && currentDestination?.route?.startsWith(
-                                    Routes.PRESCRIPTION_DETAIL
-                                ) == true)
-
-                    NavigationBarItem(
-                        selected = isSelected,
-                        onClick = {
-                            if (currentDestination?.route != item.route) {
-                                navController.navigate(item.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
+                        NavigationBarItem(
+                            selected = isSelected,
+                            onClick = {
+                                if (currentDestination?.route != item.route) {
+                                    navController.navigate(item.route) {
+                                        popUpTo(navController.graph.findStartDestination().id) {
+                                            saveState = true
+                                        }
+                                        launchSingleTop = true
+                                        restoreState = true
                                     }
-                                    launchSingleTop = true
-                                    restoreState =
-                                        item != PatientBottomNavItem.Doctors &&
-                                                item != PatientBottomNavItem.Appointments &&
-                                                item != PatientBottomNavItem.Prescriptions
                                 }
-                            }
-                        },
-                        icon = {
-                            Icon(item.icon, contentDescription = item.label)
-                        },
-                        label = {
-                            Text(
-                                text = item.label,
-                                style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
+                            },
+                            icon = {
+                                Icon(item.icon, contentDescription = item.label)
+                            },
+                            label = {
+                                Text(
+                                    text = item.label,
+                                    style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            },
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor = MaterialTheme.colorScheme.primary,
+                                selectedTextColor = MaterialTheme.colorScheme.primary,
+                                indicatorColor = MaterialTheme.colorScheme.primaryContainer,
+                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
                             )
-                        },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = MaterialTheme.colorScheme.primary,
-                            selectedTextColor = MaterialTheme.colorScheme.primary,
-                            indicatorColor = MaterialTheme.colorScheme.primaryContainer,
-                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                    )
+                    }
                 }
             }
         }
     ) { padding ->
-
         NavHost(
             navController = navController,
             startDestination = PatientBottomNavItem.Doctors.route,
