@@ -1,7 +1,6 @@
 package com.patient.app.doctors.list.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,6 +19,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MedicalServices
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.CurrencyRupee
 import androidx.compose.material.icons.outlined.ErrorOutline
@@ -46,6 +46,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -53,6 +54,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.patient.app.core.storage.TokenManager
 import com.patient.app.core.ui.components.DashboardHeader
 import com.patient.app.core.ui.components.LoadingState
+import com.patient.app.core.ui.theme.HealthcareTheme
 import com.patient.app.doctors.list.api.DoctorDto
 import com.patient.app.doctors.list.viewmodel.DoctorsScreenState
 import com.patient.app.doctors.list.viewmodel.DoctorsViewModel
@@ -194,7 +196,8 @@ fun DoctorsList(
                 title = "Find Your",
                 subtitle = "Specialist Doctor",
                 count = state.doctors.size,
-                countLabel = "Specialists"
+                countLabel = "Specialists",
+                icon = Icons.Default.MedicalServices
             )
         }
         itemsIndexed(
@@ -246,47 +249,27 @@ fun DoctorListItem(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.5.dp)
     ) {
-        Column(modifier = Modifier.padding(12.dp)) {
+        Column(modifier = Modifier.padding(16.dp)) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                // Profile Image Placeholder with status indicator
-                Box {
-                    Box(
-                        modifier = Modifier
-                            .size(72.dp)
-                            .clip(RoundedCornerShape(20.dp))
-                            .background(MaterialTheme.colorScheme.primaryContainer),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Person,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(40.dp)
-                        )
-                    }
-                    
-                    // Online indicator
-                    Box(
-                        modifier = Modifier
-                            .size(14.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.surface)
-                            .padding(2.dp)
-                            .align(Alignment.TopEnd)
-                            .offset(x = 4.dp, y = (-4).dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .clip(CircleShape)
-                                .background(Color(0xFF4CAF50))
-                        )
-                    }
+                // Profile Image Placeholder
+                Box(
+                    modifier = Modifier
+                        .size(80.dp)
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Person,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(44.dp)
+                    )
                 }
 
                 Spacer(Modifier.width(16.dp))
@@ -312,11 +295,11 @@ fun DoctorListItem(
                         Spacer(Modifier.width(8.dp))
                         
                         Surface(
-                            color = Color(0xFFFFB300).copy(alpha = 0.15f),
+                            color = Color(0xFFFFB300).copy(alpha = 0.12f),
                             shape = RoundedCornerShape(8.dp)
                         ) {
                             Row(
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Icon(
@@ -330,7 +313,7 @@ fun DoctorListItem(
                                     text = doctorDto.rating.toString(),
                                     style = MaterialTheme.typography.labelMedium,
                                     fontWeight = FontWeight.Bold,
-                                    color = if (MaterialTheme.colorScheme.surface == Color.White) Color(0xFF856404) else Color(0xFFFFD54F)
+                                    color = Color(0xFF856404)
                                 )
                             }
                         }
@@ -340,7 +323,7 @@ fun DoctorListItem(
                         text = doctorDto.specialization,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Medium,
+                        fontWeight = FontWeight.SemiBold,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -349,11 +332,11 @@ fun DoctorListItem(
                     
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         InfoChip(
                             icon = Icons.Outlined.WorkOutline,
-                            text = "${doctorDto.experience} Yrs"
+                            text = "${doctorDto.experience} Years Exp"
                         )
                         InfoChip(
                             icon = Icons.Outlined.CurrencyRupee,
@@ -363,41 +346,35 @@ fun DoctorListItem(
                 }
             }
             
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(20.dp))
             
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Surface(
-                    color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = if (MaterialTheme.colorScheme.surface == Color.White) 0.4f else 0.15f),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
+                Column {
                     Text(
-                        text = "Next: ${doctorDto.nextAvailable ?: "Today, 04:30 PM"}",
-                        modifier = Modifier
-                            .padding(horizontal = 12.dp, vertical = 6.dp),
+                        text = "Next Available",
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer,
-                        fontWeight = FontWeight.SemiBold,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                    )
+                    Text(
+                        text = doctorDto.nextAvailable ?: "Today, 04:30 PM",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Bold
                     )
                 }
                 
-                Spacer(Modifier.width(8.dp))
-                
-                Surface(
-                    color = MaterialTheme.colorScheme.primary,
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.clickable { onBookNowClick() }
+                Button(
+                    onClick = onBookNowClick,
+                    shape = RoundedCornerShape(14.dp),
+                    contentPadding = PaddingValues(horizontal = 20.dp, vertical = 10.dp)
                 ) {
                     Text(
                         text = "Book Now",
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                         style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.onPrimary,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -416,15 +393,61 @@ fun InfoChip(
             imageVector = icon,
             contentDescription = null,
             modifier = Modifier.size(16.dp),
-            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
         )
-        Spacer(Modifier.width(4.dp))
+        Spacer(Modifier.width(6.dp))
         Text(
             text = text,
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontWeight = FontWeight.Medium,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DoctorsListScreenPreview() {
+    HealthcareTheme {
+        val mockDoctors = listOf(
+            DoctorDto(
+                id = "1",
+                name = "Dr. Amit Sharma",
+                specialization = "Cardiologist",
+                experience = 12,
+                consultationFee = 800.0,
+                rating = 4.8,
+                profileImage = null,
+                nextAvailable = "Today, 05:00 PM"
+            ),
+            DoctorDto(
+                id = "2",
+                name = "Dr. Sneha Patil",
+                specialization = "Dermatologist",
+                experience = 8,
+                consultationFee = 600.0,
+                rating = 4.6,
+                profileImage = null,
+                nextAvailable = "Tomorrow, 10:00 AM"
+            ),
+            DoctorDto(
+                id = "3",
+                name = "Dr. Vikram Singh",
+                specialization = "Orthopedic",
+                experience = 15,
+                consultationFee = 1000.0,
+                rating = 4.9,
+                profileImage = null,
+                nextAvailable = "Today, 06:30 PM"
+            )
+        )
+        
+        DoctorsListScreenContent(
+            state = DoctorsScreenState(doctors = mockDoctors),
+            onLoadMore = {},
+            onDoctorClick = {}
         )
     }
 }
