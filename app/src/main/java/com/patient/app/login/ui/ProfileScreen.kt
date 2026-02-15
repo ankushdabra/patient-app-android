@@ -188,7 +188,7 @@ fun ProfileContent(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(bottomStart = 40.dp, bottomEnd = 40.dp))
+                .clip(RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
                 .background(
                     brush = Brush.linearGradient(
                         colors = listOf(
@@ -285,7 +285,7 @@ fun ProfileContent(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(24.dp),
+                .padding(start = 12.dp, end = 12.dp, top = 24.dp, bottom = 48.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             // --- Theme Settings ---
