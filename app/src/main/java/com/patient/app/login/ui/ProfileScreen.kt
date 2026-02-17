@@ -40,6 +40,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.patient.app.core.storage.TokenManager
 import com.patient.app.core.ui.UiState
 import com.patient.app.core.ui.components.LoadingState
+import com.patient.app.core.ui.theme.HeaderPrimaryDarkBlue
+import com.patient.app.core.ui.theme.HeaderSecondaryDarkBlue
 import com.patient.app.core.ui.theme.HealthcareTheme
 import com.patient.app.login.api.AuthenticationRepository
 import com.patient.app.login.api.UserDto
@@ -234,8 +236,8 @@ fun ProfileContent(
                     .background(
                         brush = Brush.verticalGradient(
                             colors = listOf(
-                                MaterialTheme.colorScheme.primaryContainer,
-                                MaterialTheme.colorScheme.primary
+                                HeaderPrimaryDarkBlue,
+                                HeaderSecondaryDarkBlue
                             )
                         )
                     )
