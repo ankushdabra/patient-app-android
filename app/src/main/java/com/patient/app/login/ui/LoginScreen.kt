@@ -54,28 +54,34 @@ fun LoginScreen(
 
     val focusManager = LocalFocusManager.current
 
-    fun validate(): Boolean {
+    fun validateAndSubmit() {
         var isValid = true
-        if (email.isBlank()) {
+        val trimmedEmail = email.trim()
+        val trimmedPassword = password.trim()
+
+        if (trimmedEmail.isBlank()) {
             emailError = "Email is required"
             isValid = false
-        } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+        } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(trimmedEmail).matches()) {
             emailError = "Invalid email format"
             isValid = false
         } else {
             emailError = null
         }
 
-        if (password.isBlank()) {
+        if (trimmedPassword.isBlank()) {
             passwordError = "Password is required"
             isValid = false
-        } else if (password.length < 6) {
+        } else if (trimmedPassword.length < 6) {
             passwordError = "Password must be at least 6 characters"
             isValid = false
         } else {
             passwordError = null
         }
-        return isValid
+
+        if (isValid) {
+            onLoginClick(trimmedEmail, trimmedPassword)
+        }
     }
 
     Surface(
@@ -250,9 +256,7 @@ fun LoginScreen(
                             keyboardActions = KeyboardActions(
                                 onDone = {
                                     focusManager.clearFocus()
-                                    if (validate()) {
-                                        onLoginClick(email, password)
-                                    }
+                                    validateAndSubmit()
                                 }
                             )
                         )
@@ -279,9 +283,7 @@ fun LoginScreen(
                         Button(
                             onClick = {
                                 focusManager.clearFocus()
-                                if (validate()) {
-                                    onLoginClick(email, password)
-                                }
+                                validateAndSubmit()
                             },
                             modifier = Modifier
                                 .fillMaxWidth()

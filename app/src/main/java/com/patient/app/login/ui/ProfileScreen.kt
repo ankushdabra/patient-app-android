@@ -1,14 +1,23 @@
 package com.patient.app.login.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material.icons.rounded.*
@@ -22,6 +31,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -70,7 +80,9 @@ fun ProfileScreen(
                             user = state.data,
                             themeMode = themeMode,
                             onThemeChange = viewModel::setThemeMode,
-                            onLogoutClick = viewModel::logout
+                            onLogoutClick = viewModel::logout,
+                            onUpdateProfile = viewModel::updateProfile,
+                            isDark = isDark
                         )
                     }
                 }
@@ -150,262 +162,347 @@ fun ProfileContent(
     user: UserDto,
     themeMode: String,
     onThemeChange: (String) -> Unit,
-    onLogoutClick: () -> Unit
+    onLogoutClick: () -> Unit,
+    onUpdateProfile: (UserDto) -> Unit,
+    isDark: Boolean
 ) {
     var showMenu by remember { mutableStateOf(false) }
+    var isEditMode by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .background(MaterialTheme.colorScheme.background)
-    ) {
-        // --- Hero Header Section (Dark Blue Visuals) ---
-        Box(
+    // Editable states (excluding name)
+    var editedAge by remember(user) { mutableStateOf(user.age?.toString() ?: "") }
+    var editedGender by remember(user) { mutableStateOf(user.gender ?: "") }
+    var editedBloodGroup by remember(user) { mutableStateOf(user.bloodGroup ?: "") }
+    var editedWeight by remember(user) { mutableStateOf(user.weight?.toString() ?: "") }
+    var editedHeight by remember(user) { mutableStateOf(user.height?.toString() ?: "") }
+
+    fun cancelEdit() {
+        editedAge = user.age?.toString() ?: ""
+        editedGender = user.gender ?: ""
+        editedBloodGroup = user.bloodGroup ?: ""
+        editedWeight = user.weight?.toString() ?: ""
+        editedHeight = user.height?.toString() ?: ""
+        isEditMode = false
+    }
+
+    Scaffold(
+        contentWindowInsets = WindowInsets(0, 0, 0, 0), // Fix for nested Scaffold insets gap
+        floatingActionButton = {
+            ExtendedFloatingActionButton(
+                onClick = {
+                    if (isEditMode) {
+                        val updatedUser = user.copy(
+                            age = editedAge.toIntOrNull(),
+                            gender = editedGender,
+                            bloodGroup = editedBloodGroup,
+                            weight = editedWeight.toDoubleOrNull(),
+                            height = editedHeight.toDoubleOrNull()
+                        )
+                        onUpdateProfile(updatedUser)
+                        isEditMode = false
+                    } else {
+                        isEditMode = true
+                    }
+                },
+                icon = {
+                    Icon(
+                        imageVector = if (isEditMode) Icons.Default.Check else Icons.Default.Edit,
+                        contentDescription = null
+                    )
+                },
+                text = {
+                    Text(text = if (isEditMode) "Save" else "Edit")
+                },
+                containerColor = if (isEditMode) Color(0xFF4CAF50) else MaterialTheme.colorScheme.primary,
+                contentColor = if (isEditMode) Color.White else MaterialTheme.colorScheme.onPrimary
+            )
+        }
+    ) { padding ->
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
-                .background(
-                    brush = Brush.linearGradient(
-                        colors = listOf(
-                            Color(0xFF003366), // Deep Dark Blue
-                            Color(0xFF005AC1)  // Healthcare Primary Blue
-                        ),
-                        start = Offset(0f, 0f),
-                        end = Offset(1000f, 1000f)
-                    )
-                )
+                .fillMaxSize()
+                .padding(padding)
+                .background(MaterialTheme.colorScheme.background)
+                .verticalScroll(rememberScrollState())
+                .imePadding()
         ) {
-            // Decorative background elements
+            // --- Hero Header Section ---
             Box(
-                modifier = Modifier
-                    .offset(x = 260.dp, y = (-30).dp)
-                    .size(180.dp)
-                    .background(
-                        color = Color.White.copy(alpha = 0.08f),
-                        shape = CircleShape
-                    )
-            )
-
-            Box(
-                modifier = Modifier
-                    .offset(x = (-20).dp, y = 120.dp)
-                    .size(100.dp)
-                    .background(
-                        color = Color.White.copy(alpha = 0.05f),
-                        shape = CircleShape
-                    )
-            )
-
-            // Top Bar with Menu
-            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 16.dp, end = 16.dp),
-                horizontalArrangement = Arrangement.End
+                    .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
+                    .background(
+                        brush = Brush.linearGradient(
+                            colors = listOf(
+                                Color(0xFF003366),
+                                Color(0xFF005AC1)
+                            ),
+                            start = Offset(0f, 0f),
+                            end = Offset(1000f, 1000f)
+                        )
+                    )
             ) {
-                Box {
-                    IconButton(onClick = { showMenu = !showMenu }) {
-                        Icon(
-                            imageVector = Icons.Default.MoreVert,
-                            contentDescription = "Options",
-                            tint = Color.White
+                // Decorative background elements
+                Box(
+                    modifier = Modifier
+                        .offset(x = 260.dp, y = (-30).dp)
+                        .size(180.dp)
+                        .background(
+                            color = Color.White.copy(alpha = 0.08f),
+                            shape = CircleShape
                         )
+                )
+
+                Box(
+                    modifier = Modifier
+                        .offset(x = (-20).dp, y = 120.dp)
+                        .size(100.dp)
+                        .background(
+                            color = Color.White.copy(alpha = 0.05f),
+                            shape = CircleShape
+                        )
+                )
+
+                // Top Bar with Menu
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp, start = 8.dp, end = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Cancel Icon at Top Left
+                    if (isEditMode) {
+                        IconButton(onClick = { cancelEdit() }) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Cancel Edit",
+                                tint = Color.White
+                            )
+                        }
+                    } else {
+                        Spacer(modifier = Modifier.width(48.dp))
                     }
-                    DropdownMenu(
-                        expanded = showMenu,
-                        onDismissRequest = { showMenu = false },
-                        modifier = Modifier.background(MaterialTheme.colorScheme.surface)
-                    ) {
-                        Text(
-                            text = "Theme Mode",
-                            style = MaterialTheme.typography.labelMedium,
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                            color = MaterialTheme.colorScheme.primary
-                        )
 
-                        val themeOptions = listOf(
-                            Triple("LIGHT", "Light", Icons.Outlined.LightMode),
-                            Triple("DARK", "Dark", Icons.Outlined.DarkMode),
-                            Triple("FOLLOW_SYSTEM", "System", Icons.Outlined.SettingsSuggest)
-                        )
+                    Box {
+                        IconButton(onClick = { showMenu = !showMenu }) {
+                            Icon(
+                                imageVector = Icons.Default.MoreVert,
+                                contentDescription = "Options",
+                                tint = Color.White
+                            )
+                        }
+                        DropdownMenu(
+                            expanded = showMenu,
+                            onDismissRequest = { showMenu = false },
+                            modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+                        ) {
+                            Text(
+                                text = "Theme Mode",
+                                style = MaterialTheme.typography.labelMedium,
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                                color = MaterialTheme.colorScheme.primary
+                            )
 
-                        themeOptions.forEach { (option, label, icon) ->
+                            val themeOptions = listOf(
+                                Triple("LIGHT", "Light", Icons.Outlined.LightMode),
+                                Triple("DARK", "Dark", Icons.Outlined.DarkMode),
+                                Triple("FOLLOW_SYSTEM", "System", Icons.Outlined.SettingsSuggest)
+                            )
+
+                            themeOptions.forEach { (option, label, icon) ->
+                                DropdownMenuItem(
+                                    text = { Text(label) },
+                                    leadingIcon = {
+                                        Icon(
+                                            icon,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                    },
+                                    onClick = {
+                                        onThemeChange(option)
+                                        showMenu = false
+                                    },
+                                    trailingIcon = {
+                                        if (themeMode == option) {
+                                            Icon(
+                                                Icons.Outlined.Check,
+                                                contentDescription = "Selected",
+                                                modifier = Modifier.size(16.dp)
+                                            )
+                                        }
+                                    }
+                                )
+                            }
+
+                            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+
                             DropdownMenuItem(
-                                text = { Text(label) },
+                                text = { Text("Sign Out", color = MaterialTheme.colorScheme.error) },
                                 leadingIcon = {
                                     Icon(
-                                        icon,
+                                        Icons.AutoMirrored.Filled.Logout,
                                         contentDescription = null,
-                                        modifier = Modifier.size(18.dp)
+                                        tint = MaterialTheme.colorScheme.error
                                     )
                                 },
                                 onClick = {
-                                    onThemeChange(option)
+                                    onLogoutClick()
                                     showMenu = false
-                                },
-                                trailingIcon = {
-                                    if (themeMode == option) {
-                                        Icon(
-                                            Icons.Outlined.Check,
-                                            contentDescription = "Selected",
-                                            modifier = Modifier.size(16.dp)
-                                        )
-                                    }
                                 }
                             )
                         }
-
-                        HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
-
-                        DropdownMenuItem(
-                            text = { Text("Sign Out", color = MaterialTheme.colorScheme.error) },
-                            leadingIcon = {
-                                Icon(
-                                    Icons.AutoMirrored.Filled.Logout,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.error
-                                )
-                            },
-                            onClick = {
-                                onLogoutClick()
-                                showMenu = false
-                            }
-                        )
                     }
                 }
-            }
 
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 48.dp, bottom = 48.dp)
-            ) {
-                Box(
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
-                        .size(100.dp)
-                        .clip(CircleShape)
-                        .background(Color.White.copy(alpha = 0.2f)),
-                    contentAlignment = Alignment.Center
+                        .fillMaxWidth()
+                        .padding(top = 48.dp, bottom = 48.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Outlined.AccountCircle,
-                        contentDescription = null,
-                        modifier = Modifier.size(80.dp),
-                        tint = Color.White
-                    )
-                }
-
-                Spacer(Modifier.height(16.dp))
-
-                Text(
-                    text = user.name,
-                    style = MaterialTheme.typography.headlineMedium.copy(
-                        fontWeight = FontWeight.Black,
-                        letterSpacing = (-0.5).sp
-                    ),
-                    color = Color.White
-                )
-
-                Spacer(Modifier.height(8.dp))
-
-                Surface(
-                    color = Color.White.copy(alpha = 0.15f),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                    Box(
+                        modifier = Modifier
+                            .size(100.dp)
+                            .clip(CircleShape)
+                            .background(Color.White.copy(alpha = 0.2f)),
+                        contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            imageVector = Icons.Outlined.Email,
+                            imageVector = Icons.Outlined.AccountCircle,
                             contentDescription = null,
-                            modifier = Modifier.size(16.dp),
+                            modifier = Modifier.size(80.dp),
                             tint = Color.White
                         )
-                        Spacer(Modifier.width(8.dp))
-                        Text(
-                            text = user.email,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = Color.White,
-                            fontWeight = FontWeight.Medium
-                        )
+                    }
+
+                    Spacer(Modifier.height(16.dp))
+
+                    Text(
+                        text = user.name,
+                        style = MaterialTheme.typography.headlineMedium.copy(
+                            fontWeight = FontWeight.Black,
+                            letterSpacing = (-0.5).sp
+                        ),
+                        color = Color.White
+                    )
+
+                    Spacer(Modifier.height(8.dp))
+
+                    Surface(
+                        color = Color.White.copy(alpha = 0.15f),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.Email,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp),
+                                tint = Color.White
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Text(
+                                text = user.email,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = Color.White,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
                     }
                 }
             }
-        }
 
-        // --- Content Section ---
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp, vertical = 28.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
-        ) {
-            // --- Personal Details ---
-            Text(
-                text = "Personal Information",
-                style = MaterialTheme.typography.titleLarge.copy(
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            )
-
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            // --- Content Section ---
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp, vertical = 28.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
-                Column(
-                    modifier = Modifier.padding(24.dp),
-                    verticalArrangement = Arrangement.spacedBy(20.dp)
-                ) {
-                    ProfileDetailRow(
-                        icon = Icons.Rounded.CalendarToday,
-                        label = "Age",
-                        value = "${user.age ?: "N/A"} Years",
-                        iconColor = Color(0xFF1976D2)
+                // --- Personal Details ---
+                Text(
+                    text = "Personal Information",
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
                     )
-                    ProfileDetailRow(
-                        icon = Icons.Rounded.Wc,
-                        label = "Gender",
-                        value = user.gender ?: "Not specified",
-                        iconColor = Color(0xFFE91E63)
-                    )
-                    ProfileDetailRow(
-                        icon = Icons.Rounded.Bloodtype,
-                        label = "Blood Group",
-                        value = user.bloodGroup ?: "Not specified",
-                        iconColor = Color(0xFFD32F2F)
-                    )
-                    ProfileDetailRow(
-                        icon = Icons.Rounded.MonitorWeight,
-                        label = "Weight",
-                        value = user.weight?.let { "$it kg" } ?: "Not specified",
-                        iconColor = Color(0xFFF57C00)
-                    )
-                    ProfileDetailRow(
-                        icon = Icons.Rounded.Straighten,
-                        label = "Height",
-                        value = user.height?.let { "$it cm" } ?: "Not specified",
-                        iconColor = Color(0xFF388E3C)
-                    )
-                }
-            }
+                )
 
-            Spacer(Modifier.height(32.dp))
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(24.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(24.dp),
+                        verticalArrangement = Arrangement.spacedBy(20.dp)
+                    ) {
+                        ProfileEditableDetailRow(
+                            isEditMode = isEditMode,
+                            icon = Icons.Rounded.CalendarToday,
+                            label = "Age",
+                            value = editedAge,
+                            onValueChange = { editedAge = it },
+                            iconColor = Color(0xFF1976D2),
+                            keyboardType = KeyboardType.Number
+                        )
+                        ProfileEditableDetailRow(
+                            isEditMode = isEditMode,
+                            icon = Icons.Rounded.Wc,
+                            label = "Gender",
+                            value = editedGender,
+                            onValueChange = { editedGender = it },
+                            iconColor = Color(0xFFE91E63)
+                        )
+                        ProfileEditableDetailRow(
+                            isEditMode = isEditMode,
+                            icon = Icons.Rounded.Bloodtype,
+                            label = "Blood Group",
+                            value = editedBloodGroup,
+                            onValueChange = { editedBloodGroup = it },
+                            iconColor = Color(0xFFD32F2F)
+                        )
+                        ProfileEditableDetailRow(
+                            isEditMode = isEditMode,
+                            icon = Icons.Rounded.MonitorWeight,
+                            label = "Weight (kg)",
+                            value = editedWeight,
+                            onValueChange = { editedWeight = it },
+                            iconColor = Color(0xFFF57C00),
+                            keyboardType = KeyboardType.Decimal
+                        )
+                        ProfileEditableDetailRow(
+                            isEditMode = isEditMode,
+                            icon = Icons.Rounded.Straighten,
+                            label = "Height (cm)",
+                            value = editedHeight,
+                            onValueChange = { editedHeight = it },
+                            iconColor = Color(0xFF388E3C),
+                            keyboardType = KeyboardType.Decimal
+                        )
+                    }
+                }
+
+                // Generous spacer removed. calculateBottomPadding() will handle this.
+            }
         }
     }
 }
 
 @Composable
-fun ProfileDetailRow(
+fun ProfileEditableDetailRow(
+    isEditMode: Boolean,
     icon: ImageVector,
     label: String,
     value: String,
-    iconColor: Color
+    onValueChange: (String) -> Unit,
+    iconColor: Color,
+    keyboardType: KeyboardType = KeyboardType.Text
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -426,19 +523,34 @@ fun ProfileDetailRow(
             )
         }
         Spacer(Modifier.width(16.dp))
-        Column {
+        Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = label,
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
             )
-            Text(
-                text = value,
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
+            if (isEditMode) {
+                TextField(
+                    value = value,
+                    onValueChange = onValueChange,
+                    modifier = Modifier.fillMaxWidth(),
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+                    keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent,
+                    )
                 )
-            )
+            } else {
+                Text(
+                    text = if (value.isEmpty()) "Not specified" else value,
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                )
+            }
         }
     }
 }
@@ -461,7 +573,9 @@ fun ProfileScreenPreview() {
             ),
             themeMode = "LIGHT",
             onThemeChange = {},
-            onLogoutClick = {}
+            onLogoutClick = {},
+            onUpdateProfile = {},
+            isDark = false
         )
     }
 }
@@ -484,7 +598,9 @@ fun ProfileScreenDarkPreview() {
             ),
             themeMode = "DARK",
             onThemeChange = {},
-            onLogoutClick = {}
+            onLogoutClick = {},
+            onUpdateProfile = {},
+            isDark = true
         )
     }
 }

@@ -63,60 +63,69 @@ fun SignUpScreen(
 
     val focusManager = LocalFocusManager.current
 
-    fun validate(): Boolean {
+    fun validateAndSubmit() {
         var isValid = true
-        if (name.isBlank()) {
+        val trimmedName = name.trim()
+        val trimmedEmail = email.trim()
+        val trimmedPassword = password.trim()
+        val trimmedAge = age.trim()
+        val trimmedGender = gender.trim()
+        val trimmedBloodGroup = bloodGroup.trim()
+
+        if (trimmedName.isBlank()) {
             nameError = "Name is required"
             isValid = false
         } else {
             nameError = null
         }
 
-        if (email.isBlank()) {
+        if (trimmedEmail.isBlank()) {
             emailError = "Email is required"
             isValid = false
-        } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+        } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(trimmedEmail).matches()) {
             emailError = "Invalid email format"
             isValid = false
         } else {
             emailError = null
         }
 
-        if (password.isBlank()) {
+        if (trimmedPassword.isBlank()) {
             passwordError = "Password is required"
             isValid = false
-        } else if (password.length < 6) {
+        } else if (trimmedPassword.length < 6) {
             passwordError = "Password must be at least 6 characters"
             isValid = false
         } else {
             passwordError = null
         }
 
-        if (age.isBlank()) {
+        if (trimmedAge.isBlank()) {
             ageError = "Age is required"
             isValid = false
-        } else if (age.toIntOrNull() == null) {
+        } else if (trimmedAge.toIntOrNull() == null) {
             ageError = "Age must be a number"
             isValid = false
         } else {
             ageError = null
         }
 
-        if (gender.isBlank()) {
+        if (trimmedGender.isBlank()) {
             genderError = "Gender is required"
             isValid = false
         } else {
             genderError = null
         }
 
-        if (bloodGroup.isBlank()) {
+        if (trimmedBloodGroup.isBlank()) {
             bloodGroupError = "Blood group is required"
             isValid = false
         } else {
             bloodGroupError = null
         }
 
-        return isValid
+        if (isValid) {
+            onRegisterClick(trimmedName, trimmedEmail, trimmedPassword, trimmedAge, trimmedGender, trimmedBloodGroup)
+        }
     }
 
     Surface(
@@ -423,9 +432,7 @@ fun SignUpScreen(
                             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                             keyboardActions = KeyboardActions(onDone = {
                                 focusManager.clearFocus()
-                                if (validate()) {
-                                    onRegisterClick(name, email, password, age, gender, bloodGroup)
-                                }
+                                validateAndSubmit()
                             })
                         )
 
@@ -435,9 +442,7 @@ fun SignUpScreen(
                         Button(
                             onClick = {
                                 focusManager.clearFocus()
-                                if (validate()) {
-                                    onRegisterClick(name, email, password, age, gender, bloodGroup)
-                                }
+                                validateAndSubmit()
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
