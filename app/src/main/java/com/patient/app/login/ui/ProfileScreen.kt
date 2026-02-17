@@ -39,6 +39,7 @@ import com.patient.app.core.ui.theme.HeaderPrimaryDarkBlue
 import com.patient.app.core.ui.theme.HeaderSecondaryDarkBlue
 import com.patient.app.core.ui.theme.HealthcareTheme
 import com.patient.app.login.api.AuthenticationRepository
+import com.patient.app.login.api.ProfileUpdateRequestDto
 import com.patient.app.login.api.UserDto
 import com.patient.app.login.viewmodel.ProfileViewModel
 import com.patient.app.login.viewmodel.ProfileViewModelFactory
@@ -159,7 +160,7 @@ fun ProfileContent(
     themeMode: String,
     onThemeChange: (String) -> Unit,
     onLogoutClick: () -> Unit,
-    onUpdateProfile: (UserDto) -> Unit
+    onUpdateProfile: (ProfileUpdateRequestDto) -> Unit
 ) {
     var showMenu by remember { mutableStateOf(false) }
     var isEditMode by remember { mutableStateOf(false) }
@@ -171,12 +172,6 @@ fun ProfileContent(
     var editedBloodGroup by remember(user) { mutableStateOf(user.bloodGroup ?: "") }
     var editedWeight by remember(user) { mutableStateOf(user.weight?.toString() ?: "") }
     var editedHeight by remember(user) { mutableStateOf(user.height?.toString() ?: "") }
-    var editedAbout by remember(user) { mutableStateOf(user.about ?: "") }
-    var editedClinicAddress by remember(user) { mutableStateOf(user.clinicAddress ?: "") }
-    var editedSpecialization by remember(user) { mutableStateOf(user.specialization ?: "") }
-    var editedQualification by remember(user) { mutableStateOf(user.qualification ?: "") }
-    var editedExperience by remember(user) { mutableStateOf(user.experience?.toString() ?: "") }
-    var editedConsultationFee by remember(user) { mutableStateOf(user.consultationFee?.toString() ?: "") }
 
     fun cancelEdit() {
         editedName = user.name
@@ -185,12 +180,6 @@ fun ProfileContent(
         editedBloodGroup = user.bloodGroup ?: ""
         editedWeight = user.weight?.toString() ?: ""
         editedHeight = user.height?.toString() ?: ""
-        editedAbout = user.about ?: ""
-        editedClinicAddress = user.clinicAddress ?: ""
-        editedSpecialization = user.specialization ?: ""
-        editedQualification = user.qualification ?: ""
-        editedExperience = user.experience?.toString() ?: ""
-        editedConsultationFee = user.consultationFee?.toString() ?: ""
         isEditMode = false
     }
 
@@ -200,21 +189,16 @@ fun ProfileContent(
             ExtendedFloatingActionButton(
                 onClick = {
                     if (isEditMode) {
-                        val updatedUser = user.copy(
+                        val updateRequest = ProfileUpdateRequestDto(
                             name = editedName,
+                            email = user.email,
                             age = editedAge.toIntOrNull(),
                             gender = editedGender,
                             bloodGroup = editedBloodGroup,
                             weight = editedWeight.toDoubleOrNull(),
-                            height = editedHeight.toDoubleOrNull(),
-                            about = editedAbout,
-                            clinicAddress = editedClinicAddress,
-                            specialization = editedSpecialization,
-                            qualification = editedQualification,
-                            experience = editedExperience.toIntOrNull(),
-                            consultationFee = editedConsultationFee.toDoubleOrNull()
+                            height = editedHeight.toDoubleOrNull()
                         )
-                        onUpdateProfile(updatedUser)
+                        onUpdateProfile(updateRequest)
                         isEditMode = false
                     } else {
                         isEditMode = true
@@ -467,46 +451,6 @@ fun ProfileContent(
                     )
                 }
 
-                if (user.role == "DOCTOR") {
-                    SectionHeader("Professional Information")
-                    InfoCard {
-                        ProfileEditableDetailRow(
-                            isEditMode = isEditMode,
-                            icon = Icons.Rounded.Work,
-                            label = "Specialization",
-                            value = editedSpecialization,
-                            onValueChange = { editedSpecialization = it },
-                            iconColor = Color(0xFF673AB7)
-                        )
-                        ProfileEditableDetailRow(
-                            isEditMode = isEditMode,
-                            icon = Icons.Rounded.School,
-                            label = "Qualification",
-                            value = editedQualification,
-                            onValueChange = { editedQualification = it },
-                            iconColor = Color(0xFF3F51B5)
-                        )
-                        ProfileEditableDetailRow(
-                            isEditMode = isEditMode,
-                            icon = Icons.Rounded.Timeline,
-                            label = "Experience (Years)",
-                            value = editedExperience,
-                            onValueChange = { editedExperience = it },
-                            iconColor = Color(0xFF009688),
-                            keyboardType = KeyboardType.Number
-                        )
-                        ProfileEditableDetailRow(
-                            isEditMode = isEditMode,
-                            icon = Icons.Rounded.Payments,
-                            label = "Consultation Fee",
-                            value = editedConsultationFee,
-                            onValueChange = { editedConsultationFee = it },
-                            iconColor = Color(0xFF4CAF50),
-                            keyboardType = KeyboardType.Decimal
-                        )
-                    }
-                }
-                
                 Spacer(modifier = Modifier.height(80.dp))
             }
         }

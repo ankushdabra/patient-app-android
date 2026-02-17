@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.patient.app.core.storage.TokenManager
 import com.patient.app.core.ui.UiState
 import com.patient.app.login.api.AuthenticationRepository
+import com.patient.app.login.api.ProfileUpdateRequestDto
 import com.patient.app.login.api.UserDto
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,6 +21,8 @@ class ProfileViewModel(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<UiState<UserDto>>(UiState.Loading)
+    private val _updateState = MutableStateFlow<UiState<Unit>>(UiState.Success(Unit))
+
     val uiState: StateFlow<UiState<UserDto>> = _uiState.asStateFlow()
 
     val themeMode: StateFlow<String> = tokenManager.themeMode
@@ -42,15 +45,16 @@ class ProfileViewModel(
         }
     }
 
-    fun updateProfile(user: UserDto) {
+    fun updateProfile(request: ProfileUpdateRequestDto) {
         viewModelScope.launch {
-            _uiState.value = UiState.Loading
-            repository.updateProfile(user)
-                .onSuccess { updatedUser ->
-                    _uiState.value = UiState.Success(updatedUser)
+            _updateState.value = UiState.Loading
+            repository.updateProfile(request)
+                .onSuccess {
+                    _updateState.value = UiState.Success(Unit)
+                    loadProfile()
                 }
                 .onFailure { error ->
-                    _uiState.value = UiState.Error(error.message ?: "Failed to update profile")
+                    _updateState.value = UiState.Error(error.message ?: "Failed to update profile")
                 }
         }
     }

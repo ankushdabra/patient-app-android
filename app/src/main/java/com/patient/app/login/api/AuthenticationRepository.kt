@@ -55,10 +55,14 @@ class AuthenticationRepository(tokenManager: TokenManager) {
         }
     }
 
-    suspend fun updateProfile(user: UserDto): Result<UserDto> {
+    suspend fun updateProfile(request: ProfileUpdateRequestDto): Result<Unit> {
         return try {
-            val response = api.updateProfile(user)
-            Result.success(response)
+            val response = api.updateProfile(request)
+            if (response.isSuccessful) {
+                Result.success(Unit)
+            } else {
+                Result.failure(Exception("Failed to update profile"))
+            }
         } catch (e: Exception) {
             Result.failure(e)
         }
