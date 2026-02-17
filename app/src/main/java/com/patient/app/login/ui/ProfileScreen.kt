@@ -529,7 +529,7 @@ fun ProfileEditableDetailRow(
                     textStyle = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
                     keyboardOptions = KeyboardOptions(
                         keyboardType = keyboardType,
-                        imeAction = if (singleLine) ImeAction.Next else ImeAction.Default
+                        imeAction = if (singleLine) ImeAction.Done else ImeAction.Default
                     ),
                     singleLine = singleLine,
                     colors = TextFieldDefaults.colors(
