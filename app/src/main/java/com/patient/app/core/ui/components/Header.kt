@@ -22,7 +22,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,11 +33,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.patient.app.core.ui.theme.PrimaryLight
-import com.patient.app.core.ui.theme.SecondaryLight
+import com.patient.app.core.ui.theme.HeaderPrimaryDarkBlue
+import com.patient.app.core.ui.theme.HeaderSecondaryDarkBlue
 
 /**
  * A flexible header component that adapts its background icon based on the screen context.
+ * The theme is fixed to dark blue as requested.
  */
 @Composable
 fun DashboardHeader(
@@ -48,16 +48,19 @@ fun DashboardHeader(
     countLabel: String,
     icon: ImageVector = Icons.Default.MedicalServices
 ) {
-    val headerBrush = remember {
-        Brush.linearGradient(
-            colors = listOf(
-                PrimaryLight,
-                SecondaryLight.copy(alpha = 0.8f)
-            ),
-            start = Offset(0f, 0f),
-            end = Offset(1000f, 1000f)
-        )
-    }
+    // Fixed Dark Blue theme colors for the header from Color.kt
+    val primaryColor = HeaderPrimaryDarkBlue
+    val secondaryColor = HeaderSecondaryDarkBlue
+    val contentColor = Color.White
+    
+    val headerBrush = Brush.linearGradient(
+        colors = listOf(
+            primaryColor,
+            secondaryColor
+        ),
+        start = Offset(0f, 0f),
+        end = Offset(1000f, 1000f)
+    )
 
     Box(
         modifier = Modifier
@@ -74,7 +77,7 @@ fun DashboardHeader(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = Color.White.copy(alpha = 0.12f),
+                tint = contentColor.copy(alpha = 0.12f),
                 modifier = Modifier.size(160.dp)
             )
         }
@@ -90,14 +93,14 @@ fun DashboardHeader(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Surface(
-                    color = Color.White.copy(alpha = 0.2f),
+                    color = contentColor.copy(alpha = 0.2f),
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     Text(
                         text = "HEALTHCARE",
                         modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
                         style = MaterialTheme.typography.labelSmall,
-                        color = Color.White,
+                        color = contentColor,
                         fontWeight = FontWeight.ExtraBold,
                         letterSpacing = 1.sp
                     )
@@ -105,14 +108,14 @@ fun DashboardHeader(
 
                 if (count > 0) {
                     Surface(
-                        color = Color.White.copy(alpha = 0.15f),
+                        color = contentColor.copy(alpha = 0.15f),
                         shape = CircleShape
                     ) {
                         Text(
                             text = "$count $countLabel",
                             modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
                             style = MaterialTheme.typography.labelMedium,
-                            color = Color.White,
+                            color = contentColor,
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -127,7 +130,7 @@ fun DashboardHeader(
                     style = MaterialTheme.typography.headlineSmall.copy(
                         fontSize = 20.sp
                     ),
-                    color = Color.White.copy(alpha = 0.85f),
+                    color = contentColor.copy(alpha = 0.85f),
                     fontWeight = FontWeight.Normal
                 )
                 Text(
@@ -137,7 +140,7 @@ fun DashboardHeader(
                         fontSize = 30.sp,
                         lineHeight = 36.sp
                     ),
-                    color = Color.White
+                    color = contentColor
                 )
             }
         }

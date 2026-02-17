@@ -88,12 +88,7 @@ fun AppointmentListScreenContent(
         modifier = Modifier
             .fillMaxSize()
             .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        MaterialTheme.colorScheme.background,
-                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                    )
-                )
+                MaterialTheme.colorScheme.background
             )
             .imePadding()
     ) {
@@ -173,7 +168,7 @@ fun AppointmentListScreenContent(
 @Composable
 fun DateHeader(date: String) {
     val relativeDate = remember(date) { getRelativeDateText(date) }
-    
+
     Text(
         text = relativeDate,
         style = MaterialTheme.typography.titleMedium,
@@ -191,13 +186,14 @@ private fun getRelativeDateText(dateString: String): String {
         val today = LocalDate.now()
         val tomorrow = today.plusDays(1)
         val fullFormatter = DateTimeFormatter.ofPattern("EEE, MMM dd")
-        
+
         when {
             date.isEqual(today) -> "Today, ${date.format(DateTimeFormatter.ofPattern("MMM dd"))}"
             date.isEqual(tomorrow) -> "Tomorrow, ${date.format(DateTimeFormatter.ofPattern("MMM dd"))}"
             date.isAfter(today) && date.isBefore(today.plusDays(7)) -> {
                 date.format(fullFormatter)
             }
+
             else -> {
                 val formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy")
                 date.format(formatter)
@@ -332,8 +328,13 @@ fun AppointmentListItem(
 
                 val (statusColor, statusBgColor) = when (appointment.status) {
                     "BOOKED" -> Color(0xFF4CAF50) to Color(0xFF4CAF50).copy(alpha = 0.1f)
-                    "CANCELLED" -> MaterialTheme.colorScheme.error to MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.12f)
-                    else -> MaterialTheme.colorScheme.secondary to MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.12f)
+                    "CANCELLED" -> MaterialTheme.colorScheme.error to MaterialTheme.colorScheme.errorContainer.copy(
+                        alpha = 0.12f
+                    )
+
+                    else -> MaterialTheme.colorScheme.secondary to MaterialTheme.colorScheme.secondaryContainer.copy(
+                        alpha = 0.12f
+                    )
                 }
 
                 Surface(

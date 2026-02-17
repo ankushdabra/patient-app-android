@@ -55,9 +55,10 @@ import com.patient.app.core.storage.TokenManager
 import com.patient.app.core.ui.UiState
 import com.patient.app.core.ui.components.ErrorState
 import com.patient.app.core.ui.components.LoadingState
+import com.patient.app.core.ui.theme.BackgroundDark
+import com.patient.app.core.ui.theme.HeaderPrimaryDarkBlue
+import com.patient.app.core.ui.theme.HeaderSecondaryDarkBlue
 import com.patient.app.core.ui.theme.HealthcareTheme
-import com.patient.app.core.ui.theme.PrimaryLight
-import com.patient.app.core.ui.theme.SecondaryLight
 import com.patient.app.prescriptions.api.PrescriptionDto
 import com.patient.app.prescriptions.api.PrescriptionsRepository
 import com.patient.app.prescriptions.viewmodel.PrescriptionDetailViewModel
@@ -98,17 +99,14 @@ fun PrescriptionDetailScreen(
         },
         containerColor = Color.Transparent
     ) { _ ->
+        // Use BackgroundDark from theme to check if we are in dark mode, then force Black if true
+        val isDarkMode = MaterialTheme.colorScheme.background == BackgroundDark
+        val backgroundColor = if (isDarkMode) Color.Black else MaterialTheme.colorScheme.background
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            MaterialTheme.colorScheme.background,
-                            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                        )
-                    )
-                )
+                .background(backgroundColor)
         ) {
             when (val state = uiState) {
                 is UiState.Loading -> LoadingState()
@@ -135,18 +133,19 @@ fun PrescriptionDetailContent(
     Column(
         modifier = modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .verticalScroll(rememberScrollState())
     ) {
-        // --- Hero Header Section ---
+        // --- Hero Header Section (Fixed Dark Blue Theme) ---
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
+                .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
                 .background(
                     brush = Brush.linearGradient(
                         colors = listOf(
-                            PrimaryLight,
-                            SecondaryLight.copy(alpha = 0.8f)
+                            HeaderPrimaryDarkBlue,
+                            HeaderSecondaryDarkBlue
                         ),
                         start = Offset(0f, 0f),
                         end = Offset(1000f, 1000f)
@@ -255,7 +254,6 @@ fun PrescriptionDetailContent(
 
                         Spacer(Modifier.height(16.dp))
 
-                        // Improved Prescription Date Alignment (now integrated into the profile column)
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 imageVector = Icons.Outlined.CalendarToday,
@@ -288,7 +286,7 @@ fun PrescriptionDetailContent(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 12.dp, end = 12.dp, top = 24.dp, bottom = 48.dp),
+                .padding(horizontal = 16.dp, vertical = 24.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             // Medications Card
@@ -305,7 +303,7 @@ fun PrescriptionDetailContent(
                 content = prescription.instructions
             )
 
-            // Notes Card (Only if notes are present)
+            // Notes Card
             if (!prescription.notes.isNullOrBlank()) {
                 PrescriptionCard(
                     title = "Additional Notes",

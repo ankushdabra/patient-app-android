@@ -232,13 +232,11 @@ fun ProfileContent(
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
                     .background(
-                        brush = Brush.linearGradient(
+                        brush = Brush.verticalGradient(
                             colors = listOf(
-                                Color(0xFF003366),
-                                Color(0xFF005AC1)
-                            ),
-                            start = Offset(0f, 0f),
-                            end = Offset(1000f, 1000f)
+                                MaterialTheme.colorScheme.primaryContainer,
+                                MaterialTheme.colorScheme.primary
+                            )
                         )
                     )
             ) {
@@ -248,7 +246,7 @@ fun ProfileContent(
                         .offset(x = 260.dp, y = (-30).dp)
                         .size(180.dp)
                         .background(
-                            color = Color.White.copy(alpha = 0.08f),
+                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.08f),
                             shape = CircleShape
                         )
                 )
@@ -258,7 +256,7 @@ fun ProfileContent(
                         .offset(x = (-20).dp, y = 120.dp)
                         .size(100.dp)
                         .background(
-                            color = Color.White.copy(alpha = 0.05f),
+                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.05f),
                             shape = CircleShape
                         )
                 )
@@ -277,7 +275,7 @@ fun ProfileContent(
                             Icon(
                                 imageVector = Icons.Default.Close,
                                 contentDescription = "Cancel Edit",
-                                tint = Color.White
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer
                             )
                         }
                     } else {
@@ -289,7 +287,7 @@ fun ProfileContent(
                             Icon(
                                 imageVector = Icons.Default.MoreVert,
                                 contentDescription = "Options",
-                                tint = Color.White
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer
                             )
                         }
                         DropdownMenu(
@@ -366,14 +364,14 @@ fun ProfileContent(
                         modifier = Modifier
                             .size(100.dp)
                             .clip(CircleShape)
-                            .background(Color.White.copy(alpha = 0.2f)),
+                            .background(MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.2f)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.AccountCircle,
                             contentDescription = null,
                             modifier = Modifier.size(80.dp),
-                            tint = Color.White
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                     }
 
@@ -385,13 +383,13 @@ fun ProfileContent(
                             fontWeight = FontWeight.Black,
                             letterSpacing = (-0.5).sp
                         ),
-                        color = Color.White
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
 
                     Spacer(Modifier.height(8.dp))
 
                     Surface(
-                        color = Color.White.copy(alpha = 0.15f),
+                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.15f),
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Row(
@@ -402,13 +400,13 @@ fun ProfileContent(
                                 imageVector = Icons.Outlined.Email,
                                 contentDescription = null,
                                 modifier = Modifier.size(16.dp),
-                                tint = Color.White
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer
                             )
                             Spacer(Modifier.width(8.dp))
                             Text(
                                 text = user.email,
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = Color.White,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
                                 fontWeight = FontWeight.Medium
                             )
                         }
@@ -559,48 +557,36 @@ fun ProfileEditableDetailRow(
 @Composable
 fun ProfileScreenPreview() {
     HealthcareTheme {
-        ProfileContent(
-            user = UserDto(
-                id = "1",
-                name = "Dr. John Smith",
-                email = "john.smith@vitalsync.com",
-                role = "DOCTOR",
-                age = 42,
-                gender = "Male",
-                bloodGroup = "A+",
-                weight = 75.0,
-                height = 180.0
-            ),
-            themeMode = "LIGHT",
-            onThemeChange = {},
-            onLogoutClick = {},
-            onUpdateProfile = {},
-            isDark = false
-        )
+        ProfileScreenPreviewContent()
     }
 }
 
 @Preview(showBackground = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun ProfileScreenDarkPreview() {
-    HealthcareTheme {
-        ProfileContent(
-            user = UserDto(
-                id = "1",
-                name = "Dr. John Smith",
-                email = "john.smith@vitalsync.com",
-                role = "DOCTOR",
-                age = 42,
-                gender = "Male",
-                bloodGroup = "A+",
-                weight = 75.0,
-                height = 180.0
-            ),
-            themeMode = "DARK",
-            onThemeChange = {},
-            onLogoutClick = {},
-            onUpdateProfile = {},
-            isDark = true
-        )
+    HealthcareTheme(darkTheme = true) {
+        ProfileScreenPreviewContent()
     }
+}
+
+@Composable
+private fun ProfileScreenPreviewContent() {
+    ProfileContent(
+        user = UserDto(
+            id = "1",
+            name = "Dr. John Smith",
+            email = "john.smith@vitalsync.com",
+            role = "DOCTOR",
+            age = 42,
+            gender = "Male",
+            bloodGroup = "A+",
+            weight = 75.0,
+            height = 180.0
+        ),
+        themeMode = "LIGHT",
+        onThemeChange = {},
+        onLogoutClick = {},
+        onUpdateProfile = {},
+        isDark = false
+    )
 }

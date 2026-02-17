@@ -4,6 +4,10 @@ import androidx.compose.ui.graphics.Color
 
 // --- Healthcare App Colors ---
 
+// Header Fixed Theme Colors
+val HeaderPrimaryDarkBlue = Color(0xFF003366)
+val HeaderSecondaryDarkBlue = Color(0xFF005AC1)
+
 // Primary: Professional Medical Blue
 val PrimaryLight = Color(0xFF005AC1)
 val OnPrimaryLight = Color(0xFFFFFFFF)
@@ -114,4 +118,3 @@ val CancelTextDark = Color(0xFFFFB4B4)
 // Success / Rating Colors
 val SuccessGreen = Color(0xFF4CAF50)
 val OnSuccessGreen = Color(0xFFFFFFFF)
-

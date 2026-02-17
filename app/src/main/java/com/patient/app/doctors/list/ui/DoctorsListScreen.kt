@@ -84,21 +84,12 @@ fun DoctorsListScreenContent(
     onLoadMore: () -> Unit,
     onDoctorClick: (String) -> Unit
 ) {
-    val backgroundColor = MaterialTheme.colorScheme.background
-    val surfaceVariantColor = MaterialTheme.colorScheme.surfaceVariant
-    val backgroundBrush = remember(backgroundColor, surfaceVariantColor) {
-        Brush.verticalGradient(
-            colors = listOf(
-                backgroundColor,
-                surfaceVariantColor.copy(alpha = 0.3f)
-            )
-        )
-    }
+    val backgroundBrush =MaterialTheme.colorScheme.background
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(brush = backgroundBrush)
+            .background(backgroundBrush)
     ) {
         if (state.isLoading && state.doctors.isEmpty()) {
             LoadingState()
