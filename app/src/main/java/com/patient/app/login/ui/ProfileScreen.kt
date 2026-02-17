@@ -1,46 +1,19 @@
 package com.patient.app.login.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
-import androidx.compose.material.icons.outlined.AccountCircle
-import androidx.compose.material.icons.outlined.Bloodtype
-import androidx.compose.material.icons.outlined.Cake
-import androidx.compose.material.icons.outlined.DarkMode
-import androidx.compose.material.icons.outlined.Email
-import androidx.compose.material.icons.outlined.ErrorOutline
-import androidx.compose.material.icons.outlined.LightMode
-import androidx.compose.material.icons.outlined.SettingsSuggest
-import androidx.compose.material.icons.outlined.Transgender
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.rounded.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,7 +22,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -59,8 +31,6 @@ import com.patient.app.core.storage.TokenManager
 import com.patient.app.core.ui.UiState
 import com.patient.app.core.ui.components.LoadingState
 import com.patient.app.core.ui.theme.HealthcareTheme
-import com.patient.app.core.ui.theme.PrimaryLight
-import com.patient.app.core.ui.theme.SecondaryLight
 import com.patient.app.login.api.AuthenticationRepository
 import com.patient.app.login.api.UserDto
 import com.patient.app.login.viewmodel.ProfileViewModel
@@ -77,31 +47,33 @@ fun ProfileScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val themeMode by viewModel.themeMode.collectAsStateWithLifecycle()
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        MaterialTheme.colorScheme.background,
-                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                    )
-                )
-            )
-    ) {
-        when (val state = uiState) {
-            is UiState.Loading -> LoadingState()
-            is UiState.Error -> ProfileErrorState(
-                onRetry = viewModel::loadProfile
-            )
+    val isDark = when (themeMode) {
+        "DARK" -> true
+        "LIGHT" -> false
+        else -> isSystemInDarkTheme()
+    }
 
-            is UiState.Success -> {
-                ProfileContent(
-                    user = state.data,
-                    themeMode = themeMode,
-                    onThemeChange = viewModel::setThemeMode,
-                    onLogoutClick = viewModel::logout
-                )
+    HealthcareTheme(darkTheme = isDark) {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                when (val state = uiState) {
+                    is UiState.Loading -> LoadingState()
+                    is UiState.Error -> ProfileErrorState(
+                        onRetry = viewModel::loadProfile
+                    )
+
+                    is UiState.Success -> {
+                        ProfileContent(
+                            user = state.data,
+                            themeMode = themeMode,
+                            onThemeChange = viewModel::setThemeMode,
+                            onLogoutClick = viewModel::logout
+                        )
+                    }
+                }
             }
         }
     }
@@ -150,7 +122,7 @@ fun ProfileErrorState(
             text = "Unable to load profile. Please check your internet connection and try again.",
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
             modifier = Modifier.fillMaxWidth(0.8f)
         )
 
@@ -172,6 +144,7 @@ fun ProfileErrorState(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileContent(
     user: UserDto,
@@ -179,21 +152,24 @@ fun ProfileContent(
     onThemeChange: (String) -> Unit,
     onLogoutClick: () -> Unit
 ) {
+    var showMenu by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
+            .background(MaterialTheme.colorScheme.background)
     ) {
-        // --- Hero Header Section ---
+        // --- Hero Header Section (Dark Blue Visuals) ---
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
+                .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
                 .background(
                     brush = Brush.linearGradient(
                         colors = listOf(
-                            PrimaryLight,
-                            SecondaryLight.copy(alpha = 0.8f)
+                            Color(0xFF003366), // Deep Dark Blue
+                            Color(0xFF005AC1)  // Healthcare Primary Blue
                         ),
                         start = Offset(0f, 0f),
                         end = Offset(1000f, 1000f)
@@ -221,11 +197,74 @@ fun ProfileContent(
                     )
             )
 
+            // Top Bar with Menu
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp, end = 16.dp),
+                horizontalArrangement = Arrangement.End
+            ) {
+                Box {
+                    IconButton(onClick = { showMenu = !showMenu }) {
+                        Icon(
+                            imageVector = Icons.Default.MoreVert,
+                            contentDescription = "Options",
+                            tint = Color.White
+                        )
+                    }
+                    DropdownMenu(
+                        expanded = showMenu,
+                        onDismissRequest = { showMenu = false },
+                        modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+                    ) {
+                        Text(
+                            text = "Theme Mode",
+                            style = MaterialTheme.typography.labelMedium,
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        
+                        val themeOptions = listOf(
+                            Triple("LIGHT", "Light", Icons.Outlined.LightMode),
+                            Triple("DARK", "Dark", Icons.Outlined.DarkMode),
+                            Triple("FOLLOW_SYSTEM", "System", Icons.Outlined.SettingsSuggest)
+                        )
+                        
+                        themeOptions.forEach { (option, label, icon) ->
+                            DropdownMenuItem(
+                                text = { Text(label) },
+                                leadingIcon = { Icon(icon, contentDescription = null, modifier = Modifier.size(18.dp)) },
+                                onClick = {
+                                    onThemeChange(option)
+                                    showMenu = false
+                                },
+                                trailingIcon = {
+                                    if (themeMode == option) {
+                                        Icon(Icons.Outlined.Check, contentDescription = "Selected", modifier = Modifier.size(16.dp))
+                                    }
+                                }
+                            )
+                        }
+                        
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+                        
+                        DropdownMenuItem(
+                            text = { Text("Sign Out", color = MaterialTheme.colorScheme.error) },
+                            leadingIcon = { Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null, tint = MaterialTheme.colorScheme.error) },
+                            onClick = {
+                                onLogoutClick()
+                                showMenu = false
+                            }
+                        )
+                    }
+                }
+            }
+
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 64.dp, bottom = 48.dp)
+                    .padding(top = 48.dp, bottom = 48.dp)
             ) {
                 Box(
                     modifier = Modifier
@@ -285,142 +324,57 @@ fun ProfileContent(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 12.dp, end = 12.dp, top = 24.dp, bottom = 48.dp),
+                .padding(horizontal = 24.dp, vertical = 28.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            // --- Theme Settings ---
-            Text(
-                text = "App Settings",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
-            )
-
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-            ) {
-                Column(modifier = Modifier.padding(20.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Outlined.SettingsSuggest,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(24.dp)
-                        )
-                        Spacer(Modifier.width(12.dp))
-                        Text(
-                            text = "Theme Mode",
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-
-                    Spacer(Modifier.height(16.dp))
-
-                    val options = listOf("LIGHT", "DARK", "FOLLOW_SYSTEM")
-                    val labels = listOf("Light", "Dark", "System")
-                    val icons = listOf(
-                        Icons.Outlined.LightMode,
-                        Icons.Outlined.DarkMode,
-                        Icons.Outlined.SettingsSuggest
-                    )
-
-                    SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-                        options.forEachIndexed { index, option ->
-                            SegmentedButton(
-                                selected = themeMode == option,
-                                onClick = { onThemeChange(option) },
-                                shape = SegmentedButtonDefaults.itemShape(
-                                    index = index,
-                                    count = options.size
-                                ),
-                                icon = {
-                                    SegmentedButtonDefaults.Icon(active = themeMode == option) {
-                                        Icon(
-                                            imageVector = icons[index],
-                                            contentDescription = null,
-                                            modifier = Modifier.size(SegmentedButtonDefaults.IconSize)
-                                        )
-                                    }
-                                }
-                            ) {
-                                Text(
-                                    text = labels[index],
-                                    color = if (themeMode == option) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-
             // --- Personal Details ---
             Text(
                 text = "Personal Information",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
             )
 
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
+                shape = RoundedCornerShape(24.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Column(
-                    modifier = Modifier.padding(20.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                    modifier = Modifier.padding(24.dp),
+                    verticalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
                     ProfileDetailRow(
-                        icon = Icons.Outlined.Cake,
+                        icon = Icons.Rounded.CalendarToday,
                         label = "Age",
-                        value = user.age?.toString() ?: "Not specified"
+                        value = "${user.age ?: "N/A"} Years",
+                        iconColor = Color(0xFF1976D2)
                     )
                     ProfileDetailRow(
-                        icon = Icons.Outlined.Transgender,
+                        icon = Icons.Rounded.Wc,
                         label = "Gender",
-                        value = user.gender ?: "Not specified"
+                        value = user.gender ?: "Not specified",
+                        iconColor = Color(0xFFE91E63)
                     )
                     ProfileDetailRow(
-                        icon = Icons.Outlined.Bloodtype,
+                        icon = Icons.Rounded.Bloodtype,
                         label = "Blood Group",
-                        value = user.bloodGroup ?: "Not specified"
+                        value = user.bloodGroup ?: "Not specified",
+                        iconColor = Color(0xFFD32F2F)
                     )
-                }
-            }
-
-            Spacer(Modifier.height(12.dp))
-
-            // --- Enhanced Logout Button ---
-            OutlinedButton(
-                onClick = onLogoutClick,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                shape = RoundedCornerShape(16.dp),
-                border = androidx.compose.foundation.BorderStroke(
-                    1.dp,
-                    MaterialTheme.colorScheme.error
-                )
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.Logout,
-                        contentDescription = "Logout",
-                        modifier = Modifier.size(20.dp),
-                        tint = MaterialTheme.colorScheme.error
+                    ProfileDetailRow(
+                        icon = Icons.Rounded.MonitorWeight,
+                        label = "Weight",
+                        value = user.weight?.let { "$it kg" } ?: "Not specified",
+                        iconColor = Color(0xFFF57C00)
                     )
-                    Spacer(Modifier.width(12.dp))
-                    Text(
-                        text = "Sign Out",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.error
+                    ProfileDetailRow(
+                        icon = Icons.Rounded.Straighten,
+                        label = "Height",
+                        value = user.height?.let { "$it cm" } ?: "Not specified",
+                        iconColor = Color(0xFF388E3C)
                     )
                 }
             }
@@ -431,20 +385,28 @@ fun ProfileContent(
 }
 
 @Composable
-fun ProfileDetailRow(icon: ImageVector, label: String, value: String) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+fun ProfileDetailRow(
+    icon: ImageVector,
+    label: String,
+    value: String,
+    iconColor: Color
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         Box(
             modifier = Modifier
-                .size(40.dp)
-                .clip(RoundedCornerShape(10.dp))
-                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
+                .size(44.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(iconColor.copy(alpha = 0.1f)),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                modifier = Modifier.size(20.dp),
-                tint = MaterialTheme.colorScheme.primary
+                modifier = Modifier.size(24.dp),
+                tint = iconColor
             )
         }
         Spacer(Modifier.width(16.dp))
@@ -456,9 +418,10 @@ fun ProfileDetailRow(icon: ImageVector, label: String, value: String) {
             )
             Text(
                 text = value,
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
             )
         }
     }
@@ -470,15 +433,40 @@ fun ProfileScreenPreview() {
     HealthcareTheme {
         ProfileContent(
             user = UserDto(
-                id = "3a919baf-1b68-4473-8409-ecc85d21bc37",
-                name = "John Doe",
-                email = "john.doe@gmail.com",
-                role = "PATIENT",
-                age = 30,
+                id = "1",
+                name = "Dr. John Smith",
+                email = "john.smith@vitalsync.com",
+                role = "DOCTOR",
+                age = 42,
                 gender = "Male",
-                bloodGroup = "O+"
+                bloodGroup = "A+",
+                weight = 75.0,
+                height = 180.0
             ),
-            themeMode = "FOLLOW_SYSTEM",
+            themeMode = "LIGHT",
+            onThemeChange = {},
+            onLogoutClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun ProfileScreenDarkPreview() {
+    HealthcareTheme {
+        ProfileContent(
+            user = UserDto(
+                id = "1",
+                name = "Dr. John Smith",
+                email = "john.smith@vitalsync.com",
+                role = "DOCTOR",
+                age = 42,
+                gender = "Male",
+                bloodGroup = "A+",
+                weight = 75.0,
+                height = 180.0
+            ),
+            themeMode = "DARK",
             onThemeChange = {},
             onLogoutClick = {}
         )
