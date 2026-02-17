@@ -1,48 +1,37 @@
 package com.patient.app.login.ui
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.patient.app.R
 import com.patient.app.core.ui.UiState
 import com.patient.app.core.ui.theme.HealthcareTheme
@@ -51,11 +40,13 @@ import com.patient.app.core.ui.theme.HealthcareTheme
 @Composable
 fun SignUpScreen(
     state: UiState<Boolean>,
-    onRegisterClick: (String, String, String, String, String, String) -> Unit
+    onRegisterClick: (String, String, String, String, String, String) -> Unit,
+    onLoginClick: () -> Unit = {}
 ) {
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var passwordVisible by remember { mutableStateOf(false) }
     var age by remember { mutableStateOf("") }
     var gender by remember { mutableStateOf("") }
     var bloodGroup by remember { mutableStateOf("") }
@@ -69,6 +60,8 @@ fun SignUpScreen(
 
     var genderExpanded by remember { mutableStateOf(false) }
     val genderOptions = listOf("Male", "Female", "Other")
+
+    val focusManager = LocalFocusManager.current
 
     fun validate(): Boolean {
         var isValid = true
@@ -127,231 +120,383 @@ fun SignUpScreen(
     }
 
     Surface(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            MaterialTheme.colorScheme.background,
-                            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+        Box(modifier = Modifier.fillMaxSize()) {
+            // 🔷 TOP GRADIENT BACKGROUND WITH CURVE
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.35f)
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(
+                                MaterialTheme.colorScheme.primaryContainer,
+                                MaterialTheme.colorScheme.primary
+                            )
+                        ),
+                        shape = RoundedCornerShape(bottomStart = 80.dp, bottomEnd = 80.dp)
+                    )
+            )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .imePadding()
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(modifier = Modifier.height(40.dp))
+
+                // 🔷 LOGO
+                Surface(
+                    modifier = Modifier.size(80.dp),
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.surface,
+                    shadowElevation = 4.dp
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_healthcare_logo),
+                            contentDescription = "Logo",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(36.dp)
                         )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = "Join VitalSync",
+                    style = MaterialTheme.typography.headlineMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        fontSize = 26.sp
                     )
                 )
-                .imePadding()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top // Changed to Top for better scrolling behavior
-        ) {
 
-            Spacer(modifier = Modifier.height(64.dp))
+                Text(
+                    text = "Create your healthcare account",
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.9f)
+                    )
+                )
 
-            // 🔷 LOGO
-            Image(
-                painter = painterResource(id = R.drawable.ic_healthcare_logo),
-                contentDescription = "App Logo",
-                modifier = Modifier.size(120.dp)
-            )
+                Spacer(modifier = Modifier.height(30.dp))
 
-            // 🔷 APP NAME
-            Text(
-                text = "Join VitalSync",
-                style = MaterialTheme.typography.headlineLarge,
-                color = MaterialTheme.colorScheme.primary
-            )
-
-            Text(
-                text = "Create your account",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
-            )
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // 🔷 REGISTER CARD
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                ),
-                elevation = CardDefaults.cardElevation(4.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(20.dp)
+                // 🔷 SIGN UP CARD
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp),
+                    shape = RoundedCornerShape(28.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    ),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
                 ) {
-
-                    OutlinedTextField(
-                        value = name,
-                        onValueChange = { 
-                            name = it
-                            nameError = null
-                        },
-                        label = { Text("Full Name") },
-                        isError = nameError != null,
-                        supportingText = nameError?.let { { Text(it) } },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth(),
-                        keyboardOptions = KeyboardOptions(
-                            imeAction = ImeAction.Next
-                        )
-                    )
-
-                    Spacer(Modifier.height(12.dp))
-
-                    OutlinedTextField(
-                        value = email,
-                        onValueChange = { 
-                            email = it
-                            emailError = null
-                        },
-                        label = { Text("Email address") },
-                        isError = emailError != null,
-                        supportingText = emailError?.let { { Text(it) } },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth(),
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Email,
-                            imeAction = ImeAction.Next
-                        )
-                    )
-
-                    Spacer(Modifier.height(12.dp))
-
-                    OutlinedTextField(
-                        value = password,
-                        onValueChange = { 
-                            password = it
-                            passwordError = null
-                        },
-                        label = { Text("Password") },
-                        isError = passwordError != null,
-                        supportingText = passwordError?.let { { Text(it) } },
-                        singleLine = true,
-                        visualTransformation = PasswordVisualTransformation(),
-                        modifier = Modifier.fillMaxWidth(),
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Password,
-                            imeAction = ImeAction.Next
-                        )
-                    )
-
-                    Spacer(Modifier.height(12.dp))
-
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    Column(
+                        modifier = Modifier.padding(24.dp),
+                        horizontalAlignment = Alignment.Start
                     ) {
+                        Text(
+                            text = "Register new account",
+                            style = MaterialTheme.typography.titleLarge.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            ),
+                            modifier = Modifier.padding(bottom = 20.dp)
+                        )
+
+                        // FULL NAME
                         OutlinedTextField(
-                            value = age,
-                            onValueChange = { 
-                                age = it
-                                ageError = null
+                            value = name,
+                            onValueChange = {
+                                name = it
+                                nameError = null
                             },
-                            label = { Text("Age") },
-                            isError = ageError != null,
-                            supportingText = ageError?.let { { Text(it) } },
+                            placeholder = { Text("Full Name") },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Default.Person,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            },
+                            isError = nameError != null,
+                            supportingText = nameError?.let { { Text(it) } },
                             singleLine = true,
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
+                                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                            ),
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+                        )
+
+                        Spacer(Modifier.height(12.dp))
+
+                        // EMAIL
+                        OutlinedTextField(
+                            value = email,
+                            onValueChange = {
+                                email = it
+                                emailError = null
+                            },
+                            placeholder = { Text("Email Address") },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Default.Email,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            },
+                            isError = emailError != null,
+                            supportingText = emailError?.let { { Text(it) } },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
+                                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                            ),
                             keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Number,
+                                keyboardType = KeyboardType.Email,
                                 imeAction = ImeAction.Next
                             )
                         )
 
-                        ExposedDropdownMenuBox(
-                            expanded = genderExpanded,
-                            onExpandedChange = { genderExpanded = it },
-                            modifier = Modifier.weight(1f)
+                        Spacer(Modifier.height(12.dp))
+
+                        // PASSWORD
+                        OutlinedTextField(
+                            value = password,
+                            onValueChange = {
+                                password = it
+                                passwordError = null
+                            },
+                            placeholder = { Text("Password") },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Default.Lock,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            },
+                            trailingIcon = {
+                                val image = if (passwordVisible)
+                                    Icons.Filled.Visibility
+                                else Icons.Filled.VisibilityOff
+
+                                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                                    Icon(
+                                        imageVector = image,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.outline
+                                    )
+                                }
+                            },
+                            isError = passwordError != null,
+                            supportingText = passwordError?.let { { Text(it) } },
+                            singleLine = true,
+                            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
+                                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                            ),
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Password,
+                                imeAction = ImeAction.Next
+                            )
+                        )
+
+                        Spacer(Modifier.height(12.dp))
+
+                        // AGE AND GENDER ROW
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            modifier = Modifier.fillMaxWidth()
                         ) {
                             OutlinedTextField(
-                                value = gender,
-                                onValueChange = {},
-                                readOnly = true,
-                                label = { Text("Gender") },
-                                isError = genderError != null,
-                                supportingText = genderError?.let { { Text(it) } },
-                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = genderExpanded) },
-                                modifier = Modifier.menuAnchor(),
-                                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
+                                value = age,
+                                onValueChange = {
+                                    age = it
+                                    ageError = null
+                                },
+                                placeholder = { Text("Age") },
+                                isError = ageError != null,
+                                supportingText = ageError?.let { { Text(it) } },
+                                singleLine = true,
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(16.dp),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                    unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
+                                    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                                ),
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                    imeAction = ImeAction.Next
+                                )
                             )
-                            ExposedDropdownMenu(
+
+                            ExposedDropdownMenuBox(
                                 expanded = genderExpanded,
-                                onDismissRequest = { genderExpanded = false }
+                                onExpandedChange = { genderExpanded = it },
+                                modifier = Modifier.weight(1f)
                             ) {
-                                genderOptions.forEach { option ->
-                                    DropdownMenuItem(
-                                        text = { Text(option) },
-                                        onClick = {
-                                            gender = option
-                                            genderError = null
-                                            genderExpanded = false
-                                        }
+                                OutlinedTextField(
+                                    value = gender,
+                                    onValueChange = {},
+                                    readOnly = true,
+                                    placeholder = { Text("Gender") },
+                                    isError = genderError != null,
+                                    supportingText = genderError?.let { { Text(it) } },
+                                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = genderExpanded) },
+                                    modifier = Modifier.menuAnchor(),
+                                    shape = RoundedCornerShape(16.dp),
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                        unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
+                                        focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
                                     )
+                                )
+                                ExposedDropdownMenu(
+                                    expanded = genderExpanded,
+                                    onDismissRequest = { genderExpanded = false }
+                                ) {
+                                    genderOptions.forEach { option ->
+                                        DropdownMenuItem(
+                                            text = { Text(option) },
+                                            onClick = {
+                                                gender = option
+                                                genderError = null
+                                                genderExpanded = false
+                                            }
+                                        )
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    Spacer(Modifier.height(12.dp))
+                        Spacer(Modifier.height(12.dp))
 
-                    OutlinedTextField(
-                        value = bloodGroup,
-                        onValueChange = { 
-                            bloodGroup = it
-                            bloodGroupError = null
-                        },
-                        label = { Text("Blood Group (e.g. O+)") },
-                        isError = bloodGroupError != null,
-                        supportingText = bloodGroupError?.let { { Text(it) } },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth(),
-                        keyboardOptions = KeyboardOptions(
-                            imeAction = ImeAction.Done
+                        // BLOOD GROUP
+                        OutlinedTextField(
+                            value = bloodGroup,
+                            onValueChange = {
+                                bloodGroup = it
+                                bloodGroupError = null
+                            },
+                            placeholder = { Text("Blood Group (e.g. O+)") },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Default.Favorite,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            },
+                            isError = bloodGroupError != null,
+                            supportingText = bloodGroupError?.let { { Text(it) } },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
+                                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                            ),
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                            keyboardActions = KeyboardActions(onDone = {
+                                focusManager.clearFocus()
+                                if (validate()) {
+                                    onRegisterClick(name, email, password, age, gender, bloodGroup)
+                                }
+                            })
                         )
-                    )
 
-                    Spacer(Modifier.height(24.dp))
+                        Spacer(Modifier.height(24.dp))
 
-                    Button(
-                        onClick = {
-                            if (validate()) {
-                                onRegisterClick(name, email, password, age, gender, bloodGroup)
+                        // REGISTER BUTTON
+                        Button(
+                            onClick = {
+                                focusManager.clearFocus()
+                                if (validate()) {
+                                    onRegisterClick(name, email, password, age, gender, bloodGroup)
+                                }
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary
+                            ),
+                            enabled = state !is UiState.Loading
+                        ) {
+                            if (state is UiState.Loading) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(24.dp),
+                                    color = MaterialTheme.colorScheme.onPrimary,
+                                    strokeWidth = 2.dp
+                                )
+                            } else {
+                                Text(
+                                    text = "Create Account",
+                                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                                )
                             }
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(54.dp),
-                        shape = RoundedCornerShape(16.dp),
-                        enabled = state !is UiState.Loading
-                    ) {
-                        Text(
-                            text = "Register",
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                    }
+                        }
 
-                    Spacer(Modifier.height(16.dp))
-
-                    if (state is UiState.Loading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.align(Alignment.CenterHorizontally)
-                        )
-                    }
-
-                    if (state is UiState.Error) {
-                        Text(
-                            text = state.message,
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.align(Alignment.CenterHorizontally)
-                        )
+                        if (state is UiState.Error) {
+                            Spacer(Modifier.height(16.dp))
+                            Text(
+                                text = state.message,
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.bodyMedium,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
                     }
                 }
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                // 🔷 FOOTER (Sign In)
+                Text(
+                    text = buildAnnotatedString {
+                        append("Already have an account? ")
+                        withStyle(
+                            style = SpanStyle(
+                                color = MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.Bold
+                            )
+                        ) {
+                            append("Sign In")
+                        }
+                    },
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier
+                        .clickable { onLoginClick() }
+                        .padding(bottom = 32.dp)
+                )
             }
-            Spacer(modifier = Modifier.height(48.dp))
         }
     }
 }
@@ -359,6 +504,17 @@ fun SignUpScreen(
 @Preview(showBackground = true, device = Devices.PIXEL_6)
 @Composable
 fun SignUpScreenPreview() {
+    HealthcareTheme {
+        SignUpScreen(
+            state = UiState.Success(false),
+            onRegisterClick = { _, _, _, _, _, _ -> }
+        )
+    }
+}
+
+@Preview(showBackground = true, device = Devices.PIXEL_6, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun SignUpScreenDarkPreview() {
     HealthcareTheme {
         SignUpScreen(
             state = UiState.Success(false),
