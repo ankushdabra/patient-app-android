@@ -420,7 +420,7 @@ fun ProfileContent(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 24.dp, vertical = 28.dp),
+                    .padding(horizontal = 12.dp, vertical = 28.dp),
                 verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
                 // --- Personal Details ---

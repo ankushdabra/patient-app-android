@@ -33,8 +33,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.patient.app.core.ui.theme.HeaderPrimaryDarkBlue
-import com.patient.app.core.ui.theme.HeaderSecondaryDarkBlue
 
 /**
  * A flexible header component that adapts its background icon based on the screen context.
@@ -48,9 +46,9 @@ fun DashboardHeader(
     countLabel: String,
     icon: ImageVector = Icons.Default.MedicalServices
 ) {
-    // Fixed Dark Blue theme colors for the header from Color.kt
-    val primaryColor = HeaderPrimaryDarkBlue
-    val secondaryColor = HeaderSecondaryDarkBlue
+    // Fixed Dark Blue theme colors for the header
+    val primaryColor = Color(0xFF003366)
+    val secondaryColor = Color(0xFF005AC1)
     val contentColor = Color.White
     
     val headerBrush = Brush.linearGradient(
@@ -65,7 +63,7 @@ fun DashboardHeader(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
+            .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
             .background(brush = headerBrush)
     ) {
         // Large background icon representing the screen context

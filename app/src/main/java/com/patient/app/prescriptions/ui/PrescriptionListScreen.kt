@@ -83,12 +83,7 @@ fun PrescriptionListScreenContent(
         modifier = Modifier
             .fillMaxSize()
             .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        MaterialTheme.colorScheme.background,
-                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                    )
-                )
+                MaterialTheme.colorScheme.background
             )
     ) {
         when (state) {
@@ -126,10 +121,7 @@ fun PrescriptionListErrorState(
         Box(
             modifier = Modifier
                 .size(120.dp)
-                .background(
-                    color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.2f),
-                    shape = CircleShape
-                ),
+                .background(MaterialTheme.colorScheme.background),
             contentAlignment = Alignment.Center
         ) {
             Icon(
@@ -196,7 +188,7 @@ fun PrescriptionsList(
                 icon = Icons.Default.Medication
             )
         }
-        
+
         if (prescriptions.isEmpty()) {
             item {
                 Box(
@@ -236,7 +228,7 @@ fun PrescriptionListItem(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
@@ -277,7 +269,7 @@ fun PrescriptionListItem(
                         )
                     }
                 }
-                
+
                 Surface(
                     color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f),
                     shape = CircleShape,
@@ -332,7 +324,7 @@ fun PrescriptionListItem(
                     overflow = TextOverflow.Ellipsis
                 )
             }
-            
+
             if (!prescription.instructions.isNullOrBlank()) {
                 Spacer(Modifier.height(12.dp))
                 Text(
