@@ -55,6 +55,15 @@ class AuthenticationRepository(tokenManager: TokenManager) {
         }
     }
 
+    suspend fun updateProfile(user: UserDto): Result<UserDto> {
+        return try {
+            val response = api.updateProfile(user)
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     suspend fun logout(): Result<Unit> {
         return try {
             val response = api.logout()

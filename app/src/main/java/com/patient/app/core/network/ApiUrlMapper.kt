@@ -13,11 +13,7 @@ import com.patient.app.doctors.list.api.DoctorDto
 import com.patient.app.doctors.list.api.PagedResponse
 import com.patient.app.prescriptions.api.PrescriptionDto
 import retrofit2.Response
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Path
-import retrofit2.http.Query
+import retrofit2.http.*
 
 interface ApiUrlMapper {
 
@@ -32,6 +28,9 @@ interface ApiUrlMapper {
 
     @GET("/api/profile")
     suspend fun getProfile(): UserDto
+
+    @PUT("/api/profile")
+    suspend fun updateProfile(@Body user: UserDto): UserDto
 
     @GET("/api/doctors")
     suspend fun getDoctors(

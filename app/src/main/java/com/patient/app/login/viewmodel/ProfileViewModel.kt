@@ -42,6 +42,19 @@ class ProfileViewModel(
         }
     }
 
+    fun updateProfile(user: UserDto) {
+        viewModelScope.launch {
+            _uiState.value = UiState.Loading
+            repository.updateProfile(user)
+                .onSuccess { updatedUser ->
+                    _uiState.value = UiState.Success(updatedUser)
+                }
+                .onFailure { error ->
+                    _uiState.value = UiState.Error(error.message ?: "Failed to update profile")
+                }
+        }
+    }
+
     fun setThemeMode(mode: String) {
         viewModelScope.launch {
             tokenManager.saveThemeMode(mode)

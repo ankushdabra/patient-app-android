@@ -223,13 +223,13 @@ fun ProfileContent(
                             modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
                             color = MaterialTheme.colorScheme.primary
                         )
-                        
+
                         val themeOptions = listOf(
                             Triple("LIGHT", "Light", Icons.Outlined.LightMode),
                             Triple("DARK", "Dark", Icons.Outlined.DarkMode),
                             Triple("FOLLOW_SYSTEM", "System", Icons.Outlined.SettingsSuggest)
                         )
-                        
+
                         themeOptions.forEach { (option, label, icon) ->
                             DropdownMenuItem(
                                 text = { Text(label) },
@@ -245,9 +245,9 @@ fun ProfileContent(
                                 }
                             )
                         }
-                        
+
                         HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
-                        
+
                         DropdownMenuItem(
                             text = { Text("Sign Out", color = MaterialTheme.colorScheme.error) },
                             leadingIcon = { Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null, tint = MaterialTheme.colorScheme.error) },
