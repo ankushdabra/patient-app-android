@@ -233,14 +233,24 @@ fun ProfileContent(
                         themeOptions.forEach { (option, label, icon) ->
                             DropdownMenuItem(
                                 text = { Text(label) },
-                                leadingIcon = { Icon(icon, contentDescription = null, modifier = Modifier.size(18.dp)) },
+                                leadingIcon = {
+                                    Icon(
+                                        icon,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                },
                                 onClick = {
                                     onThemeChange(option)
                                     showMenu = false
                                 },
                                 trailingIcon = {
                                     if (themeMode == option) {
-                                        Icon(Icons.Outlined.Check, contentDescription = "Selected", modifier = Modifier.size(16.dp))
+                                        Icon(
+                                            Icons.Outlined.Check,
+                                            contentDescription = "Selected",
+                                            modifier = Modifier.size(16.dp)
+                                        )
                                     }
                                 }
                             )
@@ -250,7 +260,13 @@ fun ProfileContent(
 
                         DropdownMenuItem(
                             text = { Text("Sign Out", color = MaterialTheme.colorScheme.error) },
-                            leadingIcon = { Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null, tint = MaterialTheme.colorScheme.error) },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.AutoMirrored.Filled.Logout,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.error
+                                )
+                            },
                             onClick = {
                                 onLogoutClick()
                                 showMenu = false
