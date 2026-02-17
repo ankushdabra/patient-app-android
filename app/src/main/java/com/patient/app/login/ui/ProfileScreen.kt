@@ -1,10 +1,5 @@
 package com.patient.app.login.ui
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
@@ -26,11 +21,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -83,8 +78,7 @@ fun ProfileScreen(
                             themeMode = themeMode,
                             onThemeChange = viewModel::setThemeMode,
                             onLogoutClick = viewModel::logout,
-                            onUpdateProfile = viewModel::updateProfile,
-                            isDark = isDark
+                            onUpdateProfile = viewModel::updateProfile
                         )
                     }
                 }
@@ -165,40 +159,60 @@ fun ProfileContent(
     themeMode: String,
     onThemeChange: (String) -> Unit,
     onLogoutClick: () -> Unit,
-    onUpdateProfile: (UserDto) -> Unit,
-    isDark: Boolean
+    onUpdateProfile: (UserDto) -> Unit
 ) {
     var showMenu by remember { mutableStateOf(false) }
     var isEditMode by remember { mutableStateOf(false) }
 
-    // Editable states (excluding name)
+    // Editable states
+    var editedName by remember(user) { mutableStateOf(user.name) }
     var editedAge by remember(user) { mutableStateOf(user.age?.toString() ?: "") }
     var editedGender by remember(user) { mutableStateOf(user.gender ?: "") }
     var editedBloodGroup by remember(user) { mutableStateOf(user.bloodGroup ?: "") }
     var editedWeight by remember(user) { mutableStateOf(user.weight?.toString() ?: "") }
     var editedHeight by remember(user) { mutableStateOf(user.height?.toString() ?: "") }
+    var editedAbout by remember(user) { mutableStateOf(user.about ?: "") }
+    var editedClinicAddress by remember(user) { mutableStateOf(user.clinicAddress ?: "") }
+    var editedSpecialization by remember(user) { mutableStateOf(user.specialization ?: "") }
+    var editedQualification by remember(user) { mutableStateOf(user.qualification ?: "") }
+    var editedExperience by remember(user) { mutableStateOf(user.experience?.toString() ?: "") }
+    var editedConsultationFee by remember(user) { mutableStateOf(user.consultationFee?.toString() ?: "") }
 
     fun cancelEdit() {
+        editedName = user.name
         editedAge = user.age?.toString() ?: ""
         editedGender = user.gender ?: ""
         editedBloodGroup = user.bloodGroup ?: ""
         editedWeight = user.weight?.toString() ?: ""
         editedHeight = user.height?.toString() ?: ""
+        editedAbout = user.about ?: ""
+        editedClinicAddress = user.clinicAddress ?: ""
+        editedSpecialization = user.specialization ?: ""
+        editedQualification = user.qualification ?: ""
+        editedExperience = user.experience?.toString() ?: ""
+        editedConsultationFee = user.consultationFee?.toString() ?: ""
         isEditMode = false
     }
 
     Scaffold(
-        contentWindowInsets = WindowInsets(0, 0, 0, 0), // Fix for nested Scaffold insets gap
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = {
                     if (isEditMode) {
                         val updatedUser = user.copy(
+                            name = editedName,
                             age = editedAge.toIntOrNull(),
                             gender = editedGender,
                             bloodGroup = editedBloodGroup,
                             weight = editedWeight.toDoubleOrNull(),
-                            height = editedHeight.toDoubleOrNull()
+                            height = editedHeight.toDoubleOrNull(),
+                            about = editedAbout,
+                            clinicAddress = editedClinicAddress,
+                            specialization = editedSpecialization,
+                            qualification = editedQualification,
+                            experience = editedExperience.toIntOrNull(),
+                            consultationFee = editedConsultationFee.toDoubleOrNull()
                         )
                         onUpdateProfile(updatedUser)
                         isEditMode = false
@@ -242,27 +256,6 @@ fun ProfileContent(
                         )
                     )
             ) {
-                // Decorative background elements
-                Box(
-                    modifier = Modifier
-                        .offset(x = 260.dp, y = (-30).dp)
-                        .size(180.dp)
-                        .background(
-                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.08f),
-                            shape = CircleShape
-                        )
-                )
-
-                Box(
-                    modifier = Modifier
-                        .offset(x = (-20).dp, y = 120.dp)
-                        .size(100.dp)
-                        .background(
-                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.05f),
-                            shape = CircleShape
-                        )
-                )
-
                 // Top Bar with Menu
                 Row(
                     modifier = Modifier
@@ -271,13 +264,12 @@ fun ProfileContent(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Cancel Icon at Top Left
                     if (isEditMode) {
                         IconButton(onClick = { cancelEdit() }) {
                             Icon(
                                 imageVector = Icons.Default.Close,
                                 contentDescription = "Cancel Edit",
-                                tint = MaterialTheme.colorScheme.onPrimaryContainer
+                                tint = Color.White
                             )
                         }
                     } else {
@@ -289,21 +281,13 @@ fun ProfileContent(
                             Icon(
                                 imageVector = Icons.Default.MoreVert,
                                 contentDescription = "Options",
-                                tint = MaterialTheme.colorScheme.onPrimaryContainer
+                                tint = Color.White
                             )
                         }
                         DropdownMenu(
                             expanded = showMenu,
-                            onDismissRequest = { showMenu = false },
-                            modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+                            onDismissRequest = { showMenu = false }
                         ) {
-                            Text(
-                                text = "Theme Mode",
-                                style = MaterialTheme.typography.labelMedium,
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                                color = MaterialTheme.colorScheme.primary
-                            )
-
                             val themeOptions = listOf(
                                 Triple("LIGHT", "Light", Icons.Outlined.LightMode),
                                 Triple("DARK", "Dark", Icons.Outlined.DarkMode),
@@ -313,13 +297,7 @@ fun ProfileContent(
                             themeOptions.forEach { (option, label, icon) ->
                                 DropdownMenuItem(
                                     text = { Text(label) },
-                                    leadingIcon = {
-                                        Icon(
-                                            icon,
-                                            contentDescription = null,
-                                            modifier = Modifier.size(18.dp)
-                                        )
-                                    },
+                                    leadingIcon = { Icon(icon, contentDescription = null, modifier = Modifier.size(18.dp)) },
                                     onClick = {
                                         onThemeChange(option)
                                         showMenu = false
@@ -327,7 +305,7 @@ fun ProfileContent(
                                     trailingIcon = {
                                         if (themeMode == option) {
                                             Icon(
-                                                Icons.Outlined.Check,
+                                                Icons.Default.Check,
                                                 contentDescription = "Selected",
                                                 modifier = Modifier.size(16.dp)
                                             )
@@ -336,7 +314,7 @@ fun ProfileContent(
                                 )
                             }
 
-                            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+                            HorizontalDivider()
 
                             DropdownMenuItem(
                                 text = { Text("Sign Out", color = MaterialTheme.colorScheme.error) },
@@ -366,32 +344,51 @@ fun ProfileContent(
                         modifier = Modifier
                             .size(100.dp)
                             .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.2f)),
+                            .background(Color.White.copy(alpha = 0.2f)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.AccountCircle,
                             contentDescription = null,
                             modifier = Modifier.size(80.dp),
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+                            tint = Color.White
                         )
                     }
 
                     Spacer(Modifier.height(16.dp))
 
-                    Text(
-                        text = user.name,
-                        style = MaterialTheme.typography.headlineMedium.copy(
-                            fontWeight = FontWeight.Black,
-                            letterSpacing = (-0.5).sp
-                        ),
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
+                    if (isEditMode) {
+                        TextField(
+                            value = editedName,
+                            onValueChange = { editedName = it },
+                            modifier = Modifier.padding(horizontal = 24.dp),
+                            textStyle = MaterialTheme.typography.headlineMedium.copy(
+                                fontWeight = FontWeight.Black,
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                                color = Color.White
+                            ),
+                            singleLine = true,
+                            colors = TextFieldDefaults.colors(
+                                focusedContainerColor = Color.Transparent,
+                                unfocusedContainerColor = Color.Transparent,
+                                cursorColor = Color.White
+                            )
+                        )
+                    } else {
+                        Text(
+                            text = user.name,
+                            style = MaterialTheme.typography.headlineMedium.copy(
+                                fontWeight = FontWeight.Black,
+                                letterSpacing = (-0.5).sp
+                            ),
+                            color = Color.White
+                        )
+                    }
 
                     Spacer(Modifier.height(8.dp))
 
                     Surface(
-                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.15f),
+                        color = Color.White.copy(alpha = 0.15f),
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Row(
@@ -402,13 +399,13 @@ fun ProfileContent(
                                 imageVector = Icons.Outlined.Email,
                                 contentDescription = null,
                                 modifier = Modifier.size(16.dp),
-                                tint = MaterialTheme.colorScheme.onPrimaryContainer
+                                tint = Color.White
                             )
                             Spacer(Modifier.width(8.dp))
                             Text(
                                 text = user.email,
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                color = Color.White,
                                 fontWeight = FontWeight.Medium
                             )
                         }
@@ -420,77 +417,126 @@ fun ProfileContent(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 12.dp, vertical = 28.dp),
+                    .padding(horizontal = 16.dp, vertical = 24.dp),
                 verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
-                // --- Personal Details ---
-                Text(
-                    text = "Personal Information",
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
+                SectionHeader("Personal Information")
+                InfoCard {
+                    ProfileEditableDetailRow(
+                        isEditMode = isEditMode,
+                        icon = Icons.Rounded.CalendarToday,
+                        label = "Age",
+                        value = editedAge,
+                        onValueChange = { editedAge = it },
+                        iconColor = Color(0xFF1976D2),
+                        keyboardType = KeyboardType.Number
                     )
-                )
+                    ProfileEditableDetailRow(
+                        isEditMode = isEditMode,
+                        icon = Icons.Rounded.Wc,
+                        label = "Gender",
+                        value = editedGender,
+                        onValueChange = { editedGender = it },
+                        iconColor = Color(0xFFE91E63)
+                    )
+                    ProfileEditableDetailRow(
+                        isEditMode = isEditMode,
+                        icon = Icons.Rounded.Bloodtype,
+                        label = "Blood Group",
+                        value = editedBloodGroup,
+                        onValueChange = { editedBloodGroup = it },
+                        iconColor = Color(0xFFD32F2F)
+                    )
+                    ProfileEditableDetailRow(
+                        isEditMode = isEditMode,
+                        icon = Icons.Rounded.MonitorWeight,
+                        label = "Weight (kg)",
+                        value = editedWeight,
+                        onValueChange = { editedWeight = it },
+                        iconColor = Color(0xFFF57C00),
+                        keyboardType = KeyboardType.Decimal
+                    )
+                    ProfileEditableDetailRow(
+                        isEditMode = isEditMode,
+                        icon = Icons.Rounded.Straighten,
+                        label = "Height (cm)",
+                        value = editedHeight,
+                        onValueChange = { editedHeight = it },
+                        iconColor = Color(0xFF388E3C),
+                        keyboardType = KeyboardType.Decimal
+                    )
+                }
 
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(24.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                ) {
-                    Column(
-                        modifier = Modifier.padding(24.dp),
-                        verticalArrangement = Arrangement.spacedBy(20.dp)
-                    ) {
+                if (user.role == "DOCTOR") {
+                    SectionHeader("Professional Information")
+                    InfoCard {
                         ProfileEditableDetailRow(
                             isEditMode = isEditMode,
-                            icon = Icons.Rounded.CalendarToday,
-                            label = "Age",
-                            value = editedAge,
-                            onValueChange = { editedAge = it },
-                            iconColor = Color(0xFF1976D2),
+                            icon = Icons.Rounded.Work,
+                            label = "Specialization",
+                            value = editedSpecialization,
+                            onValueChange = { editedSpecialization = it },
+                            iconColor = Color(0xFF673AB7)
+                        )
+                        ProfileEditableDetailRow(
+                            isEditMode = isEditMode,
+                            icon = Icons.Rounded.School,
+                            label = "Qualification",
+                            value = editedQualification,
+                            onValueChange = { editedQualification = it },
+                            iconColor = Color(0xFF3F51B5)
+                        )
+                        ProfileEditableDetailRow(
+                            isEditMode = isEditMode,
+                            icon = Icons.Rounded.Timeline,
+                            label = "Experience (Years)",
+                            value = editedExperience,
+                            onValueChange = { editedExperience = it },
+                            iconColor = Color(0xFF009688),
                             keyboardType = KeyboardType.Number
                         )
                         ProfileEditableDetailRow(
                             isEditMode = isEditMode,
-                            icon = Icons.Rounded.Wc,
-                            label = "Gender",
-                            value = editedGender,
-                            onValueChange = { editedGender = it },
-                            iconColor = Color(0xFFE91E63)
-                        )
-                        ProfileEditableDetailRow(
-                            isEditMode = isEditMode,
-                            icon = Icons.Rounded.Bloodtype,
-                            label = "Blood Group",
-                            value = editedBloodGroup,
-                            onValueChange = { editedBloodGroup = it },
-                            iconColor = Color(0xFFD32F2F)
-                        )
-                        ProfileEditableDetailRow(
-                            isEditMode = isEditMode,
-                            icon = Icons.Rounded.MonitorWeight,
-                            label = "Weight (kg)",
-                            value = editedWeight,
-                            onValueChange = { editedWeight = it },
-                            iconColor = Color(0xFFF57C00),
-                            keyboardType = KeyboardType.Decimal
-                        )
-                        ProfileEditableDetailRow(
-                            isEditMode = isEditMode,
-                            icon = Icons.Rounded.Straighten,
-                            label = "Height (cm)",
-                            value = editedHeight,
-                            onValueChange = { editedHeight = it },
-                            iconColor = Color(0xFF388E3C),
+                            icon = Icons.Rounded.Payments,
+                            label = "Consultation Fee",
+                            value = editedConsultationFee,
+                            onValueChange = { editedConsultationFee = it },
+                            iconColor = Color(0xFF4CAF50),
                             keyboardType = KeyboardType.Decimal
                         )
                     }
                 }
-
-                // Generous spacer removed. calculateBottomPadding() will handle this.
+                
+                Spacer(modifier = Modifier.height(80.dp))
             }
         }
+    }
+}
+
+@Composable
+fun SectionHeader(title: String) {
+    Text(
+        text = title,
+        style = MaterialTheme.typography.titleLarge.copy(
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary
+        )
+    )
+}
+
+@Composable
+fun InfoCard(content: @Composable ColumnScope.() -> Unit) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            content = content
+        )
     }
 }
 
@@ -502,23 +548,25 @@ fun ProfileEditableDetailRow(
     value: String,
     onValueChange: (String) -> Unit,
     iconColor: Color,
-    keyboardType: KeyboardType = KeyboardType.Text
+    keyboardType: KeyboardType = KeyboardType.Text,
+    singleLine: Boolean = true
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.Top
     ) {
         Box(
             modifier = Modifier
-                .size(44.dp)
-                .clip(RoundedCornerShape(12.dp))
+                .padding(top = 4.dp)
+                .size(40.dp)
+                .clip(RoundedCornerShape(10.dp))
                 .background(iconColor.copy(alpha = 0.1f)),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                modifier = Modifier.size(24.dp),
+                modifier = Modifier.size(20.dp),
                 tint = iconColor
             )
         }
@@ -535,16 +583,23 @@ fun ProfileEditableDetailRow(
                     onValueChange = onValueChange,
                     modifier = Modifier.fillMaxWidth(),
                     textStyle = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
-                    keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = keyboardType,
+                        imeAction = if (singleLine) ImeAction.Next else ImeAction.Default
+                    ),
+                    singleLine = singleLine,
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = Color.Transparent,
                         unfocusedContainerColor = Color.Transparent,
                         disabledContainerColor = Color.Transparent,
+                        cursorColor = MaterialTheme.colorScheme.primary,
+                        focusedIndicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                        unfocusedIndicatorColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
                     )
                 )
             } else {
                 Text(
-                    text = if (value.isEmpty()) "Not specified" else value,
+                    text = value.ifEmpty { "Not specified" },
                     style = MaterialTheme.typography.bodyLarge.copy(
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
@@ -563,32 +618,25 @@ fun ProfileScreenPreview() {
     }
 }
 
-@Preview(showBackground = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun ProfileScreenDarkPreview() {
-    HealthcareTheme(darkTheme = true) {
-        ProfileScreenPreviewContent()
-    }
-}
-
 @Composable
 private fun ProfileScreenPreviewContent() {
     ProfileContent(
         user = UserDto(
             id = "1",
-            name = "Dr. John Smith",
-            email = "john.smith@vitalsync.com",
-            role = "DOCTOR",
-            age = 42,
+            name = "John Doe",
+            email = "john.doe@example.com",
+            role = "PATIENT",
+            age = 30,
             gender = "Male",
-            bloodGroup = "A+",
-            weight = 75.0,
-            height = 180.0
+            bloodGroup = "O+",
+            weight = 70.0,
+            height = 175.0,
+            about = "Loves running and healthy food.",
+            clinicAddress = "123 Health St, Wellness City"
         ),
         themeMode = "LIGHT",
         onThemeChange = {},
         onLogoutClick = {},
-        onUpdateProfile = {},
-        isDark = false
+        onUpdateProfile = {}
     )
 }

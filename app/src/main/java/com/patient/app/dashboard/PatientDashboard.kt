@@ -15,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -218,7 +219,8 @@ private fun DashboardPreviewContent() {
     Scaffold(
         bottomBar = {
             NavigationBar(
-                containerColor = MaterialTheme.colorScheme.surface
+                containerColor = MaterialTheme.colorScheme.surface,
+                tonalElevation = 2.dp
             ) {
                 val items = listOf(
                     PatientBottomNavItem.Doctors,
