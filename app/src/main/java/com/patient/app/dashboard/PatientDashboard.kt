@@ -220,7 +220,7 @@ private fun DashboardPreviewContent() {
         bottomBar = {
             NavigationBar(
                 containerColor = MaterialTheme.colorScheme.surface,
-                tonalElevation = 2.dp
+                tonalElevation = NavigationBarDefaults.Elevation
             ) {
                 val items = listOf(
                     PatientBottomNavItem.Doctors,
@@ -233,7 +233,7 @@ private fun DashboardPreviewContent() {
                         selected = item == PatientBottomNavItem.Doctors,
                         onClick = { },
                         icon = { Icon(item.icon, contentDescription = item.label) },
-                        label = { 
+                        label = {
                             Text(
                                 text = item.label,
                                 style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
