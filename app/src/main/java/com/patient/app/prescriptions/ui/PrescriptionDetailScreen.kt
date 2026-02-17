@@ -366,18 +366,31 @@ fun PrescriptionCard(
 @Composable
 fun PrescriptionDetailPreview() {
     HealthcareTheme {
-        PrescriptionDetailContent(
-            prescription = PrescriptionDto(
-                id = "1",
-                medications = "1. Amoxicillin 500mg - 3 times a day\n2. Paracetamol 500mg - As needed for fever\n3. Vitamin C 500mg - Once daily",
-                instructions = "Complete the full course of antibiotics. Drink plenty of water and take rest.",
-                notes = "Follow up in 7 days if symptoms persist.",
-                prescriptionDate = "2026-02-09",
-                appointmentId = "a1",
-                appointmentDate = "2026-02-09",
-                doctorName = "Dr. Amit Sharma",
-                patientName = "John Doe"
-            )
-        )
+        PrescriptionDetailPreviewContent()
     }
+}
+
+@Preview(showBackground = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun PrescriptionDetailDarkPreview() {
+    HealthcareTheme(darkTheme = true) {
+        PrescriptionDetailPreviewContent()
+    }
+}
+
+@Composable
+private fun PrescriptionDetailPreviewContent() {
+    PrescriptionDetailContent(
+        prescription = PrescriptionDto(
+            id = "1",
+            medications = "1. Amoxicillin 500mg - 3 times a day\n2. Paracetamol 500mg - As needed for fever\n3. Vitamin C 500mg - Once daily",
+            instructions = "Complete the full course of antibiotics. Drink plenty of water and take rest.",
+            notes = "Follow up in 7 days if symptoms persist.",
+            prescriptionDate = "2026-02-09",
+            appointmentId = "a1",
+            appointmentDate = "2026-02-09",
+            doctorName = "Dr. Amit Sharma",
+            patientName = "John Doe"
+        )
+    )
 }

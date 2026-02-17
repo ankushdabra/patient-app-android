@@ -354,20 +354,22 @@ fun LoginScreen(
 @Composable
 fun LoginScreenPreview() {
     HealthcareTheme {
-        LoginScreen(
-            state = UiState.Success(false),
-            onLoginClick = { _, _ -> }
-        )
+        LoginScreenPreviewContent()
     }
 }
 
 @Preview(showBackground = true, device = Devices.PIXEL_6, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun LoginScreenDarkPreview() {
-    HealthcareTheme {
-        LoginScreen(
-            state = UiState.Success(false),
-            onLoginClick = { _, _ -> }
-        )
+    HealthcareTheme(darkTheme = true) {
+        LoginScreenPreviewContent()
     }
+}
+
+@Composable
+private fun LoginScreenPreviewContent() {
+    LoginScreen(
+        state = UiState.Success(false),
+        onLoginClick = { _, _ -> }
+    )
 }

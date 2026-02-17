@@ -428,43 +428,56 @@ fun InfoChip(
 @Composable
 fun DoctorsListScreenPreview() {
     HealthcareTheme {
-        val mockDoctors = listOf(
-            DoctorDto(
-                id = "1",
-                name = "Dr. Amit Sharma",
-                specialization = "Cardiologist",
-                experience = 12,
-                consultationFee = 800.0,
-                rating = 4.8,
-                profileImage = null,
-                nextAvailable = "Today, 05:00 PM"
-            ),
-            DoctorDto(
-                id = "2",
-                name = "Dr. Sneha Patil",
-                specialization = "Dermatologist",
-                experience = 8,
-                consultationFee = 600.0,
-                rating = 4.6,
-                profileImage = null,
-                nextAvailable = "Tomorrow, 10:00 AM"
-            ),
-            DoctorDto(
-                id = "3",
-                name = "Dr. Vikram Singh",
-                specialization = "Orthopedic",
-                experience = 15,
-                consultationFee = 1000.0,
-                rating = 4.9,
-                profileImage = null,
-                nextAvailable = "Wednesday, 06:30 PM"
-            )
-        )
-        
-        DoctorsListScreenContent(
-            state = DoctorsScreenState(doctors = mockDoctors),
-            onLoadMore = {},
-            onDoctorClick = {}
-        )
+        DoctorsListPreviewContent()
     }
+}
+
+@Preview(showBackground = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun DoctorsListScreenDarkPreview() {
+    HealthcareTheme(darkTheme = true) {
+        DoctorsListPreviewContent()
+    }
+}
+
+@Composable
+private fun DoctorsListPreviewContent() {
+    val mockDoctors = listOf(
+        DoctorDto(
+            id = "1",
+            name = "Dr. Amit Sharma",
+            specialization = "Cardiologist",
+            experience = 12,
+            consultationFee = 800.0,
+            rating = 4.8,
+            profileImage = null,
+            nextAvailable = "Today, 05:00 PM"
+        ),
+        DoctorDto(
+            id = "2",
+            name = "Dr. Sneha Patil",
+            specialization = "Dermatologist",
+            experience = 8,
+            consultationFee = 600.0,
+            rating = 4.6,
+            profileImage = null,
+            nextAvailable = "Tomorrow, 10:00 AM"
+        ),
+        DoctorDto(
+            id = "3",
+            name = "Dr. Vikram Singh",
+            specialization = "Orthopedic",
+            experience = 15,
+            consultationFee = 1000.0,
+            rating = 4.9,
+            profileImage = null,
+            nextAvailable = "Wednesday, 06:30 PM"
+        )
+    )
+    
+    DoctorsListScreenContent(
+        state = DoctorsScreenState(doctors = mockDoctors),
+        onLoadMore = {},
+        onDoctorClick = {}
+    )
 }

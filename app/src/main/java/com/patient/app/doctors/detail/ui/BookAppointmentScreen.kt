@@ -629,28 +629,38 @@ fun BookAppointmentButton(enabled: Boolean, onClick: () -> Unit) {
 @Composable
 fun DoctorDetailBookingPreview() {
     HealthcareTheme {
-        DoctorDetailBookingContent(
-            doctor = DoctorDetailDto(
-                id = "33333333-3333-3333-3333-333333333333",
-                name = "Dr Amit Sharma",
-                specialization = "Cardiology",
-                qualification = "MBBS, MD (Cardiology)",
-                experience = 12,
-                rating = 4.7,
-                consultationFee = 800.0,
-                about = "Experienced cardiologist with 12+ years of practice",
-                clinicAddress = "Delhi Heart Clinic, New Delhi",
-                profileImage = "profile.jpg",
-                availability = mapOf(
-                    "MON" to listOf(DoctorTimeSlotDto("10:00", "11:00"), DoctorTimeSlotDto("12:00", "13:00")),
-                    "TUE" to mapOf(
-                    "MON" to listOf(DoctorTimeSlotDto("10:00", "11:00"), DoctorTimeSlotDto("12:00", "13:00")),
-                    "TUE" to listOf(DoctorTimeSlotDto("11:00", "12:00"))
-                ).get("TUE")!!
-                )
-            ),
-            isBooking = false,
-            onBookAppointment = { _, _ -> }
-        )
+        BookAppointmentPreviewContent()
     }
+}
+
+@Preview(showBackground = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun DoctorDetailBookingDarkPreview() {
+    HealthcareTheme(darkTheme = true) {
+        BookAppointmentPreviewContent()
+    }
+}
+
+@Composable
+private fun BookAppointmentPreviewContent() {
+    DoctorDetailBookingContent(
+        doctor = DoctorDetailDto(
+            id = "33333333-3333-3333-3333-333333333333",
+            name = "Dr Amit Sharma",
+            specialization = "Cardiology",
+            qualification = "MBBS, MD (Cardiology)",
+            experience = 12,
+            rating = 4.7,
+            consultationFee = 800.0,
+            about = "Experienced cardiologist with 12+ years of practice",
+            clinicAddress = "Delhi Heart Clinic, New Delhi",
+            profileImage = "profile.jpg",
+            availability = mapOf(
+                "MON" to listOf(DoctorTimeSlotDto("10:00", "11:00"), DoctorTimeSlotDto("12:00", "13:00")),
+                "TUE" to listOf(DoctorTimeSlotDto("11:00", "12:00"))
+            )
+        ),
+        isBooking = false,
+        onBookAppointment = { _, _ -> }
+    )
 }

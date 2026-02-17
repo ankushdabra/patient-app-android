@@ -408,111 +408,113 @@ fun AppointmentListItem(
 @Composable
 fun AppointmentListScreenPreview() {
     HealthcareTheme {
-        val mockAppointments = listOf(
-            AppointmentDto(
-                id = "1",
-                doctor = DoctorDetailDto(
-                    id = "d1",
-                    name = "Dr. Amit Sharma",
-                    specialization = "Cardiology",
-                    qualification = "MBBS, MD",
-                    experience = 12,
-                    rating = 4.5,
-                    consultationFee = 800.0,
-                    about = null,
-                    clinicAddress = null,
-                    profileImage = null,
-                    availability = mapOf(
-                        "MON" to listOf(DoctorTimeSlotDto("10:00", "13:00"))
-                    )
-                ),
-                patient = PatientDto(
-                    id = "p1",
-                    user = UserDto("u1", "John Doe", "john@example.com", "PATIENT"),
-                    age = 30,
-                    gender = "MALE",
-                    bloodGroup = "O+"
-                ),
-                appointmentDate = LocalDate.now().toString(),
-                appointmentTime = "10:00",
-                status = "BOOKED",
-                createdAt = "2026-02-08T10:00:00"
-            ),
-            AppointmentDto(
-                id = "2",
-                doctor = DoctorDetailDto(
-                    id = "d2",
-                    name = "Dr. Priya Das",
-                    specialization = "Dermatology",
-                    qualification = "MBBS, MD",
-                    experience = 8,
-                    rating = 4.2,
-                    consultationFee = 600.0,
-                    about = null,
-                    clinicAddress = null,
-                    profileImage = null,
-                    availability = mapOf(
-                        "MON" to listOf(DoctorTimeSlotDto("14:00", "16:00"))
-                    )
-                ),
-                patient = PatientDto(
-                    id = "p1",
-                    user = UserDto("u1", "John Doe", "john@example.com", "PATIENT"),
-                    age = 30,
-                    gender = "MALE",
-                    bloodGroup = "O+"
-                ),
-                appointmentDate = LocalDate.now().plusDays(1).toString(),
-                appointmentTime = "15:00",
-                status = "BOOKED",
-                createdAt = "2026-02-08T11:00:00"
-            ),
-            AppointmentDto(
-                id = "3",
-                doctor = DoctorDetailDto(
-                    id = "d3",
-                    name = "Dr. Sanjay Gupta",
-                    specialization = "Neurology",
-                    qualification = "MBBS, MD",
-                    experience = 20,
-                    rating = 4.8,
-                    consultationFee = 1200.0,
-                    about = null,
-                    clinicAddress = null,
-                    profileImage = null,
-                    availability = mapOf(
-                        "TUE" to listOf(DoctorTimeSlotDto("09:00", "12:00"))
-                    )
-                ),
-                patient = PatientDto(
-                    id = "p1",
-                    user = UserDto("u1", "John Doe", "john@example.com", "PATIENT"),
-                    age = 30,
-                    gender = "MALE",
-                    bloodGroup = "O+"
-                ),
-                appointmentDate = LocalDate.now().plusDays(2).toString(),
-                appointmentTime = "09:30",
-                status = "BOOKED",
-                createdAt = "2026-02-08T12:00:00"
-            )
-        )
-        AppointmentListScreenContent(
-            uiState = UiState.Success(mockAppointments),
-            onRetry = {},
-            onAppointmentClick = {}
-        )
+        AppointmentListPreviewContent()
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun AppointmentListErrorPreview() {
-    HealthcareTheme {
-        AppointmentListScreenContent(
-            uiState = UiState.Error("Connection timed out"),
-            onRetry = {},
-            onAppointmentClick = {}
-        )
+fun AppointmentListScreenDarkPreview() {
+    HealthcareTheme(darkTheme = true) {
+        AppointmentListPreviewContent()
     }
 }
+
+@Composable
+private fun AppointmentListPreviewContent() {
+    val mockAppointments = listOf(
+        AppointmentDto(
+            id = "1",
+            doctor = DoctorDetailDto(
+                id = "d1",
+                name = "Dr. Amit Sharma",
+                specialization = "Cardiology",
+                qualification = "MBBS, MD",
+                experience = 12,
+                rating = 4.5,
+                consultationFee = 800.0,
+                about = null,
+                clinicAddress = null,
+                profileImage = null,
+                availability = mapOf(
+                    "MON" to listOf(DoctorTimeSlotDto("10:00", "13:00"))
+                )
+            ),
+            patient = PatientDto(
+                id = "p1",
+                user = UserDto("u1", "John Doe", "john@example.com", "PATIENT"),
+                age = 30,
+                gender = "MALE",
+                bloodGroup = "O+"
+            ),
+            appointmentDate = LocalDate.now().toString(),
+            appointmentTime = "10:00",
+            status = "BOOKED",
+            createdAt = "2026-02-08T10:00:00"
+        ),
+        AppointmentDto(
+            id = "2",
+            doctor = DoctorDetailDto(
+                id = "d2",
+                name = "Dr. Priya Das",
+                specialization = "Dermatology",
+                qualification = "MBBS, MD",
+                experience = 8,
+                rating = 4.2,
+                consultationFee = 600.0,
+                about = null,
+                clinicAddress = null,
+                profileImage = null,
+                availability = mapOf(
+                    "MON" to listOf(DoctorTimeSlotDto("14:00", "16:00"))
+                )
+            ),
+            patient = PatientDto(
+                id = "p1",
+                user = UserDto("u1", "John Doe", "john@example.com", "PATIENT"),
+                age = 30,
+                gender = "MALE",
+                bloodGroup = "O+"
+            ),
+            appointmentDate = LocalDate.now().plusDays(1).toString(),
+            appointmentTime = "15:00",
+            status = "BOOKED",
+            createdAt = "2026-02-08T11:00:00"
+        ),
+        AppointmentDto(
+            id = "3",
+            doctor = DoctorDetailDto(
+                id = "d3",
+                name = "Dr. Sanjay Gupta",
+                specialization = "Neurology",
+                qualification = "MBBS, MD",
+                experience = 20,
+                rating = 4.8,
+                consultationFee = 1200.0,
+                about = null,
+                clinicAddress = null,
+                profileImage = null,
+                availability = mapOf(
+                    "TUE" to listOf(DoctorTimeSlotDto("09:00", "12:00"))
+                )
+            ),
+            patient = PatientDto(
+                id = "p1",
+                user = UserDto("u1", "John Doe", "john@example.com", "PATIENT"),
+                age = 30,
+                gender = "MALE",
+                bloodGroup = "O+"
+            ),
+            appointmentDate = LocalDate.now().plusDays(2).toString(),
+            appointmentTime = "09:30",
+            status = "BOOKED",
+            createdAt = "2026-02-08T12:00:00"
+        )
+    )
+    AppointmentListScreenContent(
+        uiState = UiState.Success(mockAppointments),
+        onRetry = {},
+        onAppointmentClick = {}
+    )
+}
+

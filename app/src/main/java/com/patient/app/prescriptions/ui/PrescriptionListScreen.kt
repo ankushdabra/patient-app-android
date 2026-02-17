@@ -352,71 +352,48 @@ fun PrescriptionListItem(
 @Composable
 fun PrescriptionListScreenSuccessPreview() {
     HealthcareTheme {
-        PrescriptionListScreenContent(
-            state = UiState.Success(
-                listOf(
-                    PrescriptionDto(
-                        id = "1",
-                        medications = "Amoxicillin 500mg, Paracetamol 500mg",
-                        instructions = "Take 1 tablet every 8 hours",
-                        notes = "Drink plenty of fluids",
-                        prescriptionDate = "24 Oct 2023",
-                        appointmentId = "app1",
-                        appointmentDate = "24 Oct 2023",
-                        doctorName = "Dr. Sarah Wilson",
-                        patientName = "John Doe"
-                    ),
-                    PrescriptionDto(
-                        id = "2",
-                        medications = "Cetirizine 10mg",
-                        instructions = "Take 1 tablet daily at night",
-                        notes = null,
-                        prescriptionDate = "15 Oct 2023",
-                        appointmentId = "app2",
-                        appointmentDate = "15 Oct 2023",
-                        doctorName = "Dr. Michael Chen",
-                        patientName = "John Doe"
-                    )
+        PrescriptionListPreviewContent()
+    }
+}
+
+@Preview(showBackground = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun PrescriptionListScreenDarkPreview() {
+    HealthcareTheme(darkTheme = true) {
+        PrescriptionListPreviewContent()
+    }
+}
+
+@Composable
+private fun PrescriptionListPreviewContent() {
+    PrescriptionListScreenContent(
+        state = UiState.Success(
+            listOf(
+                PrescriptionDto(
+                    id = "1",
+                    medications = "Amoxicillin 500mg, Paracetamol 500mg",
+                    instructions = "Take 1 tablet every 8 hours",
+                    notes = "Drink plenty of fluids",
+                    prescriptionDate = "24 Oct 2023",
+                    appointmentId = "app1",
+                    appointmentDate = "24 Oct 2023",
+                    doctorName = "Dr. Sarah Wilson",
+                    patientName = "John Doe"
+                ),
+                PrescriptionDto(
+                    id = "2",
+                    medications = "Cetirizine 10mg",
+                    instructions = "Take 1 tablet daily at night",
+                    notes = null,
+                    prescriptionDate = "15 Oct 2023",
+                    appointmentId = "app2",
+                    appointmentDate = "15 Oct 2023",
+                    doctorName = "Dr. Michael Chen",
+                    patientName = "John Doe"
                 )
-            ),
-            onRetry = {},
-            onPrescriptionClick = {}
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PrescriptionListScreenEmptyPreview() {
-    HealthcareTheme {
-        PrescriptionListScreenContent(
-            state = UiState.Success(emptyList()),
-            onRetry = {},
-            onPrescriptionClick = {}
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PrescriptionListScreenLoadingPreview() {
-    HealthcareTheme {
-        PrescriptionListScreenContent(
-            state = UiState.Loading,
-            onRetry = {},
-            onPrescriptionClick = {}
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PrescriptionListScreenErrorPreview() {
-    HealthcareTheme {
-        PrescriptionListScreenContent(
-            state = UiState.Error("Something went wrong"),
-            onRetry = {},
-            onPrescriptionClick = {}
-        )
-    }
+            )
+        ),
+        onRetry = {},
+        onPrescriptionClick = {}
+    )
 }

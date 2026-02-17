@@ -502,33 +502,46 @@ fun AppointmentDetailContent(
 @Composable
 fun AppointmentDetailPreview() {
     HealthcareTheme {
-        AppointmentDetailContent(
-            appointment = AppointmentDto(
-                id = "1",
-                doctor = DoctorDetailDto(
-                    id = "d1",
-                    name = "Dr. Amit Sharma",
-                    specialization = "Cardiology",
-                    qualification = "MBBS, MD",
-                    experience = 12,
-                    rating = 4.5,
-                    consultationFee = 800.0,
-                    about = null,
-                    clinicAddress = "Healthcare Clinic, City Center",
-                    profileImage = null
-                ),
-                patient = PatientDto(
-                    id = "p1",
-                    user = UserDto("u1", "John Doe", "john@example.com", "PATIENT"),
-                    age = 30,
-                    gender = "MALE",
-                    bloodGroup = "O+"
-                ),
-                appointmentDate = "2026-02-09",
-                appointmentTime = "10:00:00",
-                status = "BOOKED",
-                createdAt = "2026-02-08T10:00:00"
-            )
-        )
+        AppointmentDetailPreviewContent()
     }
+}
+
+@Preview(showBackground = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun AppointmentDetailDarkPreview() {
+    HealthcareTheme(darkTheme = true) {
+        AppointmentDetailPreviewContent()
+    }
+}
+
+@Composable
+private fun AppointmentDetailPreviewContent() {
+    AppointmentDetailContent(
+        appointment = AppointmentDto(
+            id = "1",
+            doctor = DoctorDetailDto(
+                id = "d1",
+                name = "Dr. Amit Sharma",
+                specialization = "Cardiology",
+                qualification = "MBBS, MD",
+                experience = 12,
+                rating = 4.5,
+                consultationFee = 800.0,
+                about = null,
+                clinicAddress = "Healthcare Clinic, City Center",
+                profileImage = null
+            ),
+            patient = PatientDto(
+                id = "p1",
+                user = UserDto("u1", "John Doe", "john@example.com", "PATIENT"),
+                age = 30,
+                gender = "MALE",
+                bloodGroup = "O+"
+            ),
+            appointmentDate = "2026-02-09",
+            appointmentTime = "10:00:00",
+            status = "BOOKED",
+            createdAt = "2026-02-08T10:00:00"
+        )
+    )
 }

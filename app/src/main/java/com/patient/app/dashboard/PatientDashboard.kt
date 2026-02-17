@@ -196,50 +196,63 @@ fun PatientDashboard(tokenManager: TokenManager) {
 @Composable
 fun PatientDashboardPreview() {
     HealthcareTheme {
-        val mockDoctors = listOf(
-            DoctorDto("1", "Dr. John Smith", "Cardiologist", 15, 100.0, 4.5, null),
-            DoctorDto("2", "Dr. Sarah Wilson", "Neurologist", 10, 120.0, 4.8, null)
-        )
+        DashboardPreviewContent()
+    }
+}
 
-        Scaffold(
-            bottomBar = {
-                NavigationBar(
-                    containerColor = MaterialTheme.colorScheme.surface
-                ) {
-                    val items = listOf(
-                        PatientBottomNavItem.Doctors,
-                        PatientBottomNavItem.Appointments,
-                        PatientBottomNavItem.Prescriptions,
-                        PatientBottomNavItem.Profile
-                    )
-                    items.forEach { item ->
-                        NavigationBarItem(
-                            selected = item == PatientBottomNavItem.Doctors,
-                            onClick = { },
-                            icon = { Icon(item.icon, contentDescription = item.label) },
-                            label = { 
-                                Text(
-                                    text = item.label,
-                                    style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                            },
-                            colors = NavigationBarItemDefaults.colors(
-                                indicatorColor = MaterialTheme.colorScheme.primaryContainer
+@Preview(showBackground = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun PatientDashboardDarkPreview() {
+    HealthcareTheme(darkTheme = true) {
+        DashboardPreviewContent()
+    }
+}
+
+@Composable
+private fun DashboardPreviewContent() {
+    val mockDoctors = listOf(
+        DoctorDto("1", "Dr. John Smith", "Cardiologist", 15, 100.0, 4.5, null),
+        DoctorDto("2", "Dr. Sarah Wilson", "Neurologist", 10, 120.0, 4.8, null)
+    )
+
+    Scaffold(
+        bottomBar = {
+            NavigationBar(
+                containerColor = MaterialTheme.colorScheme.surface
+            ) {
+                val items = listOf(
+                    PatientBottomNavItem.Doctors,
+                    PatientBottomNavItem.Appointments,
+                    PatientBottomNavItem.Prescriptions,
+                    PatientBottomNavItem.Profile
+                )
+                items.forEach { item ->
+                    NavigationBarItem(
+                        selected = item == PatientBottomNavItem.Doctors,
+                        onClick = { },
+                        icon = { Icon(item.icon, contentDescription = item.label) },
+                        label = { 
+                            Text(
+                                text = item.label,
+                                style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
+                        },
+                        colors = NavigationBarItemDefaults.colors(
+                            indicatorColor = MaterialTheme.colorScheme.primaryContainer
                         )
-                    }
+                    )
                 }
             }
-        ) { padding ->
-            Box(modifier = Modifier.padding(padding)) {
-                DoctorsListScreenContent(
-                    state = DoctorsScreenState(doctors = mockDoctors),
-                    onLoadMore = { },
-                    onDoctorClick = { }
-                )
-            }
+        }
+    ) { padding ->
+        Box(modifier = Modifier.padding(padding)) {
+            DoctorsListScreenContent(
+                state = DoctorsScreenState(doctors = mockDoctors),
+                onLoadMore = { },
+                onDoctorClick = { }
+            )
         }
     }
 }
