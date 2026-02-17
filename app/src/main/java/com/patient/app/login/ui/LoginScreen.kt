@@ -128,7 +128,7 @@ fun LoginScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "VitalSync Doctor",
+                    text = "VitalSync",
                     style = MaterialTheme.typography.headlineMedium.copy(
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -137,7 +137,7 @@ fun LoginScreen(
                 )
 
                 Text(
-                    text = "Welcome back, Doctor",
+                    text = "Syncing Health with Simplicity",
                     style = MaterialTheme.typography.bodyMedium.copy(
                         color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.9f)
                     )
