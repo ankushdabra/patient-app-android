@@ -75,7 +75,12 @@ fun AuthRoute(
 
             SignUpScreen(
                 state = state,
-                onRegisterClick = viewModel::register
+                onRegisterClick = viewModel::register,
+                onLoginClick = {
+                    navController.navigate(Routes.LOGIN) {
+                        popUpTo(Routes.REGISTER) { inclusive = true }
+                    }
+                }
             )
         }
     }
