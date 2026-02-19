@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -489,24 +490,23 @@ fun DateSelector(selectedDate: String?, dates: List<String>, onDateSelected: (St
                         ),
                         contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
                     ),
-                    modifier = Modifier.width(70.dp),
+                    modifier = Modifier.widthIn(min = 80.dp),
                     border = if (isSelected) null else BorderStroke(
                         1.dp,
                         MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
                     )
                 ) {
                     Column(
-                        modifier = Modifier.padding(vertical = 12.dp, horizontal = 8.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        modifier = Modifier.padding(vertical = 12.dp, horizontal = 12.dp),
+                        horizontalAlignment = Alignment.Start
                     ) {
                         Text(
                             text = when {
                                 isToday -> "Today"
-                                isTomorrow -> "Tomorrow"
                                 else -> dayName
                             },
-                            modifier = Modifier.fillMaxWidth(),
                             textAlign = TextAlign.Left,
+                            maxLines = 1,
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = if (isSelected) MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f) else MaterialTheme.colorScheme.onSurfaceVariant
@@ -514,7 +514,6 @@ fun DateSelector(selectedDate: String?, dates: List<String>, onDateSelected: (St
                         Spacer(Modifier.height(4.dp))
                         Text(
                             text = actualDate.dayOfMonth.toString(),
-                            modifier = Modifier.fillMaxWidth(),
                             textAlign = TextAlign.Left,
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold
