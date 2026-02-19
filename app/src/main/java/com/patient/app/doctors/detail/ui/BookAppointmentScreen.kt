@@ -200,7 +200,7 @@ fun DoctorDetailBookingContent(
     bottomPadding: Dp = 0.dp
 ) {
     val availableDays = remember(doctor.availability) {
-        doctor.availability.keys.toList()
+        doctor.availability.keys.toList().sortedBy { getNextDateForDay(it) }
     }
     var selectedDate by remember(availableDays) { mutableStateOf(availableDays.firstOrNull()) }
 
