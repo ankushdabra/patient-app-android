@@ -86,7 +86,6 @@ import com.patient.app.doctors.detail.viewmodel.BookAppointmentViewModelFactory
 import com.patient.app.doctors.detail.viewmodel.BookingState
 import java.time.DayOfWeek
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
 
@@ -178,12 +177,33 @@ fun DoctorDetailBookingContent(
     bottomPadding: Dp = 0.dp
 ) {
     val availableDates = remember(doctor.availability) {
-        doctor.availability.keys.toList().sorted()
+        val today = LocalDate.now()
+        doctor.availability.keys.mapNotNull { dayCode ->
+            val dayOfWeek = when (dayCode.uppercase()) {
+                "MON" -> DayOfWeek.MONDAY
+                "TUE" -> DayOfWeek.TUESDAY
+                "WED" -> DayOfWeek.WEDNESDAY
+                "THU" -> DayOfWeek.THURSDAY
+                "FRI" -> DayOfWeek.FRIDAY
+                "SAT" -> DayOfWeek.SATURDAY
+                "SUN" -> DayOfWeek.SUNDAY
+                else -> null
+            }
+            dayOfWeek?.let { dow ->
+                var date = today
+                while (date.dayOfWeek != dow) {
+                    date = date.plusDays(1)
+                }
+                date
+            }
+        }.sorted()
     }
+    
     var selectedDate by remember(availableDates) { mutableStateOf(availableDates.firstOrNull()) }
 
     val timeSlots = remember(selectedDate, doctor.availability) {
-        doctor.availability[selectedDate] ?: emptyList()
+        val dayCode = selectedDate?.dayOfWeek?.getDisplayName(TextStyle.SHORT, Locale.ENGLISH)?.uppercase()
+        doctor.availability[dayCode] ?: emptyList()
     }
 
     var selectedTime by remember(timeSlots) {
@@ -430,7 +450,7 @@ fun DoctorDetailBookingContent(
                     onClick = {
                         selectedDate?.let { date ->
                             selectedTime?.let { time ->
-                                onBookAppointment(date, time)
+                                onBookAppointment(date.toString(), time)
                             }
                         }
                     }
@@ -459,10 +479,10 @@ fun HeaderInfoTag(icon: ImageVector, text: String) {
 }
 
 @Composable
-fun DateSelector(selectedDate: String?, dates: List<String>, onDateSelected: (String) -> Unit) {
+fun DateSelector(selectedDate: LocalDate?, dates: List<LocalDate>, onDateSelected: (LocalDate) -> Unit) {
     Column {
         Text(
-            text = "Select Date",
+            text = "Select Day",
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface
@@ -472,17 +492,15 @@ fun DateSelector(selectedDate: String?, dates: List<String>, onDateSelected: (St
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             contentPadding = PaddingValues(horizontal = 4.dp)
         ) {
-            items(dates) { dateStr ->
-                val isSelected = selectedDate == dateStr
-                val actualDate = remember(dateStr) { LocalDate.parse(dateStr) }
-                val isToday = remember(dateStr) { actualDate == LocalDate.now() }
-                val isTomorrow = remember(dateStr) { actualDate == LocalDate.now().plusDays(1) }
-                val dayName = remember(actualDate) {
-                    actualDate.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault()).uppercase()
-                }
+            items(dates) { date ->
+                val isSelected = selectedDate == date
+                
+                val isToday = date == LocalDate.now()
+                val isTomorrow = date == LocalDate.now().plusDays(1)
+                val dayName = date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault()).uppercase()
 
                 Card(
-                    onClick = { onDateSelected(dateStr) },
+                    onClick = { onDateSelected(date) },
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(
                         containerColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant.copy(
@@ -503,6 +521,7 @@ fun DateSelector(selectedDate: String?, dates: List<String>, onDateSelected: (St
                         Text(
                             text = when {
                                 isToday -> "Today"
+                                isTomorrow -> "Tomorrow"
                                 else -> dayName
                             },
                             textAlign = TextAlign.Left,
@@ -513,7 +532,7 @@ fun DateSelector(selectedDate: String?, dates: List<String>, onDateSelected: (St
                         )
                         Spacer(Modifier.height(4.dp))
                         Text(
-                            text = actualDate.dayOfMonth.toString(),
+                            text = date.dayOfMonth.toString(),
                             textAlign = TextAlign.Left,
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold
@@ -640,22 +659,28 @@ fun DoctorDetailBookingDarkPreview() {
 private fun BookAppointmentPreviewContent() {
     DoctorDetailBookingContent(
         doctor = DoctorDetailDto(
-            id = "33333333-3333-3333-3333-333333333333",
-            name = "Dr Amit Sharma",
-            specialization = "Cardiology",
+            id = "965d77e0-5222-4651-bfaa-50c14954955f",
+            name = "Dr. Rahul Mehta",
+            specialization = "Cardiologist",
             qualification = "MBBS, MD (Cardiology)",
-            experience = 12,
-            rating = 4.7,
-            consultationFee = 800.0,
-            about = "Experienced cardiologist with 12+ years of practice",
-            clinicAddress = "Delhi Heart Clinic, New Delhi",
-            profileImage = "profile.jpg",
+            experience = 18,
+            rating = 4.0,
+            consultationFee = 700.0,
+            about = "Heart specialist with expertise in interventional cardiology.",
+            clinicAddress = "Andheri East, Mumbai",
+            profileImage = "https://example.com/dr1.jpg",
             availability = mapOf(
-                "2026-02-20" to listOf(
+                "MON" to listOf(DoctorTimeSlotDto("09:00 AM", "12:00 PM")),
+                "TUE" to listOf(DoctorTimeSlotDto("09:00 AM", "05:00 PM")),
+                "WED" to listOf(DoctorTimeSlotDto("11:00 AM", "05:00 PM")),
+                "THU" to listOf(
+                    DoctorTimeSlotDto("09:00 AM", "10:00 AM"),
                     DoctorTimeSlotDto("10:00 AM", "11:00 AM"),
-                    DoctorTimeSlotDto("12:00 PM", "01:00 PM")
+                    DoctorTimeSlotDto("11:00 AM", "12:00 PM")
                 ),
-                "2026-02-21" to listOf(DoctorTimeSlotDto("11:00 AM", "12:00 PM"))
+                "FRI" to listOf(DoctorTimeSlotDto("09:00 AM", "05:00 PM")),
+                "SAT" to listOf(DoctorTimeSlotDto("09:00 AM", "05:00 PM")),
+                "SUN" to listOf(DoctorTimeSlotDto("09:00 AM", "05:00 PM"))
             )
         ),
         isBooking = false,

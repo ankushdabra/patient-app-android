@@ -469,15 +469,12 @@ fun AppointmentDetailContent(
                         )
                     } else {
                         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                            appointment.doctor.availability.toSortedMap().forEach { (dateStr, slots) ->
-                                val dayName = remember(dateStr) {
-                                    val date = LocalDate.parse(dateStr)
-                                    date.dayOfWeek.getDisplayName(
-                                        TextStyle.SHORT,
-                                        Locale.getDefault()
-                                    )
-                                        .uppercase()
-                                }
+                            // Order days of week
+                            val dayOrder = listOf("MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN")
+                            val sortedAvailability = appointment.doctor.availability.toList()
+                                .sortedBy { (day, _) -> dayOrder.indexOf(day) }
+                            
+                            sortedAvailability.forEach { (dayName, slots) ->
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     verticalAlignment = Alignment.Top
@@ -573,15 +570,17 @@ private fun AppointmentDetailPreviewContent() {
                 clinicAddress = "Healthcare Clinic, City Center",
                 profileImage = null,
                 availability = mapOf(
-                    "2026-02-20" to listOf(
-                        DoctorTimeSlotDto("10:00 AM", "11:00 AM"),
-                        DoctorTimeSlotDto("12:00 PM", "01:00 PM")
-                    ),
-                    "2026-02-21" to listOf(
+                    "MON" to listOf(DoctorTimeSlotDto("09:00 AM", "12:00 PM")),
+                    "TUE" to listOf(DoctorTimeSlotDto("09:00 AM", "05:00 PM")),
+                    "WED" to listOf(DoctorTimeSlotDto("11:00 AM", "05:00 PM")),
+                    "THU" to listOf(
                         DoctorTimeSlotDto("09:00 AM", "10:00 AM"),
-                        DoctorTimeSlotDto("03:00 PM", "04:00 PM"),
-                        DoctorTimeSlotDto("07:00 PM", "08:00 PM")
-                    )
+                        DoctorTimeSlotDto("10:00 AM", "11:00 AM"),
+                        DoctorTimeSlotDto("11:00 AM", "12:00 PM")
+                    ),
+                    "FRI" to listOf(DoctorTimeSlotDto("09:00 AM", "05:00 PM")),
+                    "SAT" to listOf(DoctorTimeSlotDto("09:00 AM", "05:00 PM")),
+                    "SUN" to listOf(DoctorTimeSlotDto("09:00 AM", "05:00 PM"))
                 )
             ),
             patient = PatientDto(
