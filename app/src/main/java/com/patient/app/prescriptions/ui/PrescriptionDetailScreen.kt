@@ -145,7 +145,7 @@ fun PrescriptionDetailContent(
                     brush = Brush.linearGradient(
                         colors = listOf(
                             HeaderPrimaryDarkBlue,
-                            HeaderSecondaryDarkBlue
+                            HeaderSecondaryDarkBlue.copy(alpha = 0.8f)
                         ),
                         start = Offset(0f, 0f),
                         end = Offset(1000f, 1000f)

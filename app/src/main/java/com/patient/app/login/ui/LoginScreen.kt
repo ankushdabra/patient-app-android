@@ -37,6 +37,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.patient.app.R
 import com.patient.app.core.ui.UiState
+import com.patient.app.core.ui.theme.HeaderPrimaryDarkBlue
+import com.patient.app.core.ui.theme.HeaderSecondaryDarkBlue
 import com.patient.app.core.ui.theme.HealthcareTheme
 
 @Composable
@@ -93,15 +95,15 @@ fun LoginScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight(0.42f)
+                    .fillMaxHeight(0.4f)
                     .background(
                         brush = Brush.verticalGradient(
                             colors = listOf(
-                                MaterialTheme.colorScheme.primaryContainer,
-                                MaterialTheme.colorScheme.primary
+                                HeaderPrimaryDarkBlue,
+                                HeaderSecondaryDarkBlue.copy(alpha = 0.8f)
                             )
                         ),
-                        shape = RoundedCornerShape(bottomStart = 80.dp, bottomEnd = 80.dp)
+                        shape = RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp)
                     )
             )
 

@@ -232,7 +232,7 @@ fun DoctorDetailBookingContent(
                     brush = Brush.verticalGradient(
                         colors = listOf(
                             HeaderPrimaryDarkBlue,
-                            HeaderSecondaryDarkBlue
+                            HeaderSecondaryDarkBlue.copy(alpha = 0.8f)
                         )
                     )
                 )

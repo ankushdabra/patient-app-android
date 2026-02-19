@@ -33,6 +33,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.patient.app.core.ui.theme.HeaderPrimaryDarkBlue
+import com.patient.app.core.ui.theme.HeaderSecondaryDarkBlue
 
 /**
  * A flexible header component that adapts its background icon based on the screen context.
@@ -53,8 +55,8 @@ fun DashboardHeader(
     
     val headerBrush = Brush.linearGradient(
         colors = listOf(
-            primaryColor,
-            secondaryColor
+            HeaderPrimaryDarkBlue,
+            HeaderSecondaryDarkBlue.copy(alpha = 0.8f)
         ),
         start = Offset(0f, 0f),
         end = Offset(1000f, 1000f)
