@@ -77,10 +77,8 @@ fun AuthRoute(
                 state = state,
                 onRegisterClick = viewModel::register,
                 onLoginClick = {
-                    if (!navController.popBackStack()) {
-                        navController.navigate(Routes.LOGIN) {
-                            popUpTo(Routes.REGISTER) { inclusive = true }
-                        }
+                    navController.navigate(Routes.LOGIN) {
+                        popUpTo(Routes.REGISTER) { inclusive = true }
                     }
                 }
             )
