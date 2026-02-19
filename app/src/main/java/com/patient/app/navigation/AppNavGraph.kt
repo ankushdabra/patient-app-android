@@ -1,5 +1,10 @@
 package com.patient.app.navigation
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.snap
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
@@ -35,7 +40,11 @@ fun AppNavGraph(
 
     NavHost(
         navController = navController,
-        startDestination = startDestination
+        startDestination = startDestination,
+        enterTransition = { fadeIn(animationSpec = snap()) },
+        exitTransition = { fadeOut(animationSpec = snap()) },
+        popEnterTransition = { fadeIn(animationSpec = snap()) },
+        popExitTransition = { fadeOut(animationSpec = snap()) }
     ) {
         composable(Routes.LOGIN) {
             AuthRoute(
