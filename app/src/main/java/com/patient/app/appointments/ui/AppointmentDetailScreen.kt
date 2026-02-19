@@ -1,6 +1,7 @@
 package com.patient.app.appointments.ui
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -500,25 +501,29 @@ fun AppointmentDetailContent(
                                             val isMorning = if (isPm) hour == 12 else hour < 12 || hour == 12
 
                                             Surface(
-                                                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
-                                                shape = RoundedCornerShape(8.dp)
+                                                color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4f),
+                                                shape = RoundedCornerShape(10.dp),
+                                                border = BorderStroke(
+                                                    1.dp,
+                                                    MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)
+                                                )
                                             ) {
                                                 Row(
-                                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+                                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
                                                     verticalAlignment = Alignment.CenterVertically,
-                                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
                                                 ) {
                                                     Icon(
                                                         imageVector = if (isMorning) Icons.Outlined.WbSunny else Icons.Outlined.NightsStay,
                                                         contentDescription = null,
                                                         modifier = Modifier.size(14.dp),
-                                                        tint = MaterialTheme.colorScheme.primary
+                                                        tint = MaterialTheme.colorScheme.secondary
                                                     )
                                                     Text(
                                                         text = slot.startTime,
                                                         style = MaterialTheme.typography.labelMedium,
                                                         fontWeight = FontWeight.Bold,
-                                                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                                                        color = MaterialTheme.colorScheme.onSecondaryContainer
                                                     )
                                                 }
                                             }
