@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,8 +26,10 @@ import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.outlined.AccountBalance
 import androidx.compose.material.icons.outlined.Event
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.NightsStay
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.School
+import androidx.compose.material.icons.outlined.WbSunny
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -40,6 +43,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -61,8 +65,12 @@ import com.patient.app.core.ui.theme.HeaderPrimaryDarkBlue
 import com.patient.app.core.ui.theme.HeaderSecondaryDarkBlue
 import com.patient.app.core.ui.theme.HealthcareTheme
 import com.patient.app.doctors.detail.api.DoctorDetailDto
+import com.patient.app.doctors.detail.api.DoctorTimeSlotDto
 import com.patient.app.login.api.UserDto
 import com.patient.app.prescriptions.api.PatientDto
+import java.time.LocalDate
+import java.time.format.TextStyle
+import java.util.Locale
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -156,7 +164,7 @@ fun AppointmentDetailContent(
                         shape = CircleShape
                     )
             )
-            
+
             Box(
                 modifier = Modifier
                     .offset(x = (-20).dp, y = 120.dp)
@@ -241,7 +249,8 @@ fun AppointmentDetailContent(
                             shape = RoundedCornerShape(6.dp)
                         ) {
                             Text(
-                                text = (appointment.doctor.specialization ?: "Specialist").uppercase(),
+                                text = (appointment.doctor.specialization
+                                    ?: "Specialist").uppercase(),
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -458,26 +467,61 @@ fun AppointmentDetailContent(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     } else {
-                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            appointment.doctor.availability.forEach { (day, slots) ->
+                        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                            appointment.doctor.availability.toSortedMap().forEach { (dateStr, slots) ->
+                                val dayName = remember(dateStr) {
+                                    val date = LocalDate.parse(dateStr)
+                                    date.dayOfWeek.getDisplayName(
+                                        TextStyle.SHORT,
+                                        Locale.getDefault()
+                                    )
+                                        .uppercase()
+                                }
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.Top
                                 ) {
                                     Text(
-                                        text = day,
+                                        text = dayName,
                                         style = MaterialTheme.typography.bodyMedium,
-                                        fontWeight = FontWeight.SemiBold,
-                                        color = MaterialTheme.colorScheme.primary
+                                        fontWeight = FontWeight.ExtraBold,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.width(48.dp)
                                     )
-                                    Column(horizontalAlignment = Alignment.End) {
+                                    
+                                    FlowRow(
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
                                         slots.forEach { slot ->
-                                            Text(
-                                                text = "${slot.startTime} - ${slot.endTime}",
-                                                style = MaterialTheme.typography.bodyMedium,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                                            )
+                                            val hour = slot.startTime.split(":")[0].toIntOrNull() ?: 0
+                                            val isPm = slot.startTime.contains("PM", ignoreCase = true)
+                                            val isMorning = if (isPm) hour == 12 else hour < 12 || hour == 12
+
+                                            Surface(
+                                                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
+                                                shape = RoundedCornerShape(8.dp)
+                                            ) {
+                                                Row(
+                                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+                                                    verticalAlignment = Alignment.CenterVertically,
+                                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                                ) {
+                                                    Icon(
+                                                        imageVector = if (isMorning) Icons.Outlined.WbSunny else Icons.Outlined.NightsStay,
+                                                        contentDescription = null,
+                                                        modifier = Modifier.size(14.dp),
+                                                        tint = MaterialTheme.colorScheme.primary
+                                                    )
+                                                    Text(
+                                                        text = slot.startTime,
+                                                        style = MaterialTheme.typography.labelMedium,
+                                                        fontWeight = FontWeight.Bold,
+                                                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                                                    )
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -486,7 +530,6 @@ fun AppointmentDetailContent(
                     }
                 }
             }
-
             Spacer(Modifier.height(16.dp))
         }
     }
@@ -523,7 +566,18 @@ private fun AppointmentDetailPreviewContent() {
                 consultationFee = 800.0,
                 about = null,
                 clinicAddress = "Healthcare Clinic, City Center",
-                profileImage = null
+                profileImage = null,
+                availability = mapOf(
+                    "2026-02-20" to listOf(
+                        DoctorTimeSlotDto("10:00 AM", "11:00 AM"),
+                        DoctorTimeSlotDto("12:00 PM", "01:00 PM")
+                    ),
+                    "2026-02-21" to listOf(
+                        DoctorTimeSlotDto("09:00 AM", "10:00 AM"),
+                        DoctorTimeSlotDto("03:00 PM", "04:00 PM"),
+                        DoctorTimeSlotDto("07:00 PM", "08:00 PM")
+                    )
+                )
             ),
             patient = PatientDto(
                 id = "p1",
