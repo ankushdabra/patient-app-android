@@ -64,6 +64,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -85,31 +86,8 @@ import com.patient.app.doctors.detail.viewmodel.BookingState
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.time.temporal.TemporalAdjusters
-
-// --- Utility Functions ---
-
-fun getNextDateForDay(day: String): String {
-    val dayOfWeek = when (day.uppercase()) {
-        "MON" -> DayOfWeek.MONDAY
-        "TUE" -> DayOfWeek.TUESDAY
-        "WED" -> DayOfWeek.WEDNESDAY
-        "THU" -> DayOfWeek.THURSDAY
-        "FRI" -> DayOfWeek.FRIDAY
-        "SAT" -> DayOfWeek.SATURDAY
-        "SUN" -> DayOfWeek.SUNDAY
-        else -> DayOfWeek.MONDAY
-    }
-
-    val today = LocalDate.now()
-    val nextDate = if (today.dayOfWeek == dayOfWeek) {
-        today
-    } else {
-        today.with(TemporalAdjusters.next(dayOfWeek))
-    }
-
-    return nextDate.format(DateTimeFormatter.ISO_DATE)
-}
+import java.time.format.TextStyle
+import java.util.Locale
 
 // --- Main Screen ---
 
@@ -178,9 +156,8 @@ fun BookAppointmentScreen(
                     DoctorDetailBookingContent(
                         doctor = s.data.doctor,
                         isBooking = s.data.bookingState is BookingState.Loading,
-                        onBookAppointment = { day, time ->
-                            val actualDate = getNextDateForDay(day)
-                            viewModel.bookAppointment(doctorId, actualDate, time)
+                        onBookAppointment = { date, time ->
+                            viewModel.bookAppointment(doctorId, date, time)
                         },
                         bottomPadding = padding.calculateBottomPadding()
                     )
@@ -199,10 +176,10 @@ fun DoctorDetailBookingContent(
     onBookAppointment: (String, String) -> Unit,
     bottomPadding: Dp = 0.dp
 ) {
-    val availableDays = remember(doctor.availability) {
-        doctor.availability.keys.toList().sortedBy { getNextDateForDay(it) }
+    val availableDates = remember(doctor.availability) {
+        doctor.availability.keys.toList().sorted()
     }
-    var selectedDate by remember(availableDays) { mutableStateOf(availableDays.firstOrNull()) }
+    var selectedDate by remember(availableDates) { mutableStateOf(availableDates.firstOrNull()) }
 
     val timeSlots = remember(selectedDate, doctor.availability) {
         doctor.availability[selectedDate] ?: emptyList()
@@ -429,7 +406,7 @@ fun DoctorDetailBookingContent(
                     } else {
                         DateSelector(
                             selectedDate = selectedDate,
-                            dates = availableDays,
+                            dates = availableDates,
                             onDateSelected = { selectedDate = it }
                         )
 
@@ -450,9 +427,9 @@ fun DoctorDetailBookingContent(
                 BookAppointmentButton(
                     enabled = isBookingEnabled,
                     onClick = {
-                        selectedDate?.let { day ->
+                        selectedDate?.let { date ->
                             selectedTime?.let { time ->
-                                onBookAppointment(day, time)
+                                onBookAppointment(date, time)
                             }
                         }
                     }
@@ -494,13 +471,17 @@ fun DateSelector(selectedDate: String?, dates: List<String>, onDateSelected: (St
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             contentPadding = PaddingValues(horizontal = 4.dp)
         ) {
-            items(dates) { day ->
-                val isSelected = selectedDate == day
-                val actualDate = remember(day) { LocalDate.parse(getNextDateForDay(day)) }
-                val isToday = remember(day) { actualDate == LocalDate.now() }
+            items(dates) { dateStr ->
+                val isSelected = selectedDate == dateStr
+                val actualDate = remember(dateStr) { LocalDate.parse(dateStr) }
+                val isToday = remember(dateStr) { actualDate == LocalDate.now() }
+                val isTomorrow = remember(dateStr) { actualDate == LocalDate.now().plusDays(1) }
+                val dayName = remember(actualDate) {
+                    actualDate.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault()).uppercase()
+                }
 
                 Card(
-                    onClick = { onDateSelected(day) },
+                    onClick = { onDateSelected(dateStr) },
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(
                         containerColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant.copy(
@@ -519,7 +500,13 @@ fun DateSelector(selectedDate: String?, dates: List<String>, onDateSelected: (St
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = if (isToday) "Today" else day.uppercase(),
+                            text = when {
+                                isToday -> "Today"
+                                isTomorrow -> "Tomorrow"
+                                else -> dayName
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Left,
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = if (isSelected) MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f) else MaterialTheme.colorScheme.onSurfaceVariant
@@ -527,6 +514,8 @@ fun DateSelector(selectedDate: String?, dates: List<String>, onDateSelected: (St
                         Spacer(Modifier.height(4.dp))
                         Text(
                             text = actualDate.dayOfMonth.toString(),
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Left,
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold
                         )
@@ -569,7 +558,10 @@ fun TimeSelector(selectedTime: String?, times: List<String>, onTimeSelected: (St
         ) {
             times.forEach { time ->
                 val isSelected = selectedTime == time
-                val isMorning = time.split(":")[0].toIntOrNull()?.let { it < 12 } ?: true
+                // Handle "09:00 AM" format
+                val hour = time.split(":")[0].toIntOrNull() ?: 0
+                val isPm = time.contains("PM", ignoreCase = true)
+                val isMorning = if (isPm) hour == 12 else hour < 12 || hour == 12
 
                 FilterChip(
                     selected = isSelected,
@@ -660,11 +652,11 @@ private fun BookAppointmentPreviewContent() {
             clinicAddress = "Delhi Heart Clinic, New Delhi",
             profileImage = "profile.jpg",
             availability = mapOf(
-                "MON" to listOf(
-                    DoctorTimeSlotDto("10:00", "11:00"),
-                    DoctorTimeSlotDto("12:00", "13:00")
+                "2026-02-20" to listOf(
+                    DoctorTimeSlotDto("10:00 AM", "11:00 AM"),
+                    DoctorTimeSlotDto("12:00 PM", "01:00 PM")
                 ),
-                "TUE" to listOf(DoctorTimeSlotDto("11:00", "12:00"))
+                "2026-02-21" to listOf(DoctorTimeSlotDto("11:00 AM", "12:00 PM"))
             )
         ),
         isBooking = false,
