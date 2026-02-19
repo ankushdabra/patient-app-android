@@ -3,16 +3,12 @@ package com.patient.app.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import com.patient.app.doctors.detail.ui.BookAppointmentScreen
-import com.patient.app.login.ui.AuthRoute
 import com.patient.app.core.storage.TokenManager
 import com.patient.app.dashboard.PatientDashboard
-import com.patient.app.doctors.list.ui.DoctorsListScreen
+import com.patient.app.login.ui.AuthRoute
 
 @Composable
 fun AppNavGraph(
@@ -55,35 +51,6 @@ fun AppNavGraph(
 
         composable(Routes.DASHBOARD) {
             PatientDashboard(tokenManager = tokenManager)
-        }
-
-        composable(Routes.DOCTORS) {
-            DoctorsListScreen(
-                tokenManager = tokenManager,
-                onDoctorClick = { id ->
-                    navController.navigate(
-                        "${Routes.DOCTOR_DETAIL}/$id"
-                    )
-                }
-            )
-        }
-
-        composable(
-            route = "${Routes.DOCTOR_DETAIL}/{id}",
-            arguments = listOf(
-                navArgument("id") {
-                    type = NavType.StringType
-                }
-            )
-        ) { backStackEntry ->
-
-            val doctorId =
-                backStackEntry.arguments?.getString("id")!!
-
-            BookAppointmentScreen(
-                doctorId = doctorId,
-                tokenManager = tokenManager
-            )
         }
     }
 }
