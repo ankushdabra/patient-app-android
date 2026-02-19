@@ -240,6 +240,25 @@ fun ProfileContent(
                         )
                     )
             ) {
+                Box(
+                    modifier = Modifier
+                        .offset(x = 280.dp, y = (-40).dp)
+                        .size(200.dp)
+                        .background(
+                            color = Color.White.copy(alpha = 0.06f),
+                            shape = CircleShape
+                        )
+                )
+
+                Box(
+                    modifier = Modifier
+                        .offset(x = (-30).dp, y = 110.dp)
+                        .size(120.dp)
+                        .background(
+                            color = Color.White.copy(alpha = 0.04f),
+                            shape = CircleShape
+                        )
+                )
                 // Top Bar with Menu
                 Row(
                     modifier = Modifier
@@ -558,6 +577,14 @@ fun ProfileEditableDetailRow(
 @Composable
 fun ProfileScreenPreview() {
     HealthcareTheme {
+        ProfileScreenPreviewContent()
+    }
+}
+
+@Preview(showBackground = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun ProfileScreenDarkPreview() {
+    HealthcareTheme(darkTheme = true) {
         ProfileScreenPreviewContent()
     }
 }
