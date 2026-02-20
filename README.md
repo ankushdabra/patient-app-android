@@ -23,7 +23,7 @@ Seamless authentication and registration flow.
 Discovery engine with real-time availability.
 | Doctors Discovery | Book Appointment |
 | :---: | :---: |
-| <img src="images/Doctors_VitalSync.jpg" width="300"> | <img src="images/Book_Appointment_VitalSync.jpg" width="300"> |
+| <img src="images/DoctorList_VitalSync.jpg" width="300"> | <img src="images/Book_Appointment_VitalSync.jpg" width="300"> |
 
 ### 📅 Manage Your Consultations
 Stay updated with your healthcare schedule.
