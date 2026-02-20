@@ -12,9 +12,9 @@ An elegant, modern, and high-performance Android application designed to bridge 
 | <img src="images/Login_VitalSync.jpg" width="300"> | <img src="images/Signup_VitalSync.jpg" width="300"> |
 
 ### 🩺 Find & Book Doctors
-| Doctors Discovery | Book Appointment |
-| :---: | :---: |
-| <img src="images/Doctors_VitalSync.jpg" width="300"> | <img src="images/Book_Appointment_VitalSync.jpg" width="300"> |
+|                    Doctors Discovery                    | Book Appointment |
+|:-------------------------------------------------------:| :---: |
+| <img src="images/DoctorList_VitalSync.jpg" width="300"> | <img src="images/Book_Appointment_VitalSync.jpg" width="300"> |
 
 ### 📅 Manage Consultations
 | My Appointments | Appointment Detail |
