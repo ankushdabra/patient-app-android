@@ -17,25 +17,25 @@ Explore the intuitive and polished user interface of VitalSync.
 Seamless authentication and registration flow.
 | Login | Registration |
 | :---: | :---: |
-| <img src="images/Login_VitalSync.jpg" width="300"> | <img src="images/Signup_VitalSync.jpg" width="300"> |
+| <img src="images/Login_VitalSync.jpg" width="300" align="top"> | <img src="images/Signup_VitalSync.jpg" width="300" align="top"> |
 
 ### 🩺 Find & Book Specialists
 Discovery engine with real-time availability.
 | Doctors Discovery | Book Appointment |
 | :---: | :---: |
-| <img src="images/DoctorList_VitalSync.jpg" width="300"> | <img src="images/Book_Appointment_VitalSync.jpg" width="300"> |
+| <img src="images/DoctorList_VitalSync.jpg" width="300" align="top"> | <img src="images/Book_Appointment_VitalSync.jpg" width="300" align="top"> |
 
 ### 📅 Manage Your Consultations
 Stay updated with your healthcare schedule.
 | My Appointments | Appointment Detail |
 | :---: | :---: |
-| <img src="images/My_Appointments_VitalSync.jpg" width="300"> | <img src="images/Appointment_Detail_VitalSync.jpg" width="300"> |
+| <img src="images/My_Appointments_VitalSync.jpg" width="300" align="top"> | <img src="images/Appointment_Detail_VitalSync.jpg" width="300" align="top"> |
 
 ### 📜 Digital Health Records
 Quick access to prescriptions and profile management.
 | Prescriptions | Prescription Detail | Profile |
 | :---: | :---: | :---: |
-| <img src="images/Prescriptions_VitalSync.jpg" width="250"> | <img src="images/Prescription_Detail_VitalSync.jpg" width="250"> | <img src="images/Profile_VitalSync.jpg" width="250"> |
+| <img src="images/Prescriptions_VitalSync.jpg" width="250" align="top"> | <img src="images/Prescription_Detail_VitalSync.jpg" width="250" align="top"> | <img src="images/Profile_VitalSync.jpg" width="250" align="top"> |
 
 ---
 
